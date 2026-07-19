@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AIMS Architecture Blueprint – Intent Catalog, Contracts &amp; Implementation Sequence</title>
+    <style>
+        :root { color-scheme: light only; }
+
+        body {
+            font-family: Calibri, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #000000;
+            background: #ffffff;
+            max-width: 816px;
+            margin: 0 auto;
+            padding: 72px;
+        }
+
+        h1 { font-family: Calibri, sans-serif; font-size: 24pt; font-weight: bold; margin-top: 24pt; margin-bottom: 6pt; line-height: 1.3; color: #1a1a1a; }
+        h2 { font-family: Calibri, sans-serif; font-size: 18pt; font-weight: bold; margin-top: 18pt; margin-bottom: 6pt; line-height: 1.3; color: #1a1a1a; }
+        h3 { font-family: Calibri, sans-serif; font-size: 14pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; line-height: 1.3; color: #1a1a1a; }
+        h4 { font-family: Calibri, sans-serif; font-size: 12pt; font-weight: bold; margin-top: 10pt; margin-bottom: 4pt; color: #2b5797; }
+
+        p { margin-top: 0; margin-bottom: 6pt; }
+
+        a { color: #2b5797; text-decoration: underline; }
+
+        table { border-collapse: collapse; width: 100%; margin-top: 12pt; margin-bottom: 12pt; }
+        th, td { border: 1px solid #000000; padding: 6px 8px; text-align: left; vertical-align: top; font-size: 10pt; }
+        th { font-weight: bold; background-color: #e8eef7; }
+
+        ul, ol { margin-top: 6pt; margin-bottom: 6pt; padding-left: 36px; }
+        li { margin-bottom: 3pt; }
+
+        blockquote {
+            border-left: 3px solid #2b5797;
+            margin: 12pt 0;
+            padding: 6pt 12pt;
+            color: #333333;
+            font-style: italic;
+            background-color: #f4f7fc;
+        }
+
+        .callout {
+            border: 1px solid #cccccc;
+            border-left: 4px solid #cccccc;
+            background-color: #f9f9f9;
+            padding: 10px 14px;
+            margin: 12pt 0;
+        }
+        .callout-label {
+            font-weight: bold;
+            margin-bottom: 4pt;
+            font-size: 10pt;
+        }
+        .callout-note { border-left-color: #2b5797; background-color: #e8eef7; }
+        .callout-warning { border-left-color: #cc0000; background-color: #fce8e8; }
+        .callout-important { border-left-color: #cc7a00; background-color: #fff4e0; }
+
+        pre {
+            font-family: Consolas, monospace;
+            font-size: 9pt;
+            background-color: #f5f5f5;
+            border: 1px solid #cccccc;
+            border-left: 3px solid #2b5797;
+            padding: 10px 14px;
+            margin: 10pt 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+
+        code {
+            font-family: Consolas, monospace;
+            font-size: 9pt;
+            background-color: #f0f0f0;
+            padding: 1px 4px;
+            color: #1a1a1a;
+        }
+
+        .title-block {
+            border-bottom: 3px solid #2b5797;
+            padding-bottom: 16pt;
+            margin-bottom: 24pt;
+        }
+        .title-block h1 {
+            font-size: 26pt;
+            color: #2b5797;
+            margin-top: 0;
+            margin-bottom: 4pt;
+        }
+        .title-block .subtitle {
+            font-size: 14pt;
+            color: #1a1a1a;
+            font-weight: bold;
+            margin-bottom: 4pt;
+        }
+        .title-block .meta {
+            font-size: 10pt;
+            color: #444444;
+            margin-bottom: 2pt;
+        }
+        .title-block .badge-row {
+            margin-top: 10pt;
+        }
+        .badge {
+            display: inline;
+            font-size: 9pt;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #2b5797;
+            padding: 2px 8px;
+            margin-right: 6px;
+            letter-spacing: 0.5px;
+        }
+        .badge-orange { background-color: #cc7a00; }
+        .badge-green { background-color: #2e7d32; }
+        .badge-grey { background-color: #555555; }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid #2b5797;
+            margin: 20pt 0 12pt 0;
+        }
+
+        .footer-note {
+            border-top: 1px solid #cccccc;
+            margin-top: 36pt;
+            padding-top: 8pt;
+            font-size: 9pt;
+            color: #666666;
+            font-style: italic;
+        }
+
+        .toc-entry {
+            margin-bottom: 3pt;
+            font-size: 10pt;
+        }
+        .toc-entry a {
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+        .toc-entry .toc-page {
+            color: #666666;
+            font-size: 9pt;
+        }
+        .toc-indent { padding-left: 24px; }
+        .toc-indent2 { padding-left: 48px; }
+
+        .sprint-approved { color: #2e7d32; font-weight: bold; }
+        .sprint-next { color: #cc7a00; font-weight: bold; }
+        .sprint-planned { color: #2b5797; font-weight: bold; }
+        .sprint-backlog { color: #555555; font-weight: bold; }
+
+        .kv-label { font-weight: bold; color: #2b5797; }
+
+        @media print { body { padding: 0; max-width: none; } pre { white-space: pre-wrap; } }
+    </style>
+</head>
+<body data-id="0" class="theme-professional">
+
+    <!-- ═══════════════════════════════════════════════════════ TITLE BLOCK -->
+    <div data-id="1" class="title-block">
+        <div data-id="2" class="meta">INTERNAL ENGINEERING REFERENCE &nbsp;·&nbsp; CONFIDENTIAL</div>
+        <h1 data-id="3">AIMS Architecture Blueprint</h1>
+        <div data-id="4" class="subtitle">Intent Catalog &nbsp;·&nbsp; Contracts &nbsp;·&nbsp; Component Registry &nbsp;·&nbsp; Implementation Sequence</div>
+        <div data-id="5" class="meta" style="margin-top:8pt;">
+            <span data-id="6" class="kv-label">Version:</span> 1.0 &nbsp;&nbsp;
+            <span data-id="7" class="kv-label">Date:</span> 19 July 2026 &nbsp;&nbsp;
+            <span data-id="8" class="kv-label">Prepared by:</span> Nalin &nbsp;&nbsp;
+            <span data-id="9" class="kv-label">Location:</span> Bethany, OR, United States
+        </div>
+        <div data-id="10" class="meta">
+            <span data-id="11" class="kv-label">Classification:</span> Confidential — Internal Engineering Use Only
+        </div>
+        <div data-id="12" class="badge-row">
+            <span data-id="13" class="badge">AG-UI</span>
+            <span data-id="14" class="badge badge-orange">A2UI</span>
+            <span data-id="15" class="badge badge-green">Gemma-4-2B-IT</span>
+            <span data-id="16" class="badge badge-grey">CRDT Sync</span>
+            <span data-id="17" class="badge badge-grey">Evidence Chain</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ TOC -->
+    <h2 data-id="18">Table of Contents</h2>
+    <div data-id="19" class="toc-entry"><strong data-id="20">Executive Summary</strong></div>
+    <div data-id="21" class="toc-entry toc-indent">Section 1 — VS Code Copilot Proposed Sequence</div>
+    <div data-id="22" class="toc-entry toc-indent">Section 2 — Additional Suggestions (Copilot Additions)</div>
+    <div data-id="23" class="toc-entry toc-indent">Section 3 — System Architecture Layers</div>
+    <div data-id="24" class="toc-entry toc-indent">Section 4 — AG-UI Transport Layer</div>
+    <div data-id="25" class="toc-entry toc-indent2">4.1 Core Events &nbsp;|&nbsp; 4.2 Thread Persistence Strategy &nbsp;|&nbsp; 4.3 AIMSThread Interface</div>
+    <div data-id="26" class="toc-entry toc-indent">Section 5 — A2UI Workspace Layer</div>
+    <div data-id="27" class="toc-entry toc-indent2">5.1 Render Pipeline &nbsp;|&nbsp; 5.2 Authorization Gate</div>
+    <div data-id="28" class="toc-entry toc-indent">Section 6 — Shared Request/Response Envelope</div>
+    <div data-id="29" class="toc-entry toc-indent">Section 7 — Planner Intent Catalog</div>
+    <div data-id="30" class="toc-entry toc-indent">Section 8 — Reviewer Intent Catalog</div>
+    <div data-id="31" class="toc-entry toc-indent">Section 9 — Supervisor Intent Catalog</div>
+    <div data-id="32" class="toc-entry toc-indent">Section 10 — Inspector / Gemma Intent Catalog</div>
+    <div data-id="33" class="toc-entry toc-indent">Section 11 — Evidence Chain Governance Contract</div>
+    <div data-id="34" class="toc-entry toc-indent">Section 12 — Escalation Protocol</div>
+    <div data-id="35" class="toc-entry toc-indent">Section 13 — Offline-First CRDT Sync Contract</div>
+    <div data-id="36" class="toc-entry toc-indent">Section 14 — Agent-to-Agent (A2A) Handoff Envelope</div>
+    <div data-id="37" class="toc-entry toc-indent">Section 15 — Trusted Renderer Catalog</div>
+    <div data-id="38" class="toc-entry toc-indent">Section 16 — Authorization Matrix</div>
+    <div data-id="39" class="toc-entry toc-indent">Section 17 — Multi-Modal Intent Router</div>
+    <div data-id="40" class="toc-entry toc-indent">Section 18 — Regulatory Schema Mapper</div>
+    <div data-id="41" class="toc-entry toc-indent">Section 19 — Implementation Sequence — Full 15-Step Roadmap</div>
+    <div data-id="42" class="toc-entry toc-indent">Appendix A — Glossary</div>
+
+    <hr data-id="43" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ EXECUTIVE SUMMARY -->
+    <h2 data-id="44">Executive Summary</h2>
+
+    <p data-id="45">AIMS (Asset Integrity Management System) adopts a three-layer agentic architecture that enforces a strict separation between agent intent, workspace rendering, and deterministic execution. The three primary layers are:</p>
+
+    <ol data-id="46">
+        <li data-id="47"><strong data-id="48">AG-UI</strong> — Persistent agent session and event transport (threadId, SSE events, message snapshots, state)</li>
+        <li data-id="49"><strong data-id="50">A2UI</strong> — Dynamically generated workspaces proposed by agents, rendered from a trusted component catalog</li>
+        <li data-id="51"><strong data-id="52">AIMS Trusted Renderer Catalog</strong> — The deterministic, role-authorized component registry that agents may reference but never bypass</li>
+    </ol>
+
+    <div data-id="53" class="callout callout-note">
+        <div data-id="54" class="callout-label">Core Principle (VS Code Copilot)</div>
+        The agent may propose the UI and action. Authorization and execution remain in deterministic backend services.
+    </div>
+
+    <p data-id="55">An additional fourth sub-layer is introduced via the <strong data-id="56">Inspector layer</strong>: <strong data-id="57">Gemma-4-2B-IT</strong>, an on-device language model that operates fully offline and escalates to cloud orchestrators via a governed A2A envelope when confidence thresholds are breached or cloud intervention is required. This offline-capable intelligence layer enables field inspection in zero-connectivity environments while preserving full evidence integrity.</p>
+
+    <p data-id="58">This document is the authoritative engineering reference synthesizing recommendations from VS Code Copilot and supplementary Copilot additions into a single, actionable blueprint. It defines all intent catalogs, typed contracts, the component registry, the authorization matrix, and the full 15-step implementation roadmap.</p>
+
+    <hr data-id="59" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 1 -->
+    <h2 data-id="60">Section 1: VS Code Copilot Proposed Sequence</h2>
+
+    <p data-id="61">The following sequence was proposed by Copilot in VS Code and is adopted as the foundational implementation path. All subsequent additions build on top of this sequence without replacing it.</p>
+
+    <h3 data-id="62">Proposed Next Sequence</h3>
+    <ol data-id="63">
+        <li data-id="64">Define the Planner intent catalog and shared request/response envelope</li>
+        <li data-id="65">Define the first approved A2UI components</li>
+        <li data-id="66">Add real AG-UI threadId, message snapshots, state, and run events</li>
+        <li data-id="67">Replace sessionStorage as the source of truth with backend thread persistence</li>
+        <li data-id="68">Fill the left navigation and route each destination to its current session surface</li>
+        <li data-id="69">Connect the first three production intents:
+            <ul data-id="70">
+                <li data-id="71"><code data-id="72">planner_session_brief</code></li>
+                <li data-id="73"><code data-id="74">show_field_ready_assignments</code></li>
+                <li data-id="75"><code data-id="76">prepare_assignment_release</code></li>
+            </ul>
+        </li>
+        <li data-id="77">Add risk, readiness, scheduling, and evidence contracts incrementally</li>
+    </ol>
+
+    <h3 data-id="78">Architectural Recommendation (VS Code Copilot)</h3>
+    <blockquote data-id="79">
+        AG-UI for the persistent agent session and event transport; A2UI for the dynamically generated workspace; our existing AIMS components as the trusted renderer catalog.
+    </blockquote>
+
+    <hr data-id="80" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 2 -->
+    <h2 data-id="81">Section 2: Additional Suggestions (Copilot Additions)</h2>
+
+    <p data-id="82">Building on the VS Code Copilot foundation, the following additions extend the architecture to cover the Inspector/Gemma offline layer, evidence governance, multi-modal routing, and regulatory compliance mapping.</p>
+
+    <h3 data-id="83">Additional Sequence Steps (8–15)</h3>
+    <ol data-id="84" start="8">
+        <li data-id="85"><strong data-id="86">Inspector/Gemma intent catalog + A2A handoff envelope</strong> — Define the full on-device intent set for Gemma-4-2B-IT and the standardized envelope for escalation to cloud agents</li>
+        <li data-id="87"><strong data-id="88">Offline-first CRDT sync contract + conflict resolution</strong> — Vector clock-based delta sync for Inspector PWA; SQLite local store, priority-ordered sync queue</li>
+        <li data-id="89"><strong data-id="90">Evidence chain governance contract</strong> — SHA-256 hash-chaining at capture, tamper detection hooks, chain-break alerts</li>
+        <li data-id="91"><strong data-id="92">Escalation protocol: Gemma → Cloud orchestrator priority routing</strong> — Threshold-triggered, confidence-gated, offline-queued escalation pipeline</li>
+        <li data-id="93"><strong data-id="94">Component Authorization Matrix (role × component × action trust level)</strong> — Server-enforced gate before any COMPONENT_RENDER event is emitted</li>
+        <li data-id="95"><strong data-id="96">Reviewer + Supervisor full intent catalogs</strong> — Complete intent definitions for all three cloud roles</li>
+        <li data-id="97"><strong data-id="98">Multi-modal intent router (text · voice · image → agent mapping)</strong> — Single entry point for all modalities; routes to correct agent based on content type and role</li>
+        <li data-id="99"><strong data-id="100">Regulatory schema mapper (API 653 · PSSR · ATEX · ISO 55001 · DNV GL)</strong> — Local cached schema vault for Inspector; cloud-authoritative version for Reviewer/Supervisor</li>
+    </ol>
+
+    <hr data-id="101" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 3 -->
+    <h2 data-id="102">Section 3: System Architecture Layers</h2>
+
+    <p data-id="103">The AIMS system is decomposed into six vertical layers. L1 through L2 support offline-first field operations; L3 through L6 are cloud-resident and require connectivity. All layers communicate via the AG-UI protocol or the CRDT sync engine.</p>
+
+    <table data-id="104">
+        <thead data-id="105">
+            <tr data-id="106">
+                <th data-id="107">Layer</th>
+                <th data-id="108">Name</th>
+                <th data-id="109">Components</th>
+                <th data-id="110">Connectivity</th>
+            </tr>
+        </thead>
+        <tbody data-id="111">
+            <tr data-id="112">
+                <td data-id="113"><strong data-id="114">L1</strong></td>
+                <td data-id="115">Field Edge</td>
+                <td data-id="116">Inspector PWA · Gemma-4-2B-IT · Local Evidence Cache · SQLite</td>
+                <td data-id="117">Offline-first</td>
+            </tr>
+            <tr data-id="118">
+                <td data-id="119"><strong data-id="120">L2</strong></td>
+                <td data-id="121">Transport</td>
+                <td data-id="122">AG-UI Protocol · threadId · SSE Events · CRDT Sync Engine</td>
+                <td data-id="123">Bidirectional</td>
+            </tr>
+            <tr data-id="124">
+                <td data-id="125"><strong data-id="126">L3</strong></td>
+                <td data-id="127">Workspace</td>
+                <td data-id="128">A2UI Dynamic Renderer · Planner/Reviewer/Supervisor Workspaces · Auth Gate</td>
+                <td data-id="129">Online</td>
+            </tr>
+            <tr data-id="130">
+                <td data-id="131"><strong data-id="132">L4</strong></td>
+                <td data-id="133">Orchestration</td>
+                <td data-id="134">SchedulerAgent · DispatchAgent · CaptureAgent · AnalysisAgent · ReviewAgent · SubmitAgent</td>
+                <td data-id="135">Online</td>
+            </tr>
+            <tr data-id="136">
+                <td data-id="137"><strong data-id="138">L5</strong></td>
+                <td data-id="139">Governance</td>
+                <td data-id="140">Evidence Hash Chain · Audit Log · Regulatory Schema Mapper</td>
+                <td data-id="141">Online</td>
+            </tr>
+            <tr data-id="142">
+                <td data-id="143"><strong data-id="144">L6</strong></td>
+                <td data-id="145">Persistence</td>
+                <td data-id="146">Thread Store (Redis/PostgreSQL) · Evidence DB · Asset Registry · Work Order DB</td>
+                <td data-id="147">Online</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="148" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 4 -->
+    <h2 data-id="149">Section 4: AG-UI Transport Layer</h2>
+
+    <h3 data-id="150">4.1 Core Events</h3>
+
+    <p data-id="151">All events are transmitted via Server-Sent Events (SSE) over the AG-UI protocol. The event stream is keyed by <code data-id="152">threadId</code> and multiplexed across concurrent runs within the same thread. Events are immutable once emitted and are persisted to the audit trail.</p>
+
+    <table data-id="153">
+        <thead data-id="154">
+            <tr data-id="155">
+                <th data-id="156">Event</th>
+                <th data-id="157">Direction</th>
+                <th data-id="158">Key Payload Fields</th>
+                <th data-id="159">Trigger</th>
+            </tr>
+        </thead>
+        <tbody data-id="160">
+            <tr data-id="161">
+                <td data-id="162"><code data-id="163">RUN_STARTED</code></td>
+                <td data-id="164">Server→Client</td>
+                <td data-id="165">threadId, runId, agentId, role, timestamp</td>
+                <td data-id="166">Intent dispatched</td>
+            </tr>
+            <tr data-id="167">
+                <td data-id="168"><code data-id="169">TEXT_DELTA</code></td>
+                <td data-id="170">Server→Client</td>
+                <td data-id="171">runId, delta, chunkIndex</td>
+                <td data-id="172">Agent streaming</td>
+            </tr>
+            <tr data-id="173">
+                <td data-id="174"><code data-id="175">TOOL_CALL</code></td>
+                <td data-id="176">Server→Client</td>
+                <td data-id="177">runId, toolName, args, callId</td>
+                <td data-id="178">Agent action</td>
+            </tr>
+            <tr data-id="179">
+                <td data-id="180"><code data-id="181">TOOL_RESULT</code></td>
+                <td data-id="182">Client→Server</td>
+                <td data-id="183">callId, result, status</td>
+                <td data-id="184">Action complete</td>
+            </tr>
+            <tr data-id="185">
+                <td data-id="186"><code data-id="187">STATE_SNAPSHOT</code></td>
+                <td data-id="188">Server→Client</td>
+                <td data-id="189">threadId, state, version</td>
+                <td data-id="190">State hydration</td>
+            </tr>
+            <tr data-id="191">
+                <td data-id="192"><code data-id="193">RUN_FINISHED</code></td>
+                <td data-id="194">Server→Client</td>
+                <td data-id="195">runId, finalState, duration</td>
+                <td data-id="196">Run complete</td>
+            </tr>
+            <tr data-id="197">
+                <td data-id="198"><code data-id="199">COMPONENT_RENDER</code></td>
+                <td data-id="200">Server→Client</td>
+                <td data-id="201">componentId, props, authToken</td>
+                <td data-id="202">A2UI render signal</td>
+            </tr>
+            <tr data-id="203">
+                <td data-id="204"><code data-id="205">ESCALATION_QUEUED</code></td>
+                <td data-id="206">Server→Client</td>
+                <td data-id="207">escalationId, priority, routing</td>
+                <td data-id="208">Threshold breach</td>
+            </tr>
+            <tr data-id="209">
+                <td data-id="210"><code data-id="211">SYNC_DELTA</code></td>
+                <td data-id="212">Bidirectional</td>
+                <td data-id="213">deviceId, records[], crdt_vector</td>
+                <td data-id="214">Offline sync merge</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="215">4.2 Thread Persistence Strategy</h3>
+
+    <p data-id="216">sessionStorage is replaced by a two-tier durable thread store. This ensures that no agent context is lost across browser refreshes, device reconnects, or application restarts.</p>
+
+    <ul data-id="217">
+        <li data-id="218"><strong data-id="219">Hot tier — Redis:</strong> Threads active within last 24 hours; sub-millisecond lookup by threadId</li>
+        <li data-id="220"><strong data-id="221">Cold tier — PostgreSQL:</strong> Archived threads; full audit trail; queryable by threadId, userId, agentId, and date range</li>
+        <li data-id="222"><strong data-id="223">Inspector local — SQLite:</strong> On-device persistence for Gemma threads; merged to cloud on sync via vector clock reconciliation</li>
+        <li data-id="224"><strong data-id="225">Hydration on reconnect:</strong> Replay last N STATE_SNAPSHOT events to restore full workspace context without re-executing agent logic</li>
+    </ul>
+
+    <h3 data-id="226">4.3 AIMSThread Interface</h3>
+
+<pre data-id="227">interface AIMSThread {
+  threadId: string;           // UUIDv7 — time-ordered
+  role: 'planner' | 'reviewer' | 'supervisor' | 'inspector';
+  agentId: string;
+  deviceId?: string;          // Set for Inspector/Gemma threads only
+  messages: MessageSnapshot[];
+  state: WorkspaceState;
+  runs: RunRecord[];
+  createdAt: string;          // ISO 8601 UTC
+  lastActiveAt: string;
+  persistenceLayer: 'redis' | 'postgres' | 'sqlite-local';
+  syncVector?: CRDTVector;    // Inspector only — for CRDT merge
+}</pre>
+
+    <hr data-id="228" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 5 -->
+    <h2 data-id="229">Section 5: A2UI Workspace Layer</h2>
+
+    <h3 data-id="230">5.1 Render Pipeline</h3>
+
+    <p data-id="231">The A2UI render pipeline enforces a strict authorization gate between agent intent and component rendering. No component may be mounted without a valid orchestrator-signed token and role-based approval. The eight-step pipeline is:</p>
+
+    <ol data-id="232">
+        <li data-id="233">Agent resolves intent → emits <code data-id="234">componentId</code></li>
+        <li data-id="235"><code data-id="236">COMPONENT_RENDER</code> event emitted via AG-UI SSE</li>
+        <li data-id="237"><strong data-id="238">Authorization Gate</strong> checks: role × componentId × action → ALLOW / DENY</li>
+        <li data-id="239">Component resolved from Trusted Renderer Catalog</li>
+        <li data-id="240">Props validated against component contract schema (Zod)</li>
+        <li data-id="241">Component mounted in workspace pane with fade transition</li>
+        <li data-id="242">User action → deterministic backend handler (never the agent directly)</li>
+        <li data-id="243">Result fed back as <code data-id="244">TOOL_RESULT</code> into AG-UI thread</li>
+    </ol>
+
+    <div data-id="245" class="callout callout-warning">
+        <div data-id="246" class="callout-label">Security Invariant</div>
+        At no point does an agent directly execute an action on behalf of the user. All user-visible actions flow through the Authorization Gate and deterministic backend handlers. The agent may propose; it may never execute.
+    </div>
+
+    <h3 data-id="247">5.2 Authorization Gate</h3>
+
+<pre data-id="248">async function authorizeRender(
+  event: ComponentRenderEvent,
+  session: AIMSSession
+): Promise&lt;AuthDecision&gt; {
+  const { componentId, props, authToken } = event;
+  const { role, threadId } = session;
+
+  // 1. Verify authToken signed by orchestrator (not the agent)
+  const verified = await verifyOrchestratorSignature(authToken);
+  if (!verified) return { allow: false, reason: 'invalid_auth_token' };
+
+  // 2. Check role × component authorization matrix
+  const allowed = AUTH_MATRIX[role]?.[componentId];
+  if (!allowed) return { allow: false, reason: 'role_not_permitted' };
+
+  // 3. Validate props schema (Zod)
+  const valid = validateProps(componentId, props);
+  if (!valid) return { allow: false, reason: 'invalid_props_schema' };
+
+  // 4. Log render event to evidence chain audit log
+  await logToAuditChain({ threadId, componentId, role, timestamp: now() });
+
+  return { allow: true, resolvedComponent: CATALOG[componentId] };
+}</pre>
+
+    <hr data-id="249" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 6 -->
+    <h2 data-id="250">Section 6: Shared Request/Response Envelope</h2>
+
+    <p data-id="251">All intents across all roles share a common typed envelope. This ensures consistent authentication, audit trail generation, and Gemma context propagation. Intent-specific payloads are contained in the <code data-id="252">payload</code> field.</p>
+
+    <h3 data-id="253">BaseIntentRequest</h3>
+
+<pre data-id="254">interface BaseIntentRequest {
+  // AG-UI identifiers
+  threadId: string;           // UUIDv7
+  runId?: string;             // Auto-assigned by orchestrator
+
+  // Session
+  intent: string;             // e.g. 'planner_session_brief'
+  role: AIMSRole;
+  userId: string;
+  deviceId?: string;          // Inspector PWA device fingerprint
+
+  // Evidence chain
+  sessionNonce: string;       // Single-use — prevents replay attacks
+  requestedAt: string;        // ISO 8601 UTC
+
+  // Gemma context (Inspector only)
+  gemmaContext?: {
+    modelVersion: string;     // '4-2B-IT-INT4'
+    inferenceMs: number;
+    confidence?: number;      // 0–1
+    offlineDurationSecs?: number;
+  };
+
+  // Intent-specific payload
+  payload: Record&lt;string, unknown&gt;;
+}</pre>
+
+    <h3 data-id="255">BaseIntentResponse</h3>
+
+<pre data-id="256">interface BaseIntentResponse {
+  threadId: string;
+  runId: string;
+  intent: string;
+
+  // A2UI render instruction
+  render: {
+    componentId: string;      // Must exist in trusted catalog
+    props: Record&lt;string, unknown&gt;;
+    authToken: string;        // Orchestrator-signed JWT
+    ttl: number;              // Component TTL in seconds
+  };
+
+  // Evidence
+  responseHash: string;       // SHA-256 of full payload
+  respondedAt: string;
+  agentId: string;
+
+  // Error handling
+  error?: {
+    code: string;
+    message: string;
+    retryable: boolean;
+  };
+
+  // Escalation (if triggered by this intent)
+  escalation?: EscalationRecord;
+}</pre>
+
+    <hr data-id="257" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 7 -->
+    <h2 data-id="258">Section 7: Planner Intent Catalog</h2>
+
+    <h3 data-id="259">Production Intents — Sprint 1</h3>
+
+    <h4 data-id="260">planner_session_brief</h4>
+    <table data-id="261">
+        <tbody data-id="262">
+            <tr data-id="263"><td data-id="264"><strong data-id="265">Agent</strong></td><td data-id="266">SchedulerAgent</td></tr>
+            <tr data-id="267"><td data-id="268"><strong data-id="269">Component</strong></td><td data-id="270"><code data-id="271">&lt;PlannerBriefCard /&gt;</code></td></tr>
+            <tr data-id="272"><td data-id="273"><strong data-id="274">Trust Level</strong></td><td data-id="275">READ</td></tr>
+            <tr data-id="276"><td data-id="277"><strong data-id="278">Purpose</strong></td><td data-id="279">Load planner's daily briefing — risk-ranked work orders, agent deployment status, schedule completion rate</td></tr>
+            <tr data-id="280"><td data-id="281"><strong data-id="282">Request Payload</strong></td><td data-id="283"><code data-id="284">{ plannerUserId, date }</code></td></tr>
+            <tr data-id="285"><td data-id="286"><strong data-id="287">Response</strong></td><td data-id="288"><code data-id="289">{ workOrders[], agentStatus, kpis, riskQueue[] }</code></td></tr>
+        </tbody>
+    </table>
+
+    <h4 data-id="290">show_field_ready_assignments</h4>
+    <table data-id="291">
+        <tbody data-id="292">
+            <tr data-id="293"><td data-id="294"><strong data-id="295">Agent</strong></td><td data-id="296">DispatchAgent</td></tr>
+            <tr data-id="297"><td data-id="298"><strong data-id="299">Component</strong></td><td data-id="300"><code data-id="301">&lt;FieldReadyAssignmentTable /&gt;</code></td></tr>
+            <tr data-id="302"><td data-id="303"><strong data-id="304">Trust Level</strong></td><td data-id="305">READ</td></tr>
+            <tr data-id="306"><td data-id="307"><strong data-id="308">Purpose</strong></td><td data-id="309">Display assignments where field conditions, permits, and agent availability are confirmed green</td></tr>
+            <tr data-id="310"><td data-id="311"><strong data-id="312">Request Payload</strong></td><td data-id="313"><code data-id="314">{ date, zone? }</code></td></tr>
+            <tr data-id="315"><td data-id="316"><strong data-id="317">Response</strong></td><td data-id="318"><code data-id="319">{ assignments[], readinessMap, permitStatus[] }</code></td></tr>
+        </tbody>
+    </table>
+
+    <h4 data-id="320">prepare_assignment_release</h4>
+    <table data-id="321">
+        <tbody data-id="322">
+            <tr data-id="323"><td data-id="324"><strong data-id="325">Agent</strong></td><td data-id="326">DispatchAgent</td></tr>
+            <tr data-id="327"><td data-id="328"><strong data-id="329">Component</strong></td><td data-id="330"><code data-id="331">&lt;AssignmentReleaseConfirm /&gt;</code></td></tr>
+            <tr data-id="332"><td data-id="333"><strong data-id="334">Trust Level</strong></td><td data-id="335">CONFIRM</td></tr>
+            <tr data-id="336"><td data-id="337"><strong data-id="338">Purpose</strong></td><td data-id="339">Stage work orders for release — preflight: permits, PPE, agent assigned, route planned</td></tr>
+            <tr data-id="340"><td data-id="341"><strong data-id="342">Request Payload</strong></td><td data-id="343"><code data-id="344">{ workOrderIds[], releasedBy }</code></td></tr>
+            <tr data-id="345"><td data-id="346"><strong data-id="347">Response</strong></td><td data-id="348"><code data-id="349">{ releasePackage, preflightChecks[], confirmationToken }</code></td></tr>
+            <tr data-id="350"><td data-id="351"><strong data-id="352">Note</strong></td><td data-id="353">User must explicitly confirm before backend executes. Confirmation token is single-use.</td></tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="354">Next Sprint Intents</h3>
+    <table data-id="355">
+        <thead data-id="356">
+            <tr data-id="357"><th data-id="358">Intent</th><th data-id="359">Agent</th><th data-id="360">Component</th><th data-id="361">Purpose</th></tr>
+        </thead>
+        <tbody data-id="362">
+            <tr data-id="363">
+                <td data-id="364"><code data-id="365">generate_work_orders</code></td>
+                <td data-id="366">SchedulerAgent</td>
+                <td data-id="367">WorkOrderGeneratorPanel</td>
+                <td data-id="368">Risk-ranked WO generation from asset registry + regulatory calendar</td>
+            </tr>
+            <tr data-id="369">
+                <td data-id="370"><code data-id="371">optimize_field_routes</code></td>
+                <td data-id="372">DispatchAgent</td>
+                <td data-id="373">RouteOptimizationMap</td>
+                <td data-id="374">Multi-zone route optimization</td>
+            </tr>
+            <tr data-id="375">
+                <td data-id="376"><code data-id="377">risk_rank_asset_queue</code></td>
+                <td data-id="378">SchedulerAgent</td>
+                <td data-id="379">RiskRankingTable</td>
+                <td data-id="380">Score assets by risk factors</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="381">Backlog Intents</h3>
+    <table data-id="382">
+        <thead data-id="383">
+            <tr data-id="384"><th data-id="385">Intent</th><th data-id="386">Agent</th><th data-id="387">Component</th></tr>
+        </thead>
+        <tbody data-id="388">
+            <tr data-id="389"><td data-id="390"><code data-id="391">deploy_agent_assignments</code></td><td data-id="392">DispatchAgent</td><td data-id="393">AgentDeployConsole</td></tr>
+            <tr data-id="394"><td data-id="395"><code data-id="396">schedule_calendar_view</code></td><td data-id="397">SchedulerAgent</td><td data-id="398">InspectionCalendar</td></tr>
+            <tr data-id="399"><td data-id="400"><code data-id="401">asset_search_filter</code></td><td data-id="402">SchedulerAgent</td><td data-id="403">AssetSearchPanel</td></tr>
+        </tbody>
+    </table>
+
+    <hr data-id="404" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 8 -->
+    <h2 data-id="405">Section 8: Reviewer Intent Catalog</h2>
+
+    <table data-id="406">
+        <thead data-id="407">
+            <tr data-id="408"><th data-id="409">Intent</th><th data-id="410">Status</th><th data-id="411">Agent(s)</th><th data-id="412">Component</th><th data-id="413">Trust Level</th></tr>
+        </thead>
+        <tbody data-id="414">
+            <tr data-id="415">
+                <td data-id="416"><code data-id="417">load_evidence_review_queue</code></td>
+                <td data-id="418">Next Sprint</td>
+                <td data-id="419">ReviewAgent</td>
+                <td data-id="420">EvidenceReviewQueue</td>
+                <td data-id="421">READ</td>
+            </tr>
+            <tr data-id="422">
+                <td data-id="423"><code data-id="424">open_evidence_record</code></td>
+                <td data-id="425">Next Sprint</td>
+                <td data-id="426">ReviewAgent + AnalysisAgent</td>
+                <td data-id="427">EvidenceRecordViewer</td>
+                <td data-id="428">READ</td>
+            </tr>
+            <tr data-id="429">
+                <td data-id="430"><code data-id="431">approve_evidence_record</code></td>
+                <td data-id="432">Next Sprint</td>
+                <td data-id="433">ReviewAgent (proposes) → Backend</td>
+                <td data-id="434">ApprovalFlowPanel</td>
+                <td data-id="435">SIGN</td>
+            </tr>
+            <tr data-id="436">
+                <td data-id="437"><code data-id="438">flag_anomaly</code></td>
+                <td data-id="439">Backlog</td>
+                <td data-id="440">AnalysisAgent</td>
+                <td data-id="441">AnomalyReportBuilder</td>
+                <td data-id="442">ACTION</td>
+            </tr>
+            <tr data-id="443">
+                <td data-id="444"><code data-id="445">request_field_rework</code></td>
+                <td data-id="446">Backlog</td>
+                <td data-id="447">ReviewAgent</td>
+                <td data-id="448">ReworkRequestPanel</td>
+                <td data-id="449">ACTION</td>
+            </tr>
+            <tr data-id="450">
+                <td data-id="451"><code data-id="452">verify_hash_chain</code></td>
+                <td data-id="453">Backlog</td>
+                <td data-id="454">ReviewAgent (read-only)</td>
+                <td data-id="455">HashChainVerifier</td>
+                <td data-id="456">READ</td>
+            </tr>
+            <tr data-id="457">
+                <td data-id="458"><code data-id="459">defect_analytics_view</code></td>
+                <td data-id="460">Backlog</td>
+                <td data-id="461">AnalysisAgent</td>
+                <td data-id="462">DefectAnalyticsDashboard</td>
+                <td data-id="463">READ</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div data-id="464" class="callout callout-important">
+        <div data-id="465" class="callout-label">Critical Note — approve_evidence_record</div>
+        Approval execution is fully deterministic. The agent pre-fills the checklist and summary. The engineer provides cryptographic co-sign. No agent can approve a record autonomously. This constraint is enforced at the Authorization Gate level, not merely by convention.
+    </div>
+
+    <hr data-id="466" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 9 -->
+    <h2 data-id="467">Section 9: Supervisor Intent Catalog</h2>
+
+    <table data-id="468">
+        <thead data-id="469">
+            <tr data-id="470"><th data-id="471">Intent</th><th data-id="472">Status</th><th data-id="473">Agent(s)</th><th data-id="474">Component</th><th data-id="475">Trust Level</th></tr>
+        </thead>
+        <tbody data-id="476">
+            <tr data-id="477">
+                <td data-id="478"><code data-id="479">load_fleet_operations_brief</code></td>
+                <td data-id="480">Next Sprint</td>
+                <td data-id="481">All (aggregated)</td>
+                <td data-id="482">FleetOperationsCenter</td>
+                <td data-id="483">READ</td>
+            </tr>
+            <tr data-id="484">
+                <td data-id="485"><code data-id="486">review_escalation_queue</code></td>
+                <td data-id="487">Next Sprint</td>
+                <td data-id="488">All escalation sources</td>
+                <td data-id="489">EscalationBoard</td>
+                <td data-id="490">ACTION</td>
+            </tr>
+            <tr data-id="491">
+                <td data-id="492"><code data-id="493">agent_health_dashboard</code></td>
+                <td data-id="494">Next Sprint</td>
+                <td data-id="495">Orchestrator (meta)</td>
+                <td data-id="496">AgentHealthPanel</td>
+                <td data-id="497">READ</td>
+            </tr>
+            <tr data-id="498">
+                <td data-id="499"><code data-id="500">compliance_report_view</code></td>
+                <td data-id="501">Backlog</td>
+                <td data-id="502">SubmitAgent</td>
+                <td data-id="503">ComplianceReportViewer</td>
+                <td data-id="504">READ</td>
+            </tr>
+            <tr data-id="505">
+                <td data-id="506"><code data-id="507">supervisor_override</code></td>
+                <td data-id="508">Backlog</td>
+                <td data-id="509">Supervisor only</td>
+                <td data-id="510">OverrideConsole</td>
+                <td data-id="511">OVERRIDE</td>
+            </tr>
+            <tr data-id="512">
+                <td data-id="513"><code data-id="514">kpi_analytics_dashboard</code></td>
+                <td data-id="515">Backlog</td>
+                <td data-id="516">All</td>
+                <td data-id="517">KPIDashboard</td>
+                <td data-id="518">READ</td>
+            </tr>
+            <tr data-id="519">
+                <td data-id="520"><code data-id="521">fleet_zone_map</code></td>
+                <td data-id="522">Backlog</td>
+                <td data-id="523">DispatchAgent</td>
+                <td data-id="524">FleetZoneMap</td>
+                <td data-id="525">READ</td>
+            </tr>
+            <tr data-id="526">
+                <td data-id="527"><code data-id="528">regulatory_submission_view</code></td>
+                <td data-id="529">Backlog</td>
+                <td data-id="530">SubmitAgent</td>
+                <td data-id="531">RegulatorySubmissionPanel</td>
+                <td data-id="532">CONFIRM</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div data-id="533" class="callout callout-warning">
+        <div data-id="534" class="callout-label">supervisor_override — Governance Requirements</div>
+        Requires MFA re-authentication before rendering. Every override is permanently logged to the evidence chain with: justification text, supervisor userId, timestamp (ISO 8601 UTC), and the original agent decision being overridden. Override logs are immutable and cannot be deleted.
+    </div>
+
+    <hr data-id="535" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 10 -->
+    <h2 data-id="536">Section 10: Inspector / Gemma Intent Catalog</h2>
+
+    <p data-id="537">Gemma-4-2B-IT runs INT4 quantized on-device at approximately 2.1 GB RAM. All intents marked LOCAL work fully offline with no connectivity dependency. Escalation intents queue in the local SQLite store and transmit on reconnect via the CRDT sync pipeline.</p>
+
+    <h3 data-id="538">10.1 Local Intents — Always Available Offline</h3>
+
+    <table data-id="539">
+        <thead data-id="540">
+            <tr data-id="541"><th data-id="542">Intent</th><th data-id="543">Component</th><th data-id="544">Offline</th><th data-id="545">Notes</th></tr>
+        </thead>
+        <tbody data-id="546">
+            <tr data-id="547">
+                <td data-id="548"><code data-id="549">load_my_work_queue</code></td>
+                <td data-id="550">WorkQueueScreen</td>
+                <td data-id="551">Full</td>
+                <td data-id="552">Synced from Planner on last connection</td>
+            </tr>
+            <tr data-id="553">
+                <td data-id="554"><code data-id="555">guide_inspection_step</code></td>
+                <td data-id="556">InspectionStepGuide</td>
+                <td data-id="557">Full</td>
+                <td data-id="558">Step checklist, measurements, reference values</td>
+            </tr>
+            <tr data-id="559">
+                <td data-id="560"><code data-id="561">classify_defect_image</code></td>
+                <td data-id="562">DefectClassificationOverlay</td>
+                <td data-id="563">Full</td>
+                <td data-id="564">ONNX vision inference, target &lt;200ms latency</td>
+            </tr>
+            <tr data-id="565">
+                <td data-id="566"><code data-id="567">assess_measurement_threshold</code></td>
+                <td data-id="568">ThresholdAssessmentCard</td>
+                <td data-id="569">Full</td>
+                <td data-id="570">Local regulatory schema cache; no network needed</td>
+            </tr>
+            <tr data-id="571">
+                <td data-id="572"><code data-id="573">generate_defect_report_draft</code></td>
+                <td data-id="574">DefectReportForm</td>
+                <td data-id="575">Draft only</td>
+                <td data-id="576">Draft stored locally; syncs to ReviewAgent queue on reconnect</td>
+            </tr>
+            <tr data-id="577">
+                <td data-id="578"><code data-id="579">verify_local_evidence_hash</code></td>
+                <td data-id="580">LocalHashVerifier</td>
+                <td data-id="581">Full</td>
+                <td data-id="582">Tamper detection before sync — quarantines mismatched records</td>
+            </tr>
+            <tr data-id="583">
+                <td data-id="584"><code data-id="585">regulatory_lookup</code></td>
+                <td data-id="586">RegulatoryLookupCard</td>
+                <td data-id="587">Full</td>
+                <td data-id="588">RAG over local API 653 / PSSR / ATEX cache</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="589">10.2 Escalation Intents — Queue When Offline</h3>
+
+    <table data-id="590">
+        <thead data-id="591">
+            <tr data-id="592"><th data-id="593">Intent</th><th data-id="594">Target Role</th><th data-id="595">Priority</th><th data-id="596">Trigger Condition</th></tr>
+        </thead>
+        <tbody data-id="597">
+            <tr data-id="598">
+                <td data-id="599"><code data-id="600">escalate_to_reviewer</code></td>
+                <td data-id="601">Reviewer</td>
+                <td data-id="602">HIGH</td>
+                <td data-id="603">Confidence ≥ 70% + severity HIGH</td>
+            </tr>
+            <tr data-id="604">
+                <td data-id="605"><code data-id="606">escalate_to_supervisor</code></td>
+                <td data-id="607">Supervisor</td>
+                <td data-id="608">CRITICAL</td>
+                <td data-id="609">Measurement below regulatory minimum OR confidence ≥ 85% + CRITICAL defect</td>
+            </tr>
+            <tr data-id="610">
+                <td data-id="611"><code data-id="612">request_planner_rescheduling</code></td>
+                <td data-id="613">Planner</td>
+                <td data-id="614">LOW</td>
+                <td data-id="615">Field findings require adjacent asset inspection to be scheduled</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="616" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 11 -->
+    <h2 data-id="617">Section 11: Evidence Chain Governance Contract</h2>
+
+    <h3 data-id="618">11.1 EvidenceRecord</h3>
+
+<pre data-id="619">interface EvidenceRecord {
+  recordId: string;             // EV-{YYYYMMDD}-{seq}
+  workOrderId: string;
+  assetId: string;
+
+  // Capture context
+  capturedAt: string;           // ISO 8601 UTC
+  capturedBy: string;           // userId or 'GemmaAgent'
+  deviceId: string;
+  gps: { lat: number; lng: number; accuracyM: number };
+
+  // Artifact
+  artifactType: 'image' | 'measurement' | 'agent_output' | 'approval' | 'override';
+  artifactPayload: Record&lt;string, unknown&gt;;
+
+  // Hash chain
+  contentHash: string;          // SHA-256(artifactPayload)
+  prevHash: string;             // Hash of previous record in chain
+  chainHash: string;            // SHA-256(contentHash + prevHash)
+
+  // Gemma classification (if applicable)
+  gemmaClassification?: {
+    defectType: string;
+    severity: 'nominal' | 'low' | 'moderate' | 'high' | 'critical';
+    confidence: number;         // 0–1
+    modelVersion: string;
+    inferenceMs: number;
+  };
+
+  // Approval state
+  status: 'captured' | 'pending_review' | 'approved' | 'flagged' | 'rejected';
+  approvedBy?: string;
+  approvedAt?: string;
+  approvalHash?: string;        // SHA-256 of approval action
+
+  // Sync state
+  syncStatus: 'local' | 'synced' | 'conflict';
+  syncedAt?: string;
+}</pre>
+
+    <h3 data-id="620">11.2 Tamper Detection Hooks</h3>
+
+    <table data-id="621">
+        <thead data-id="622">
+            <tr data-id="623"><th data-id="624">Hook</th><th data-id="625">Trigger</th><th data-id="626">Action</th><th data-id="627">Notified</th></tr>
+        </thead>
+        <tbody data-id="628">
+            <tr data-id="629">
+                <td data-id="630"><code data-id="631">chain_break_detected</code></td>
+                <td data-id="632">chainHash mismatch on verification</td>
+                <td data-id="633">HALT sync · CRITICAL alert</td>
+                <td data-id="634">Supervisor + Compliance</td>
+            </tr>
+            <tr data-id="635">
+                <td data-id="636"><code data-id="637">local_tampering</code></td>
+                <td data-id="638">contentHash mismatch vs local ledger</td>
+                <td data-id="639">Quarantine record</td>
+                <td data-id="640">Supervisor</td>
+            </tr>
+            <tr data-id="641">
+                <td data-id="642"><code data-id="643">sync_conflict</code></td>
+                <td data-id="644">Vector clock conflict on merge</td>
+                <td data-id="645">Human resolution required</td>
+                <td data-id="646">Reviewer + Planner</td>
+            </tr>
+            <tr data-id="647">
+                <td data-id="648"><code data-id="649">approval_replay</code></td>
+                <td data-id="650">Duplicate approvalHash detected</td>
+                <td data-id="651">Reject + log</td>
+                <td data-id="652">Supervisor + Audit</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="653" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 12 -->
+    <h2 data-id="654">Section 12: Escalation Protocol</h2>
+
+    <h3 data-id="655">12.1 GemmaEscalationEnvelope</h3>
+
+<pre data-id="656">interface GemmaEscalationEnvelope {
+  escalationId: string;         // ESC-{YYYYMMDD}-{seq}
+  triggeredAt: string;
+
+  // Source
+  inspectorId: string;
+  deviceId: string;
+  workOrderId: string;
+  assetId: string;
+
+  // Gemma inference context
+  gemma: {
+    modelVersion: string;
+    triggerIntent: string;
+    triggerReason: string;
+    confidence: number;
+    offlineDurationSecs: number;
+    localInferenceMs: number;
+    regulatoryReference?: string;   // e.g. 'API 653 §4.4.1'
+  };
+
+  // Routing
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  targetRole: 'reviewer' | 'supervisor' | 'planner';
+  targetAgentId: string;
+
+  // Evidence package
+  evidenceRecordIds: string[];
+  escalationSummary: string;        // Gemma-generated plain language
+  recommendedAction: string;
+
+  // Transport state
+  syncStatus: 'queued' | 'transmitting' | 'delivered' | 'acknowledged';
+  queuedAt: string;
+  deliveredAt?: string;
+  acknowledgedAt?: string;
+  acknowledgedBy?: string;
+}</pre>
+
+    <h3 data-id="657">12.2 Priority Routing Table</h3>
+
+    <table data-id="658">
+        <thead data-id="659">
+            <tr data-id="660"><th data-id="661">Condition</th><th data-id="662">Priority</th><th data-id="663">Target</th><th data-id="664">SLA</th></tr>
+        </thead>
+        <tbody data-id="665">
+            <tr data-id="666">
+                <td data-id="667">Measurement below regulatory minimum</td>
+                <td data-id="668"><strong data-id="669">CRITICAL</strong></td>
+                <td data-id="670">Supervisor</td>
+                <td data-id="671">Immediate</td>
+            </tr>
+            <tr data-id="672">
+                <td data-id="673">Defect confidence ≥ 85% + severity CRITICAL</td>
+                <td data-id="674"><strong data-id="675">CRITICAL</strong></td>
+                <td data-id="676">Supervisor + Reviewer</td>
+                <td data-id="677">Immediate</td>
+            </tr>
+            <tr data-id="678">
+                <td data-id="679">Defect confidence ≥ 70% + severity HIGH</td>
+                <td data-id="680"><strong data-id="681">HIGH</strong></td>
+                <td data-id="682">Reviewer</td>
+                <td data-id="683">&lt; 1 hour</td>
+            </tr>
+            <tr data-id="684">
+                <td data-id="685">Anomaly matches fleet failure pattern</td>
+                <td data-id="686"><strong data-id="687">HIGH</strong></td>
+                <td data-id="688">Reviewer</td>
+                <td data-id="689">&lt; 1 hour</td>
+            </tr>
+            <tr data-id="690">
+                <td data-id="691">Regulatory lookup: uncertain result</td>
+                <td data-id="692"><strong data-id="693">MEDIUM</strong></td>
+                <td data-id="694">Reviewer</td>
+                <td data-id="695">&lt; 4 hours</td>
+            </tr>
+            <tr data-id="696">
+                <td data-id="697">Inspector-initiated manual escalation</td>
+                <td data-id="698">Variable</td>
+                <td data-id="699">Inspector choice</td>
+                <td data-id="700">N/A</td>
+            </tr>
+            <tr data-id="701">
+                <td data-id="702">Adjacent asset rescheduling needed</td>
+                <td data-id="703"><strong data-id="704">LOW</strong></td>
+                <td data-id="705">Planner</td>
+                <td data-id="706">Next sync</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="707" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 13 -->
+    <h2 data-id="708">Section 13: Offline-First CRDT Sync Contract</h2>
+
+    <h3 data-id="709">13.1 SyncDelta</h3>
+
+<pre data-id="710">interface SyncDelta {
+  deviceId: string;
+  syncSessionId: string;
+
+  // CRDT vector clocks
+  deviceVector: Record&lt;string, number&gt;;   // { deviceId: lamportClock }
+  serverVector: Record&lt;string, number&gt;;   // Server echoes its vector
+
+  // Payload
+  records: EvidenceRecord[];
+  escalations: GemmaEscalationEnvelope[];
+  workOrderAcks: WorkOrderAck[];
+
+  // Conflict metadata
+  conflicts?: SyncConflict[];
+
+  // Priority ordering (server processes CRITICAL first)
+  priorityOrder: string[];    // escalationIds + recordIds in priority order
+}</pre>
+
+    <h3 data-id="711">13.2 Sync Queue Priority Order</h3>
+
+    <ol data-id="712">
+        <li data-id="713">CRITICAL escalations (supervisor-bound)</li>
+        <li data-id="714">HIGH escalations (reviewer-bound)</li>
+        <li data-id="715">Evidence records — CRITICAL assets first</li>
+        <li data-id="716">Measurement logs</li>
+        <li data-id="717">Work order status updates</li>
+        <li data-id="718">Agent telemetry / performance logs</li>
+    </ol>
+
+    <h3 data-id="719">13.3 Conflict Resolution Strategy</h3>
+
+    <table data-id="720">
+        <thead data-id="721">
+            <tr data-id="722"><th data-id="723">Conflict Type</th><th data-id="724">Resolution</th></tr>
+        </thead>
+        <tbody data-id="725">
+            <tr data-id="726">
+                <td data-id="727">Concurrent edit — different fields</td>
+                <td data-id="728">Merge: field-level LWW (last-write-wins by Lamport clock)</td>
+            </tr>
+            <tr data-id="729">
+                <td data-id="730">Concurrent edit — same field</td>
+                <td data-id="731">Human resolution required — flagged to Reviewer</td>
+            </tr>
+            <tr data-id="732">
+                <td data-id="733">Hash mismatch</td>
+                <td data-id="734">Quarantine local copy — flagged to Supervisor</td>
+            </tr>
+            <tr data-id="735">
+                <td data-id="736">Approval conflict</td>
+                <td data-id="737">Server version wins — discrepancy logged immutably</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="738" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 14 -->
+    <h2 data-id="739">Section 14: Agent-to-Agent (A2A) Handoff Envelope</h2>
+
+    <p data-id="740">The A2A handoff envelope governs all structured transfers of context between agents, including Gemma-to-cloud and cloud-to-cloud handoffs. The envelope preserves thread continuity across agent boundaries and includes a governance hash to prevent tampering in transit.</p>
+
+<pre data-id="741">interface A2AHandoff {
+  handoffId: string;              // UUIDv7
+  fromAgent: string;              // 'GemmaAgent-{deviceId}' | 'AnalysisAgent'
+  toAgent: string;                // 'ReviewAgent' | 'SupervisorAgent'
+  handoffReason: string;
+
+  // Thread continuity
+  originThreadId: string;
+  targetThreadId?: string;        // Assigned by cloud on delivery
+
+  // Context package
+  context: {
+    workOrderId: string;
+    assetId: string;
+    findingSummary: string;
+    evidenceRecordIds: string[];
+    regulatoryRefs: string[];
+    fromAgentReasoning: string;
+    fromAgentConfidence: number;
+    suggestedActions: string[];   // Suggestions only — not authoritative
+  };
+
+  // Governance
+  handoffHash: string;            // SHA-256(context)
+  requiresHumanAction: boolean;
+  requiresHumanActionReason?: string;
+  sentAt: string;
+  ttl: number;                    // Seconds before handoff expires
+}</pre>
+
+    <div data-id="742" class="callout callout-note">
+        <div data-id="743" class="callout-label">Thread Continuity Note</div>
+        The <code data-id="744">originThreadId</code> from the Inspector/Gemma thread is preserved throughout the handoff chain. The receiving cloud agent creates a new <code data-id="745">targetThreadId</code> that references the origin, maintaining a complete, queryable ancestry trail from field capture to regulatory submission.
+    </div>
+
+    <hr data-id="746" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 15 -->
+    <h2 data-id="747">Section 15: Trusted Renderer Catalog</h2>
+
+    <p data-id="748">The Trusted Renderer Catalog is the finite, server-enforced set of components that agents may reference via COMPONENT_RENDER events. No component outside this catalog may be rendered. The catalog is version-controlled and any modification requires a full security review cycle.</p>
+
+    <table data-id="749">
+        <thead data-id="750">
+            <tr data-id="751"><th data-id="752">Component ID</th><th data-id="753">Human Name</th><th data-id="754">Role(s)</th><th data-id="755">Trust Level</th><th data-id="756">Can Execute</th><th data-id="757">Escalates</th><th data-id="758">Status</th></tr>
+        </thead>
+        <tbody data-id="759">
+            <tr data-id="760"><td data-id="761">PlannerBriefCard</td><td data-id="762">Planner Daily Brief</td><td data-id="763">planner</td><td data-id="764">READ</td><td data-id="765">No</td><td data-id="766">No</td><td data-id="767">Production</td></tr>
+            <tr data-id="768"><td data-id="769">FieldReadyAssignmentTable</td><td data-id="770">Field Ready Assignments</td><td data-id="771">planner</td><td data-id="772">READ</td><td data-id="773">No</td><td data-id="774">No</td><td data-id="775">Production</td></tr>
+            <tr data-id="776"><td data-id="777">AssignmentReleaseConfirm</td><td data-id="778">Release Confirmation</td><td data-id="779">planner</td><td data-id="780">CONFIRM</td><td data-id="781">Yes</td><td data-id="782">No</td><td data-id="783">Production</td></tr>
+            <tr data-id="784"><td data-id="785">WorkOrderGeneratorPanel</td><td data-id="786">Work Order Generator</td><td data-id="787">planner</td><td data-id="788">ACTION</td><td data-id="789">Yes</td><td data-id="790">No</td><td data-id="791">Next Sprint</td></tr>
+            <tr data-id="792"><td data-id="793">RouteOptimizationMap</td><td data-id="794">Route Optimizer</td><td data-id="795">planner</td><td data-id="796">READ</td><td data-id="797">No</td><td data-id="798">No</td><td data-id="799">Next Sprint</td></tr>
+            <tr data-id="800"><td data-id="801">RiskRankingTable</td><td data-id="802">Risk Queue</td><td data-id="803">planner</td><td data-id="804">READ</td><td data-id="805">No</td><td data-id="806">Yes</td><td data-id="807">Next Sprint</td></tr>
+            <tr data-id="808"><td data-id="809">AgentDeployConsole</td><td data-id="810">Agent Deploy</td><td data-id="811">planner</td><td data-id="812">ACTION</td><td data-id="813">Yes</td><td data-id="814">No</td><td data-id="815">Backlog</td></tr>
+            <tr data-id="816"><td data-id="817">EvidenceReviewQueue</td><td data-id="818">Review Queue</td><td data-id="819">reviewer</td><td data-id="820">READ</td><td data-id="821">No</td><td data-id="822">Yes</td><td data-id="823">Next Sprint</td></tr>
+            <tr data-id="824"><td data-id="825">EvidenceRecordViewer</td><td data-id="826">Evidence Viewer</td><td data-id="827">reviewer</td><td data-id="828">READ</td><td data-id="829">No</td><td data-id="830">Yes</td><td data-id="831">Next Sprint</td></tr>
+            <tr data-id="832"><td data-id="833">ApprovalFlowPanel</td><td data-id="834">Approval Flow</td><td data-id="835">reviewer</td><td data-id="836">SIGN</td><td data-id="837">Yes</td><td data-id="838">No</td><td data-id="839">Next Sprint</td></tr>
+            <tr data-id="840"><td data-id="841">AnomalyReportBuilder</td><td data-id="842">Anomaly Report</td><td data-id="843">reviewer</td><td data-id="844">ACTION</td><td data-id="845">Yes</td><td data-id="846">Yes</td><td data-id="847">Backlog</td></tr>
+            <tr data-id="848"><td data-id="849">HashChainVerifier</td><td data-id="850">Hash Verifier</td><td data-id="851">reviewer · supervisor</td><td data-id="852">READ</td><td data-id="853">No</td><td data-id="854">Yes</td><td data-id="855">Backlog</td></tr>
+            <tr data-id="856"><td data-id="857">FleetOperationsCenter</td><td data-id="858">Fleet Ops</td><td data-id="859">supervisor</td><td data-id="860">READ</td><td data-id="861">No</td><td data-id="862">No</td><td data-id="863">Next Sprint</td></tr>
+            <tr data-id="864"><td data-id="865">EscalationBoard</td><td data-id="866">Escalations</td><td data-id="867">supervisor</td><td data-id="868">ACTION</td><td data-id="869">Yes</td><td data-id="870">No</td><td data-id="871">Next Sprint</td></tr>
+            <tr data-id="872"><td data-id="873">OverrideConsole</td><td data-id="874">Override Console</td><td data-id="875">supervisor</td><td data-id="876">OVERRIDE</td><td data-id="877">Yes</td><td data-id="878">No</td><td data-id="879">Backlog</td></tr>
+            <tr data-id="880"><td data-id="881">WorkQueueScreen</td><td data-id="882">Field Work Queue</td><td data-id="883">inspector</td><td data-id="884">READ</td><td data-id="885">No</td><td data-id="886">Yes</td><td data-id="887">Local/Prod</td></tr>
+            <tr data-id="888"><td data-id="889">DefectClassificationOverlay</td><td data-id="890">Defect Overlay</td><td data-id="891">inspector</td><td data-id="892">READ</td><td data-id="893">No</td><td data-id="894">Yes</td><td data-id="895">Local/Prod</td></tr>
+            <tr data-id="896"><td data-id="897">ThresholdAssessmentCard</td><td data-id="898">Threshold Check</td><td data-id="899">inspector</td><td data-id="900">READ</td><td data-id="901">No</td><td data-id="902">Yes</td><td data-id="903">Local/Prod</td></tr>
+            <tr data-id="904"><td data-id="905">EscalationPackageViewer</td><td data-id="906">Escalation Pkg</td><td data-id="907">inspector</td><td data-id="908">CONFIRM</td><td data-id="909">Yes</td><td data-id="910">No</td><td data-id="911">Next Sprint</td></tr>
+            <tr data-id="912"><td data-id="913">LocalHashVerifier</td><td data-id="914">Local Hash Check</td><td data-id="915">inspector</td><td data-id="916">READ</td><td data-id="917">No</td><td data-id="918">No</td><td data-id="919">Next Sprint</td></tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="920">Trust Level Definitions</h3>
+
+    <table data-id="921">
+        <thead data-id="922">
+            <tr data-id="923"><th data-id="924">Level</th><th data-id="925">Description</th></tr>
+        </thead>
+        <tbody data-id="926">
+            <tr data-id="927"><td data-id="928"><strong data-id="929">READ</strong></td><td data-id="930">Display only — no state mutations permitted</td></tr>
+            <tr data-id="931"><td data-id="932"><strong data-id="933">CONFIRM</strong></td><td data-id="934">User must explicitly confirm before backend executes; confirmation token is single-use</td></tr>
+            <tr data-id="935"><td data-id="936"><strong data-id="937">ACTION</strong></td><td data-id="938">Executes a deterministic backend handler; result returned as TOOL_RESULT</td></tr>
+            <tr data-id="939"><td data-id="940"><strong data-id="941">SIGN</strong></td><td data-id="942">Requires cryptographic engineer co-sign; agent pre-fills, human authorizes</td></tr>
+            <tr data-id="943"><td data-id="944"><strong data-id="945">OVERRIDE</strong></td><td data-id="946">Supervisor only · MFA required · Always permanently logged to evidence chain</td></tr>
+        </tbody>
+    </table>
+
+    <hr data-id="947" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 16 -->
+    <h2 data-id="948">Section 16: Authorization Matrix</h2>
+
+    <table data-id="949">
+        <thead data-id="950">
+            <tr data-id="951"><th data-id="952">Role</th><th data-id="953">READ</th><th data-id="954">CONFIRM</th><th data-id="955">ACTION</th><th data-id="956">SIGN</th><th data-id="957">OVERRIDE</th><th data-id="958">ESCALATE</th></tr>
+        </thead>
+        <tbody data-id="959">
+            <tr data-id="960">
+                <td data-id="961"><strong data-id="962">Planner</strong></td>
+                <td data-id="963">Yes</td>
+                <td data-id="964">Yes</td>
+                <td data-id="965">Yes</td>
+                <td data-id="966">No</td>
+                <td data-id="967">No</td>
+                <td data-id="968">Conditional (scheduling only)</td>
+            </tr>
+            <tr data-id="969">
+                <td data-id="970"><strong data-id="971">Reviewer</strong></td>
+                <td data-id="972">Yes</td>
+                <td data-id="973">Yes</td>
+                <td data-id="974">Yes</td>
+                <td data-id="975">Yes</td>
+                <td data-id="976">No</td>
+                <td data-id="977">Yes</td>
+            </tr>
+            <tr data-id="978">
+                <td data-id="979"><strong data-id="980">Supervisor</strong></td>
+                <td data-id="981">Yes</td>
+                <td data-id="982">Yes</td>
+                <td data-id="983">Yes</td>
+                <td data-id="984">Yes</td>
+                <td data-id="985">Yes</td>
+                <td data-id="986">Yes</td>
+            </tr>
+            <tr data-id="987">
+                <td data-id="988"><strong data-id="989">Inspector / Gemma</strong></td>
+                <td data-id="990">Yes</td>
+                <td data-id="991">Yes</td>
+                <td data-id="992">No</td>
+                <td data-id="993">No</td>
+                <td data-id="994">No</td>
+                <td data-id="995">Yes</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="996">Authorization Notes</h3>
+    <ul data-id="997">
+        <li data-id="998"><strong data-id="999">Inspector ACTION denied:</strong> Inspector proposes via Gemma inference; execution requires cloud agent confirmation after sync. This is not a user-experience limitation — it is a governance invariant.</li>
+        <li data-id="1000"><strong data-id="1001">Inspector SIGN denied:</strong> Field co-sign is available only after Reviewer approval of the full evidence record. Inspector acknowledgement at capture does not constitute approval.</li>
+        <li data-id="1002"><strong data-id="1003">Planner ESCALATE conditional:</strong> Scheduling conflicts only. Planners cannot escalate evidence decisions or regulatory findings — those are Reviewer/Supervisor jurisdiction.</li>
+        <li data-id="1004"><strong data-id="1005">All matrix entries are server-enforced:</strong> The Authorization Gate validates role × component × action on every COMPONENT_RENDER event. Client-side enforcement is advisory only.</li>
+    </ul>
+
+    <hr data-id="1006" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 17 -->
+    <h2 data-id="1007">Section 17: Multi-Modal Intent Router</h2>
+
+    <p data-id="1008">A single entry point handles all input modalities — text input, voice command, and image capture — and routes to the correct agent and intent based on content type and role context. This eliminates per-modality code paths and ensures consistent authorization regardless of how the user initiates an action.</p>
+
+    <h3 data-id="1009">17.1 Router Interface</h3>
+
+<pre data-id="1010">interface MultiModalIntentRouter {
+  route(input: ModalInput, session: AIMSSession): IntentRoute;
+}
+
+type ModalInput =
+  | { type: 'text';  content: string }
+  | { type: 'voice'; audioBlob: Blob; transcript?: string }
+  | { type: 'image'; imageBlob: Blob; metadata: CaptureMetadata };
+
+interface IntentRoute {
+  intent: string;
+  agent: string;
+  confidence: number;
+  fallback?: string;      // If confidence &lt; 0.6, suggest this
+}</pre>
+
+    <h3 data-id="1011">17.2 Routing Logic by Modality</h3>
+
+    <table data-id="1012">
+        <thead data-id="1013">
+            <tr data-id="1014"><th data-id="1015">Modality</th><th data-id="1016">Processing Path</th><th data-id="1017">Primary Agent</th><th data-id="1018">Fallback</th></tr>
+        </thead>
+        <tbody data-id="1019">
+            <tr data-id="1020">
+                <td data-id="1021">Text</td>
+                <td data-id="1022">Keyword extraction → intent classification → agent dispatch</td>
+                <td data-id="1023">Role-appropriate orchestrator</td>
+                <td data-id="1024">Prompt user to clarify</td>
+            </tr>
+            <tr data-id="1025">
+                <td data-id="1026">Voice</td>
+                <td data-id="1027">Whisper transcription → same as text path</td>
+                <td data-id="1028">Role-appropriate orchestrator</td>
+                <td data-id="1029">Re-prompt for voice re-capture</td>
+            </tr>
+            <tr data-id="1030">
+                <td data-id="1031">Image (offline)</td>
+                <td data-id="1032">Gemma vision ONNX (local, &lt;200ms) → <code data-id="1033">classify_defect_image</code></td>
+                <td data-id="1034">GemmaAgent</td>
+                <td data-id="1035">Manual classification form</td>
+            </tr>
+            <tr data-id="1036">
+                <td data-id="1037">Image (online)</td>
+                <td data-id="1038">CaptureAgent (cloud) → <code data-id="1039">open_evidence_record</code></td>
+                <td data-id="1040">CaptureAgent</td>
+                <td data-id="1041">GemmaAgent offline fallback</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="1042" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 18 -->
+    <h2 data-id="1043">Section 18: Regulatory Schema Mapper</h2>
+
+    <p data-id="1044">A local cached schema vault allows Gemma to assess measurements and classify defects against regulatory thresholds without any network connectivity. The cloud-authoritative version remains the source of truth for Reviewer and Supervisor decisions.</p>
+
+    <h3 data-id="1045">18.1 Supported Regulatory Frameworks</h3>
+
+    <table data-id="1046">
+        <thead data-id="1047">
+            <tr data-id="1048"><th data-id="1049">Framework</th><th data-id="1050">Scope</th><th data-id="1051">Local Cache</th><th data-id="1052">Cloud Authoritative</th></tr>
+        </thead>
+        <tbody data-id="1053">
+            <tr data-id="1054"><td data-id="1055"><strong data-id="1056">API 653</strong></td><td data-id="1057">Aboveground storage tanks</td><td data-id="1058">Yes</td><td data-id="1059">Yes</td></tr>
+            <tr data-id="1060"><td data-id="1061"><strong data-id="1062">PSSR</strong></td><td data-id="1063">Pressure systems safety regulations</td><td data-id="1064">Yes</td><td data-id="1065">Yes</td></tr>
+            <tr data-id="1066"><td data-id="1067"><strong data-id="1068">ATEX</strong></td><td data-id="1069">Explosive atmosphere equipment</td><td data-id="1070">Yes</td><td data-id="1071">Yes</td></tr>
+            <tr data-id="1072"><td data-id="1073"><strong data-id="1074">ISO 55001</strong></td><td data-id="1075">Asset management systems</td><td data-id="1076">Yes</td><td data-id="1077">Yes</td></tr>
+            <tr data-id="1078"><td data-id="1079"><strong data-id="1080">DNV GL</strong></td><td data-id="1081">Marine and offshore assets</td><td data-id="1082">Yes</td><td data-id="1083">Yes</td></tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="1084">18.2 Cache Strategy</h3>
+
+    <ul data-id="1085">
+        <li data-id="1086">Schemas cached as structured JSON on Inspector device at last sync</li>
+        <li data-id="1087">Version hash checked on each sync — schema updated if server version differs</li>
+        <li data-id="1088">Gemma uses RAG (retrieval-augmented generation) over cached schemas for <code data-id="1089">regulatory_lookup</code> intent</li>
+        <li data-id="1090">Regulatory references surfaced in Gemma output include section identifiers (e.g. <code data-id="1091">API 653 §4.4.1</code>) and are included in the GemmaEscalationEnvelope</li>
+        <li data-id="1092">Cloud Reviewer/Supervisor always queries the authoritative version — local cache is advisory only for field use</li>
+        <li data-id="1093">Schema updates are propagated to all Inspector devices within the next sync cycle following a cloud-side schema version bump</li>
+    </ul>
+
+    <hr data-id="1094" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ SECTION 19 -->
+    <h2 data-id="1095">Section 19: Implementation Sequence — Full 15-Step Roadmap</h2>
+
+    <h3 data-id="1096">Sprint 1 — Foundation (Steps 1–3) &nbsp;<span data-id="1097" class="sprint-approved">✅ Approved</span></h3>
+
+    <table data-id="1098">
+        <thead data-id="1099">
+            <tr data-id="1100"><th data-id="1101">Step</th><th data-id="1102">Deliverable</th><th data-id="1103">Owner</th></tr>
+        </thead>
+        <tbody data-id="1104">
+            <tr data-id="1105">
+                <td data-id="1106"><strong data-id="1107">1</strong></td>
+                <td data-id="1108">Planner intent catalog + BaseIntentRequest / BaseIntentResponse shared envelope</td>
+                <td data-id="1109">Backend + Frontend</td>
+            </tr>
+            <tr data-id="1110">
+                <td data-id="1111"><strong data-id="1112">2</strong></td>
+                <td data-id="1113">First 3 approved A2UI components: PlannerBriefCard, FieldReadyAssignmentTable, AssignmentReleaseConfirm</td>
+                <td data-id="1114">Frontend</td>
+            </tr>
+            <tr data-id="1115">
+                <td data-id="1116"><strong data-id="1117">3</strong></td>
+                <td data-id="1118">Real AG-UI threadId, SSE event stream, message snapshots, state checkpoints</td>
+                <td data-id="1119">Backend</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="1120">Sprint 2 — Persistence &amp; Routing (Steps 4–6) &nbsp;<span data-id="1121" class="sprint-next">🔜 Next</span></h3>
+
+    <table data-id="1122">
+        <thead data-id="1123">
+            <tr data-id="1124"><th data-id="1125">Step</th><th data-id="1126">Deliverable</th><th data-id="1127">Owner</th></tr>
+        </thead>
+        <tbody data-id="1128">
+            <tr data-id="1129">
+                <td data-id="1130"><strong data-id="1131">4</strong></td>
+                <td data-id="1132">Replace sessionStorage with Redis (hot tier) + PostgreSQL (cold tier) thread store</td>
+                <td data-id="1133">Backend</td>
+            </tr>
+            <tr data-id="1134">
+                <td data-id="1135"><strong data-id="1136">5</strong></td>
+                <td data-id="1137">Left navigation fully wired — each destination routes to current session surface</td>
+                <td data-id="1138">Frontend</td>
+            </tr>
+            <tr data-id="1139">
+                <td data-id="1140"><strong data-id="1141">6</strong></td>
+                <td data-id="1142">Connect 3 production intents: planner_session_brief · show_field_ready_assignments · prepare_assignment_release</td>
+                <td data-id="1143">Full Stack</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="1144">Sprint 3 — Contracts &amp; Inspector Layer (Steps 7–9) &nbsp;<span data-id="1145" class="sprint-next">🔜 Next</span></h3>
+
+    <table data-id="1146">
+        <thead data-id="1147">
+            <tr data-id="1148"><th data-id="1149">Step</th><th data-id="1150">Deliverable</th><th data-id="1151">Owner</th></tr>
+        </thead>
+        <tbody data-id="1152">
+            <tr data-id="1153">
+                <td data-id="1154"><strong data-id="1155">7</strong></td>
+                <td data-id="1156">Risk, readiness, scheduling, and evidence contracts — incremental rollout</td>
+                <td data-id="1157">Backend</td>
+            </tr>
+            <tr data-id="1158">
+                <td data-id="1159"><strong data-id="1160">8</strong></td>
+                <td data-id="1161">Inspector/Gemma intent catalog + A2A handoff envelope specification</td>
+                <td data-id="1162">Mobile + Backend</td>
+            </tr>
+            <tr data-id="1163">
+                <td data-id="1164"><strong data-id="1165">9</strong></td>
+                <td data-id="1166">CRDT offline sync contract + SQLite local store for Inspector PWA</td>
+                <td data-id="1167">Mobile</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="1168">Sprint 4 — Evidence Governance (Steps 10–11) &nbsp;<span data-id="1169" class="sprint-planned">🔮 Planned</span></h3>
+
+    <table data-id="1170">
+        <thead data-id="1171">
+            <tr data-id="1172"><th data-id="1173">Step</th><th data-id="1174">Deliverable</th><th data-id="1175">Owner</th></tr>
+        </thead>
+        <tbody data-id="1176">
+            <tr data-id="1177">
+                <td data-id="1178"><strong data-id="1179">10</strong></td>
+                <td data-id="1180">Evidence chain governance contract — SHA-256 hash-chaining, tamper hooks, chain-break alerts</td>
+                <td data-id="1181">Backend</td>
+            </tr>
+            <tr data-id="1182">
+                <td data-id="1183"><strong data-id="1184">11</strong></td>
+                <td data-id="1185">Escalation protocol — Gemma threshold triggers, priority routing, offline queue</td>
+                <td data-id="1186">Mobile + Backend</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="1187">Sprint 5 — Security &amp; Full Catalog (Steps 12–13) &nbsp;<span data-id="1188" class="sprint-planned">🔮 Planned</span></h3>
+
+    <table data-id="1189">
+        <thead data-id="1190">
+            <tr data-id="1191"><th data-id="1192">Step</th><th data-id="1193">Deliverable</th><th data-id="1194">Owner</th></tr>
+        </thead>
+        <tbody data-id="1195">
+            <tr data-id="1196">
+                <td data-id="1197"><strong data-id="1198">12</strong></td>
+                <td data-id="1199">Component Authorization Matrix enforced server-side before every COMPONENT_RENDER event</td>
+                <td data-id="1200">Backend</td>
+            </tr>
+            <tr data-id="1201">
+                <td data-id="1202"><strong data-id="1203">13</strong></td>
+                <td data-id="1204">Full Reviewer + Supervisor intent catalogs — all defined intents implemented</td>
+                <td data-id="1205">Full Stack</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 data-id="1206">Sprint 6 — Intelligence Layer (Steps 14–15) &nbsp;<span data-id="1207" class="sprint-backlog">🗂 Backlog</span></h3>
+
+    <table data-id="1208">
+        <thead data-id="1209">
+            <tr data-id="1210"><th data-id="1211">Step</th><th data-id="1212">Deliverable</th><th data-id="1213">Owner</th></tr>
+        </thead>
+        <tbody data-id="1214">
+            <tr data-id="1215">
+                <td data-id="1216"><strong data-id="1217">14</strong></td>
+                <td data-id="1218">Multi-modal intent router — text · voice · image → agent mapping with confidence gating</td>
+                <td data-id="1219">ML + Backend</td>
+            </tr>
+            <tr data-id="1220">
+                <td data-id="1221"><strong data-id="1222">15</strong></td>
+                <td data-id="1223">Regulatory schema mapper — local RAG cache for Gemma, authoritative cloud version for Reviewer/Supervisor</td>
+                <td data-id="1224">ML + Backend</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr data-id="1225" class="section-divider" />
+
+    <!-- ═══════════════════════════════════════════════════════ APPENDIX A -->
+    <h2 data-id="1226">Appendix A: Glossary</h2>
+
+    <table data-id="1227">
+        <thead data-id="1228">
+            <tr data-id="1229"><th data-id="1230">Term</th><th data-id="1231">Definition</th></tr>
+        </thead>
+        <tbody data-id="1232">
+            <tr data-id="1233">
+                <td data-id="1234"><strong data-id="1235">AG-UI</strong></td>
+                <td data-id="1236">Agent-UI protocol — persistent session, SSE event transport, thread model for agent–workspace communication</td>
+            </tr>
+            <tr data-id="1237">
+                <td data-id="1238"><strong data-id="1239">A2UI</strong></td>
+                <td data-id="1240">Agent-to-UI — dynamic workspace rendering from the trusted component catalog; agents propose, the gate authorizes</td>
+            </tr>
+            <tr data-id="1241">
+                <td data-id="1242"><strong data-id="1243">A2A</strong></td>
+                <td data-id="1244">Agent-to-Agent — structured handoff envelope for context transfer between agents across trust boundaries</td>
+            </tr>
+            <tr data-id="1245">
+                <td data-id="1246"><strong data-id="1247">CRDT</strong></td>
+                <td data-id="1248">Conflict-free Replicated Data Type — enables offline-first sync without central coordination using vector clocks</td>
+            </tr>
+            <tr data-id="1249">
+                <td data-id="1250"><strong data-id="1251">threadId</strong></td>
+                <td data-id="1252">UUIDv7 identifier for an AG-UI conversation thread — time-ordered, persisted in Redis/PostgreSQL</td>
+            </tr>
+            <tr data-id="1253">
+                <td data-id="1254"><strong data-id="1255">runId</strong></td>
+                <td data-id="1256">Identifier for a single agent run within a thread; scopes all events for that run</td>
+            </tr>
+            <tr data-id="1257">
+                <td data-id="1258"><strong data-id="1259">GemmaEscalationEnvelope</strong></td>
+                <td data-id="1260">Typed contract governing Inspector→Cloud escalations including full local inference context and routing metadata</td>
+            </tr>
+            <tr data-id="1261">
+                <td data-id="1262"><strong data-id="1263">Trusted Renderer Catalog</strong></td>
+                <td data-id="1264">The finite, server-enforced set of A2UI components agents may reference — enforced by the Authorization Gate</td>
+            </tr>
+            <tr data-id="1265">
+                <td data-id="1266"><strong data-id="1267">Vector Clock</strong></td>
+                <td data-id="1268">CRDT mechanism tracking per-device logical time (Lamport clock) for conflict-free merge on sync</td>
+            </tr>
+            <tr data-id="1269">
+                <td data-id="1270"><strong data-id="1271">Chain Hash</strong></td>
+                <td data-id="1272">SHA-256(contentHash + prevHash) — links each evidence record to its predecessor for tamper detection</td>
+            </tr>
+            <tr data-id="1273">
+                <td data-id="1274"><strong data-id="1275">Gemma-4-2B-IT</strong></td>
+                <td data-id="1276">On-device language model running INT4 quantized (~2.1 GB RAM); handles all Inspector intents fully offline</td>
+            </tr>
+            <tr data-id="1277">
+                <td data-id="1278"><strong data-id="1279">sessionNonce</strong></td>
+                <td data-id="1280">Single-use token included in every BaseIntentRequest to prevent replay attacks</td>
+            </tr>
+            <tr data-id="1281">
+                <td data-id="1282"><strong data-id="1283">LWW</strong></td>
+                <td data-id="1284">Last-Write-Wins — conflict resolution strategy using Lamport clock for field-level CRDT merge</td>
+            </tr>
+            <tr data-id="1285">
+                <td data-id="1286"><strong data-id="1287">RAG</strong></td>
+                <td data-id="1288">Retrieval-Augmented Generation — Gemma's mechanism for querying cached regulatory schemas during offline <code data-id="1289">regulatory_lookup</code> intents</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════ FOOTER -->
+    <div data-id="1290" class="footer-note">
+        <p data-id="1291">This document is a living reference. Update after each sprint. All contracts should be versioned and reviewed before sprint kickoff.</p>
+        <p data-id="1292">AIMS Architecture Blueprint &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; 19 July 2026 &nbsp;·&nbsp; 09:18 PDT &nbsp;·&nbsp; Bethany, OR, United States &nbsp;·&nbsp; Prepared by Nalin</p>
+        <p data-id="1293">Confidential — Internal Engineering Use Only. Do not distribute outside the AIMS engineering organization.</p>
+    </div>
+
+</body>
+</html>

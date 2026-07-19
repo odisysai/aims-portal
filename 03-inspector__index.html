@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>AIMS Inspector – Field Mobile App</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        deep: '#080D15',
+        surface: '#0C1520',
+        card: '#101C2E',
+        elevated: '#152235',
+        bdr: '#1E3048',
+        pri: '#0A84FF',
+        teal: '#00C7BE',
+        amb: '#FF9F0A',
+        red: '#FF3B30',
+        grn: '#32D74B',
+        purp: '#BF5AF2',
+        tp: '#F5F5F7',
+        ts: '#8E8E93',
+        tm: '#48484A',
+      }
+    }
+  }
+};
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --deep:#080D15;--surface:#0C1520;--card:#101C2E;--elevated:#152235;--bdr:#1E3048;
+    --pri:#0A84FF;--teal:#00C7BE;--amb:#FF9F0A;--red:#FF3B30;--grn:#32D74B;
+    --purp:#BF5AF2;--tp:#F5F5F7;--ts:#8E8E93;--tm:#48484A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,-apple-system,'SF Pro Text',sans-serif;background:#030508;color:var(--tp);min-height:100vh;overflow-x:hidden;}
+  .no-scroll{overflow:hidden;}
+  /* Device Frame */
+  .device-wrapper{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+  .device-frame{position:relative;background:#000;overflow:hidden;transition:all .5s cubic-bezier(.4,0,.2,1);flex-shrink:0;}
+  .device-frame.phone{width:390px;height:844px;border-radius:44px;border:12px solid #1a1a1a;}
+  .device-frame.tablet{width:820px;height:1080px;border-radius:24px;border:8px solid #1a1a1a;}
+  .device-inner{position:relative;width:100%;height:100%;overflow:hidden;background:var(--deep);display:flex;flex-direction:column;}
+  /* Dynamic Island */
+  .dynamic-island{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#000;border-radius:22px;z-index:100;transition:all .4s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;gap:6px;overflow:hidden;}
+  .dynamic-island.default{width:120px;height:34px;}
+  .dynamic-island.expanded{width:260px;height:42px;padding:0 14px;}
+  .dynamic-island .di-text{font-size:11px;font-weight:600;white-space:nowrap;opacity:0;transition:opacity .3s;}
+  .dynamic-island.expanded .di-text{opacity:1;}
+  .dynamic-island .di-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse-dot 1.5s infinite;}
+  @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.4;}}
+  /* Status Bar */
+  .status-bar{height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 6px;flex-shrink:0;position:relative;z-index:50;background:var(--deep);}
+  .status-bar .time{font-size:15px;font-weight:600;letter-spacing:-.02em;}
+  .status-bar .icons{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;}
+  /* Tab Bar */
+  .tab-bar{display:flex;align-items:center;justify-content:space-around;height:82px;padding-bottom:18px;background:rgba(8,13,21,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(30,48,72,.5);flex-shrink:0;position:relative;z-index:90;}
+  .tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 8px;min-width:56px;position:relative;user-select:none;}
+  .tab-item .tab-icon{width:24px;height:24px;color:var(--ts);transition:color .2s;}
+  .tab-item .tab-label{font-size:10px;font-weight:500;color:var(--ts);transition:color .2s;}
+  .tab-item.active .tab-icon{color:var(--pri);}
+  .tab-item.active .tab-label{color:var(--pri);}
+  .tab-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--pri);border-radius:0 0 3px 3px;}
+  /* Sidebar for tablet */
+  .sidebar{display:none;}
+  .device-frame.tablet .sidebar{display:flex;flex-direction:column;align-items:center;gap:8px;padding:60px 0 20px;width:60px;background:rgba(8,13,21,.95);backdrop-filter:blur(20px);border-right:1px solid rgba(30,48,72,.5);position:absolute;left:0;top:0;bottom:0;z-index:80;}
+  .device-frame.tablet .tab-bar{display:none;}
+  .device-frame.tablet .screen-content{margin-left:60px;}
+  .sidebar .sb-item{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;color:var(--ts);transition:all .2s;}
+  .sidebar .sb-item.active{background:rgba(10,132,255,.15);color:var(--pri);}
+  /* Screen Content */
+  .screen-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
+  .screen-content::-webkit-scrollbar{display:none;}
+  .screen{display:none;padding:16px;padding-bottom:8px;min-height:100%;}
+  .screen.active{display:block;}
+  /* Tablet split */
+  .device-frame.tablet .screen.active{display:flex;gap:0;}
+  .device-frame.tablet .split-primary{flex:0 0 58%;padding-right:12px;border-right:1px solid var(--bdr);overflow-y:auto;max-height:100%;}
+  .device-frame.tablet .split-context{flex:0 0 42%;padding-left:12px;overflow-y:auto;max-height:100%;}
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:14px;margin-bottom:12px;}
+  .card-elevated{background:var(--elevated);}
+  /* Accent bar */
+  .accent-bar{width:4px;border-radius:4px;flex-shrink:0;align-self:stretch;}
+  /* Pills / Badges */
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+  /* Chips */
+  .chip{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;border:1px solid var(--bdr);background:var(--card);color:var(--ts);flex-shrink:0;transition:all .2s;}
+  .chip:hover,.chip.active{background:rgba(10,132,255,.15);border-color:var(--pri);color:var(--pri);}
+  /* Capture overlay */
+  .capture-overlay{position:absolute;inset:0;background:var(--deep);z-index:200;display:none;flex-direction:column;}
+  .capture-overlay.active{display:flex;}
+  .viewfinder{flex:1;position:relative;background:#0a0f18;margin:12px;border-radius:12px;overflow:hidden;}
+  .corner-bracket{position:absolute;width:30px;height:30px;border-color:rgba(255,255,255,.6);}
+  .corner-bracket.tl{top:16px;left:16px;border-top:2px solid;border-left:2px solid;}
+  .corner-bracket.tr{top:16px;right:16px;border-top:2px solid;border-right:2px solid;}
+  .corner-bracket.bl{bottom:16px;left:16px;border-bottom:2px solid;border-left:2px solid;}
+  .corner-bracket.br{bottom:16px;right:16px;border-bottom:2px solid;border-right:2px solid;}
+  @keyframes glow-bracket{0%,100%{opacity:.5;}50%{opacity:1;}}
+  .corner-bracket{animation:glow-bracket 2s infinite;}
+  .crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;}
+  .crosshair::before,.crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.4);}
+  .crosshair::before{width:1px;height:100%;left:50%;top:0;}
+  .crosshair::after{height:1px;width:100%;top:50%;left:0;}
+  .detection-box{position:absolute;top:30%;left:25%;width:50%;height:35%;border:2px dashed var(--amb);border-radius:4px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;transition:border-color .3s;}
+  .detection-box.detected{border-color:var(--red);}
+  .detection-label{background:rgba(0,0,0,.7);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;color:var(--amb);}
+  .detection-box.detected .detection-label{color:var(--red);}
+  /* Chat */
+  .chat-msg{margin-bottom:14px;}
+  .chat-msg .msg-header{font-size:11px;font-weight:600;margin-bottom:4px;}
+  .chat-msg .msg-body{font-size:13.5px;line-height:1.55;padding:12px;border-radius:14px;}
+  .msg-inspector .msg-body{background:var(--elevated);border-bottom-right-radius:4px;margin-left:40px;}
+  .msg-gemma .msg-body{background:rgba(191,90,242,.08);border:1px solid rgba(191,90,242,.15);border-bottom-left-radius:4px;margin-right:20px;}
+  /* Flash effects */
+  .flash-white{animation:flash-w .3s;}
+  @keyframes flash-w{0%{opacity:0;}30%{opacity:.7;}100%{opacity:0;}}
+  .flash-overlay{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;}
+  /* Progress bar anim */
+  @keyframes progress-fill{from{width:0}to{width:var(--pw)}}
+  .progress-bar-fill{animation:progress-fill 1s ease-out forwards;}
+  /* Notification banner */
+  .notif-banner{position:absolute;top:54px;left:12px;right:12px;z-index:150;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;transform:translateY(-120%);transition:transform .4s cubic-bezier(.4,0,.2,1);font-size:13px;font-weight:500;}
+  .notif-banner.show{transform:translateY(0);}
+  /* Scroll chips */
+  .chips-scroll{display:flex;gap:8px;overflow-x:auto;padding:4px 0;-webkit-overflow-scrolling:touch;}
+  .chips-scroll::-webkit-scrollbar{display:none;}
+  /* Toggle Switch */
+  .toggle-sw{width:44px;height:26px;background:var(--tm);border-radius:13px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;}
+  .toggle-sw.on{background:var(--grn);}
+  .toggle-sw::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;background:#fff;border-radius:50%;transition:transform .3s;}
+  .toggle-sw.on::after{transform:translateX(18px);}
+  /* Footer */
+  .app-footer{text-align:center;padding:8px;font-size:10px;color:var(--tm);}
+  /* Typing dots */
+  .typing-dots{display:inline-flex;gap:3px;padding:8px 12px;}
+  .typing-dots span{width:6px;height:6px;background:var(--purp);border-radius:50%;animation:typing-bounce .6s infinite alternate;}
+  .typing-dots span:nth-child(2){animation-delay:.15s;}
+  .typing-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes typing-bounce{to{opacity:.3;transform:translateY(-4px);}}
+  /* Capture button */
+  .capture-btn{width:72px;height:72px;border-radius:50%;border:4px solid rgba(255,255,255,.8);background:transparent;cursor:pointer;position:relative;transition:all .15s;}
+  .capture-btn::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff;transition:all .15s;}
+  .capture-btn:active::after{inset:8px;}
+  /* Smooth page transitions */
+  .screen{animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  /* Demo controls */
+  .demo-controls{position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .demo-btn{padding:8px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:inherit;}
+  .demo-btn:hover{transform:scale(1.03);}
+</style>
+</head>
+<body data-id="0">
+<app-icon data-id="1" hidden data-icon="shield-check" data-palette="Dark"></app-icon>
+
+<!-- Demo Controls (outside device frame) -->
+<div data-id="2" class="demo-controls" id="demo-controls-a1b2">
+  <button data-id="3" class="demo-btn" id="frame-phone-btn-x1" style="background:#0A84FF;color:#fff;">📱 Phone</button>
+  <button data-id="4" class="demo-btn" id="frame-tablet-btn-x2" style="background:#1E3048;color:#F5F5F7;">📋 Tablet</button>
+  <button data-id="5" class="demo-btn" id="conn-toggle-btn-x3" style="background:#FF9F0A;color:#080D15;">Go Online</button>
+</div>
+
+<div data-id="6" class="device-wrapper" id="device-wrapper-m1">
+  <div data-id="7" class="device-frame phone" id="device-frame-f1">
+    <div data-id="8" class="device-inner" id="device-inner-d1">
+
+      <!-- Notification Banner -->
+      <div data-id="9" class="notif-banner" id="notif-banner-n1" style="background:rgba(50,215,75,.15);border:1px solid rgba(50,215,75,.3);color:#32D74B;">
+        <i data-id="10" data-lucide="check-circle" class="w-5 h-5" style="color:#32D74B;"></i>
+        <span data-id="11" id="notif-text-n2">Supervisor acknowledged · Response incoming</span>
+      </div>
+
+      <!-- Dynamic Island -->
+      <div data-id="12" class="dynamic-island default" id="dynamic-island-i1">
+        <div data-id="13" class="di-dot" id="di-dot-d2" style="background:var(--amb);"></div>
+        <span data-id="14" class="di-text" id="di-text-t1" style="color:var(--amb);">OFFLINE · Gemma Active</span>
+      </div>
+
+      <!-- Status Bar -->
+      <div data-id="15" class="status-bar">
+        <span data-id="16" class="time">00:29</span>
+        <div data-id="17" class="icons">
+          <span data-id="18" id="signal-icon-s1" style="color:var(--ts);">
+            <i data-id="19" data-lucide="signal-low" class="w-4 h-4"></i>
+          </span>
+          <span data-id="20" id="wifi-icon-w1" style="color:var(--amb);">
+            <i data-id="21" data-lucide="wifi-off" class="w-4 h-4"></i>
+          </span>
+          <span data-id="22" style="color:var(--ts);font-size:12px;font-weight:600;">68%</span>
+          <i data-id="23" data-lucide="battery-medium" class="w-5 h-5" style="color:var(--ts);"></i>
+        </div>
+      </div>
+
+      <!-- Sidebar (tablet only) -->
+      <div data-id="24" class="sidebar" id="sidebar-s2">
+        <div data-id="25" class="sb-item active" data-tab="home"><i data-id="26" data-lucide="home" class="w-5 h-5"></i></div>
+        <div data-id="27" class="sb-item" data-tab="inspect"><i data-id="28" data-lucide="search" class="w-5 h-5"></i></div>
+        <div data-id="29" class="sb-item" data-tab="agent"><i data-id="30" data-lucide="bot" class="w-5 h-5"></i></div>
+        <div data-id="31" class="sb-item" data-tab="evidence"><i data-id="32" data-lucide="package" class="w-5 h-5"></i></div>
+        <div data-id="33" class="sb-item" data-tab="sync"><i data-id="34" data-lucide="cloud" class="w-5 h-5"></i></div>
+      </div>
+
+      <!-- Screen Content -->
+      <div data-id="35" class="screen-content" id="screen-content-c1">
+
+        <!-- ==================== HOME SCREEN ==================== -->
+        <div data-id="36" class="screen active" id="screen-home-h1" data-screen="home">
+          <div data-id="37" class="split-primary">
+            <!-- Inspector Header -->
+            <div data-id="38" class="card" id="inspector-card-ic1" style="display:flex;align-items:center;gap:12px;">
+              <div data-id="39" style="width:48px;height:48px;border-radius:50%;background:rgba(255,159,10,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span data-id="40" style="color:var(--amb);font-weight:700;font-size:16px;">NP</span>
+              </div>
+              <div data-id="41" style="flex:1;min-width:0;">
+                <div data-id="42" style="font-size:16px;font-weight:700;">Nalin Patel</div>
+                <div data-id="43" style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+                  <span data-id="44" class="badge" style="background:rgba(10,132,255,.15);color:var(--pri);font-size:10px;">Inspector Level 3</span>
+                </div>
+                <div data-id="45" style="font-size:12px;color:var(--tm);margin-top:4px;">Zone: Offshore Platform B · Sector 4</div>
+              </div>
+              <div data-id="46" id="conn-pill-cp1" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);font-size:11px;cursor:pointer;">
+                <span data-id="47" id="conn-dot-cd1" style="width:6px;height:6px;border-radius:50%;background:var(--amb);animation:pulse-dot 1.5s infinite;"></span>
+                <span data-id="48" id="conn-label-cl1">OFFLINE</span>
+              </div>
+            </div>
+
+            <!-- Gemma Status -->
+            <div data-id="49" class="card" style="border-left:3px solid var(--teal);padding:10px 14px;">
+              <div data-id="50" style="display:flex;align-items:center;justify-content:space-between;">
+                <div data-id="51" style="display:flex;align-items:center;gap:8px;">
+                  <div data-id="52" style="width:28px;height:28px;border-radius:50%;background:rgba(191,90,242,.2);display:flex;align-items:center;justify-content:center;">
+                    <span data-id="53" style="color:var(--purp);font-weight:800;font-size:13px;">G</span>
+                  </div>
+                  <div data-id="54">
+                    <div data-id="55" style="font-size:13px;font-weight:600;">Gemma-4-2B-IT · On-device</div>
+                    <div data-id="56" style="font-size:11px;color:var(--ts);">Ready · 847ms avg inference</div>
+                  </div>
+                </div>
+                <span data-id="57" class="badge" style="background:rgba(191,90,242,.15);color:var(--purp);">Local</span>
+              </div>
+              <div data-id="58" id="cloud-status-cs1" style="font-size:11px;color:var(--amb);margin-top:8px;">
+                <i data-id="59" data-lucide="cloud-off" class="w-3 h-3" style="display:inline;vertical-align:middle;"></i>
+                Cloud agents unavailable — local agent active
+              </div>
+            </div>
+
+            <!-- Work Orders Header -->
+            <div data-id="60" style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;">
+              <h2 data-id="61" style="font-size:18px;font-weight:700;">Today's Work Orders</h2>
+              <span data-id="62" class="badge" style="background:rgba(10,132,255,.15);color:var(--pri);">6 assigned</span>
+            </div>
+
+            <!-- WO Cards -->
+            <!-- WO-2847 CRITICAL -->
+            <div data-id="63" class="card" id="wo-2847-card" style="display:flex;gap:12px;cursor:pointer;position:relative;overflow:hidden;">
+              <div data-id="64" class="accent-bar" style="background:var(--red);"></div>
+              <div data-id="65" style="flex:1;min-width:0;">
+                <div data-id="66" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                  <span data-id="67" style="font-size:14px;font-weight:700;">WO-2847</span>
+                  <span data-id="68" class="badge" style="background:rgba(255,59,48,.15);color:var(--red);">⚠️ CRITICAL</span>
+                </div>
+                <div data-id="69" style="font-size:15px;font-weight:600;margin-bottom:2px;">Subsea Valve SV-047</div>
+                <div data-id="70" style="font-size:12px;color:var(--ts);">Corrosion Assessment · Deck 3 · Section B</div>
+                <div data-id="71" style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;">
+                  <span data-id="72" style="font-size:12px;color:var(--red);font-weight:600;">Overdue 2h</span>
+                  <span data-id="73" style="font-size:12px;color:var(--ts);">Est: 45 min</span>
+                  <span data-id="74" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">Not Started</span>
+                </div>
+                <div data-id="75" style="margin-top:8px;padding:8px 10px;background:rgba(0,199,190,.06);border:1px solid rgba(0,199,190,.12);border-radius:10px;font-size:12px;color:var(--teal);line-height:1.4;">
+                  <span data-id="76" style="font-weight:700;">⚡ Gemma:</span> High probability of pitting corrosion based on last 3 cycles. Bring ultrasonic gauge.
+                </div>
+              </div>
+            </div>
+
+            <!-- WO-2848 HIGH -->
+            <div data-id="77" class="card" style="display:flex;gap:12px;">
+              <div data-id="78" class="accent-bar" style="background:var(--amb);"></div>
+              <div data-id="79" style="flex:1;min-width:0;">
+                <div data-id="80" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                  <span data-id="81" style="font-size:14px;font-weight:700;">WO-2848</span>
+                  <span data-id="82" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">HIGH</span>
+                </div>
+                <div data-id="83" style="font-size:15px;font-weight:600;margin-bottom:2px;">Flange Connection FC-112</div>
+                <div data-id="84" style="font-size:12px;color:var(--ts);">Visual Inspection</div>
+                <div data-id="85" style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;">
+                  <span data-id="86" style="font-size:12px;color:var(--amb);font-weight:600;">Due in 1h 20min</span>
+                  <span data-id="87" style="font-size:12px;color:var(--ts);">Est: 20 min</span>
+                  <span data-id="88" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">Not Started</span>
+                </div>
+                <div data-id="89" style="margin-top:8px;padding:8px 10px;background:rgba(0,199,190,.06);border:1px solid rgba(0,199,190,.12);border-radius:10px;font-size:12px;color:var(--teal);line-height:1.4;">
+                  <span data-id="90" style="font-weight:700;">⚡ Gemma:</span> Similar flange failed at this location in 2023. Check bolt torque.
+                </div>
+              </div>
+            </div>
+
+            <!-- WO-2849 NORMAL In Progress -->
+            <div data-id="91" class="card" style="display:flex;gap:12px;">
+              <div data-id="92" class="accent-bar" style="background:var(--pri);"></div>
+              <div data-id="93" style="flex:1;min-width:0;">
+                <div data-id="94" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                  <span data-id="95" style="font-size:14px;font-weight:700;">WO-2849</span>
+                  <span data-id="96" class="badge" style="background:rgba(10,132,255,.15);color:var(--pri);">NORMAL</span>
+                </div>
+                <div data-id="97" style="font-size:15px;font-weight:600;margin-bottom:2px;">Safety Relief Valve SRV-09</div>
+                <div data-id="98" style="font-size:12px;color:var(--ts);">Functional Test</div>
+                <div data-id="99" style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;">
+                  <span data-id="100" style="font-size:12px;color:var(--ts);">Due today EOD</span>
+                  <span data-id="101" style="font-size:12px;color:var(--ts);">Est: 30 min</span>
+                  <span data-id="102" class="badge" style="background:rgba(10,132,255,.15);color:var(--pri);">In Progress</span>
+                </div>
+                <div data-id="103" style="margin-top:6px;background:var(--bdr);border-radius:4px;height:6px;overflow:hidden;">
+                  <div data-id="104" style="width:40%;height:100%;background:var(--pri);border-radius:4px;--pw:40%;" class="progress-bar-fill"></div>
+                </div>
+                <div data-id="105" style="margin-top:8px;padding:8px 10px;background:rgba(0,199,190,.06);border:1px solid rgba(0,199,190,.12);border-radius:10px;font-size:12px;color:var(--teal);line-height:1.4;">
+                  <span data-id="106" style="font-weight:700;">⚡ Gemma:</span> SRV-09 last tested within spec. Likely routine sign-off.
+                </div>
+              </div>
+            </div>
+
+            <!-- WO-2850 Completed -->
+            <div data-id="107" class="card" style="display:flex;gap:12px;opacity:.7;">
+              <div data-id="108" class="accent-bar" style="background:var(--grn);"></div>
+              <div data-id="109" style="flex:1;min-width:0;">
+                <div data-id="110" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                  <span data-id="111" style="font-size:14px;font-weight:700;">WO-2850</span>
+                  <span data-id="112" class="badge" style="background:rgba(10,132,255,.15);color:var(--pri);">NORMAL</span>
+                </div>
+                <div data-id="113" style="font-size:15px;font-weight:600;margin-bottom:2px;">Pressure Gauge PG-034</div>
+                <div data-id="114" style="font-size:12px;color:var(--ts);">Calibration Check · Est: 15 min</div>
+                <div data-id="115" style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+                  <span data-id="116" style="font-size:12px;color:var(--ts);">Due today EOD</span>
+                  <span data-id="117" class="badge" style="background:rgba(50,215,75,.15);color:var(--grn);">✓ Completed</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- WO-2851 -->
+            <div data-id="118" class="card" style="display:flex;gap:12px;">
+              <div data-id="119" class="accent-bar" style="background:var(--pri);"></div>
+              <div data-id="120" style="flex:1;min-width:0;">
+                <div data-id="121" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                  <span data-id="122" style="font-size:14px;font-weight:700;">WO-2851</span>
+                  <span data-id="123" class="badge" style="background:rgba(10,132,255,.15);color:var(--pri);">NORMAL</span>
+                </div>
+                <div data-id="124" style="font-size:15px;font-weight:600;margin-bottom:2px;">Firewater Pump FWP-02</div>
+                <div data-id="125" style="font-size:12px;color:var(--ts);">Flow Test</div>
+                <div data-id="126" style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+                  <span data-id="127" style="font-size:12px;color:var(--ts);">Due tomorrow</span>
+                  <span data-id="128" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">Not Started</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- WO-2852 LOW -->
+            <div data-id="129" class="card" style="display:flex;gap:12px;">
+              <div data-id="130" class="accent-bar" style="background:var(--tm);"></div>
+              <div data-id="131" style="flex:1;min-width:0;">
+                <div data-id="132" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                  <span data-id="133" style="font-size:14px;font-weight:700;">WO-2852</span>
+                  <span data-id="134" class="badge" style="background:rgba(72,72,74,.3);color:var(--ts);">LOW</span>
+                </div>
+                <div data-id="135" style="font-size:15px;font-weight:600;margin-bottom:2px;">Handrail HR-Section-7</div>
+                <div data-id="136" style="font-size:12px;color:var(--ts);">Visual Check</div>
+                <div data-id="137" style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+                  <span data-id="138" style="font-size:12px;color:var(--ts);">Due this week</span>
+                  <span data-id="139" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">Not Started</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sync footer -->
+            <div data-id="140" id="sync-hint-sh1" style="text-align:center;padding:12px 0;font-size:12px;color:var(--tm);cursor:pointer;">
+              Sync last: 4h 23min ago · 3 records pending upload
+            </div>
+          </div>
+
+          <!-- Tablet Context Panel -->
+          <div data-id="141" class="split-context" id="home-context-hc1">
+            <div data-id="142" style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--ts);">Gemma Context</div>
+            <div data-id="143" class="card" style="border-left:3px solid var(--purp);">
+              <div data-id="144" style="font-size:13px;font-weight:600;margin-bottom:6px;">Selected: WO-2847</div>
+              <div data-id="145" style="font-size:12px;color:var(--ts);line-height:1.5;">Subsea Valve SV-047 has shown progressive corrosion over 3 inspection cycles. Previous readings: 3.1mm (Jan '26), 2.9mm (Apr '26). Trend suggests accelerating material loss. API 653 threshold: 2.8mm.</div>
+            </div>
+            <div data-id="146" class="card">
+              <div data-id="147" style="font-size:13px;font-weight:600;margin-bottom:6px;">Previous Findings</div>
+              <div data-id="148" style="font-size:12px;color:var(--ts);line-height:1.5;">• Jan 2026 — Minor surface corrosion noted<br data-id="149">• Apr 2026 — Pitting identified, monitoring recommended<br data-id="150">• Jul 2026 — Current cycle (this inspection)</div>
+            </div>
+            <div data-id="151" class="card">
+              <div data-id="152" style="font-size:13px;font-weight:600;margin-bottom:6px;">Regulatory References</div>
+              <div data-id="153" style="font-size:12px;color:var(--ts);line-height:1.5;">• API 653 §4.4 — Minimum wall thickness<br data-id="154">• INT-047 — Company procedure for corrosion escalation<br data-id="155">• OSHA 1910.119 — PSM compliance</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== INSPECT SCREEN ==================== -->
+        <div data-id="156" class="screen" id="screen-inspect-i1" data-screen="inspect">
+          <div data-id="157" class="split-primary">
+            <!-- Step Progress -->
+            <div data-id="158" style="margin-bottom:14px;">
+              <div data-id="159" style="font-size:12px;color:var(--ts);margin-bottom:8px;font-weight:600;">Step 2 of 5</div>
+              <div data-id="160" style="display:flex;gap:4px;">
+                <div data-id="161" style="flex:1;height:6px;border-radius:3px;background:var(--grn);" title="Asset Confirm"></div>
+                <div data-id="162" style="flex:1;height:6px;border-radius:3px;background:var(--pri);box-shadow:0 0 8px rgba(10,132,255,.4);" title="Site Conditions"></div>
+                <div data-id="163" style="flex:1;height:6px;border-radius:3px;background:var(--bdr);" title="Capture"></div>
+                <div data-id="164" style="flex:1;height:6px;border-radius:3px;background:var(--bdr);" title="Measurements"></div>
+                <div data-id="165" style="flex:1;height:6px;border-radius:3px;background:var(--bdr);" title="Review & Submit"></div>
+              </div>
+              <div data-id="166" style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--tm);">
+                <span data-id="167">① Confirm</span><span data-id="168" style="color:var(--pri);font-weight:600;">② Site Cond.</span><span data-id="169">③ Capture</span><span data-id="170">④ Measure</span><span data-id="171">⑤ Review</span>
+              </div>
+            </div>
+
+            <!-- WO Info Bar -->
+            <div data-id="172" class="card" style="display:flex;align-items:center;gap:10px;padding:10px 14px;">
+              <div data-id="173" style="width:8px;height:8px;border-radius:50%;background:var(--red);"></div>
+              <div data-id="174" style="flex:1;">
+                <div data-id="175" style="font-size:14px;font-weight:700;">WO-2847 · Corrosion Assessment</div>
+                <div data-id="176" style="font-size:12px;color:var(--ts);">Subsea Valve SV-047 · CRITICAL</div>
+              </div>
+            </div>
+
+            <!-- Site Conditions Card -->
+            <div data-id="177" class="card">
+              <div data-id="178" style="font-size:15px;font-weight:700;margin-bottom:12px;">Confirm Site Conditions</div>
+
+              <div data-id="179" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <i data-id="180" data-lucide="map-pin" class="w-4 h-4" style="color:var(--grn);"></i>
+                <div data-id="181">
+                  <div data-id="182" style="font-size:13px;font-weight:500;">28.3847° N, 96.1234° W · ±3m</div>
+                  <div data-id="183" style="font-size:11px;color:var(--grn);">GPS confirmed ✓</div>
+                </div>
+              </div>
+
+              <div data-id="184" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <i data-id="185" data-lucide="clock" class="w-4 h-4" style="color:var(--ts);"></i>
+                <div data-id="186" style="font-size:13px;color:var(--ts);">00:18:42 · 19 Jul 2026</div>
+              </div>
+
+              <div data-id="187" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <i data-id="188" data-lucide="cloud" class="w-4 h-4" style="color:var(--ts);"></i>
+                <div data-id="189" style="font-size:13px;color:var(--ts);">Offshore · 24°C · Wind 18 knots · Humidity 81%</div>
+              </div>
+
+              <!-- Permit Check -->
+              <div data-id="190" style="background:var(--elevated);border-radius:10px;padding:10px 12px;margin-bottom:10px;">
+                <div data-id="191" style="display:flex;align-items:center;justify-content:space-between;">
+                  <div data-id="192" style="display:flex;align-items:center;gap:8px;">
+                    <i data-id="193" data-lucide="file-check" class="w-4 h-4" style="color:var(--amb);"></i>
+                    <span data-id="194" style="font-size:13px;font-weight:500;">Hot Work Permit Verified</span>
+                  </div>
+                  <div data-id="195" class="toggle-sw" id="permit-toggle-pt1"></div>
+                </div>
+                <div data-id="196" id="permit-warn-pw1" style="font-size:11px;color:var(--amb);margin-top:6px;">⚠ Permit not yet verified</div>
+              </div>
+
+              <!-- PPE Checklist -->
+              <div data-id="197" style="font-size:13px;font-weight:600;margin-bottom:8px;">PPE Checklist</div>
+              <div data-id="198" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <div data-id="199" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(50,215,75,.06);border:1px solid rgba(50,215,75,.15);border-radius:8px;">
+                  <i data-id="200" data-lucide="check-circle" class="w-4 h-4" style="color:var(--grn);"></i>
+                  <span data-id="201" style="font-size:12px;">Hard Hat</span>
+                </div>
+                <div data-id="202" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(50,215,75,.06);border:1px solid rgba(50,215,75,.15);border-radius:8px;">
+                  <i data-id="203" data-lucide="check-circle" class="w-4 h-4" style="color:var(--grn);"></i>
+                  <span data-id="204" style="font-size:12px;">Safety Glasses</span>
+                </div>
+                <div data-id="205" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(50,215,75,.06);border:1px solid rgba(50,215,75,.15);border-radius:8px;">
+                  <i data-id="206" data-lucide="check-circle" class="w-4 h-4" style="color:var(--grn);"></i>
+                  <span data-id="207" style="font-size:12px;">Gloves</span>
+                </div>
+                <div data-id="208" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,59,48,.06);border:1px solid rgba(255,59,48,.2);border-radius:8px;">
+                  <i data-id="209" data-lucide="x-circle" class="w-4 h-4" style="color:var(--red);"></i>
+                  <span data-id="210" style="font-size:12px;color:var(--red);">Harness</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gemma Agent Card -->
+            <div data-id="211" class="card" style="border-left:3px solid var(--teal);">
+              <div data-id="212" style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:6px;">⚡ Gemma Analysis · Local Inference 1.2s</div>
+              <div data-id="213" style="font-size:13px;color:var(--tp);line-height:1.55;">Site conditions show elevated humidity (81%) — this accelerates active corrosion. I recommend starting with the underside of the valve body where moisture pools. Flag if you see any white/rust deposits.</div>
+              <div data-id="214" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                <button data-id="215" class="chip" style="font-size:12px;padding:6px 12px;">👍 Noted</button>
+                <button data-id="216" class="chip" style="font-size:12px;padding:6px 12px;">🔁 Ask follow-up</button>
+                <button data-id="217" class="chip" style="font-size:12px;padding:6px 12px;">☁️ Cloud assess</button>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <button data-id="218" id="capture-open-btn-co1" style="width:100%;height:56px;background:var(--pri);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-family:inherit;">
+              <i data-id="219" data-lucide="camera" class="w-5 h-5"></i> Capture Evidence
+            </button>
+            <button data-id="220" style="width:100%;height:56px;background:transparent;color:var(--tp);border:1px solid var(--bdr);border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-family:inherit;">
+              <i data-id="221" data-lucide="ruler" class="w-5 h-5"></i> Record Measurement
+            </button>
+            <button data-id="222" style="width:100%;height:56px;background:transparent;color:var(--amb);border:1px solid rgba(255,159,10,.3);border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;font-family:inherit;">
+              <i data-id="223" data-lucide="alert-triangle" class="w-5 h-5"></i> Report Hazard
+            </button>
+
+            <!-- Step Nav -->
+            <div data-id="224" style="display:flex;gap:10px;margin-bottom:8px;">
+              <button data-id="225" style="flex:1;height:48px;background:var(--elevated);color:var(--ts);border:1px solid var(--bdr);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">← Previous</button>
+              <button data-id="226" style="flex:1;height:48px;background:var(--pri);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Next Step →</button>
+            </div>
+          </div>
+
+          <!-- Tablet Context -->
+          <div data-id="227" class="split-context">
+            <div data-id="228" style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--ts);">Gemma Context</div>
+            <div data-id="229" class="card" style="border-left:3px solid var(--purp);">
+              <div data-id="230" style="font-size:13px;font-weight:600;margin-bottom:4px;">Inspection Steps</div>
+              <div data-id="231" style="font-size:12px;color:var(--ts);line-height:1.6;">
+                <div data-id="232" style="color:var(--grn);">✓ 1. Asset Confirm — Complete</div>
+                <div data-id="233" style="color:var(--pri);font-weight:600;">▶ 2. Site Conditions — Active</div>
+                <div data-id="234">3. Capture</div>
+                <div data-id="235">4. Measurements</div>
+                <div data-id="236">5. Review & Submit</div>
+              </div>
+            </div>
+            <div data-id="237" class="card">
+              <div data-id="238" style="font-size:13px;font-weight:600;margin-bottom:4px;">Asset History — SV-047</div>
+              <div data-id="239" style="font-size:12px;color:var(--ts);line-height:1.5;">Last inspected: April 2026<br data-id="240">Previous finding: Pitting 2.9mm<br data-id="241">Trend: Deteriorating<br data-id="242">Cycles inspected: 3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== CAPTURE OVERLAY ==================== -->
+        <div data-id="243" class="capture-overlay" id="capture-overlay-co2">
+          <!-- Top bar -->
+          <div data-id="244" style="display:flex;align-items:center;justify-content:space-between;padding:54px 16px 8px;flex-shrink:0;">
+            <button data-id="245" id="capture-close-btn-cc1" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;">
+              <i data-id="246" data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <span data-id="247" style="font-size:13px;font-weight:600;">Capture · WO-2847</span>
+            <span data-id="248" style="font-size:11px;color:var(--ts);">Step 3</span>
+          </div>
+
+          <!-- Viewfinder -->
+          <div data-id="249" class="viewfinder" id="viewfinder-vf1">
+            <div data-id="250" class="corner-bracket tl"></div>
+            <div data-id="251" class="corner-bracket tr"></div>
+            <div data-id="252" class="corner-bracket bl"></div>
+            <div data-id="253" class="corner-bracket br"></div>
+            <div data-id="254" class="crosshair"></div>
+
+            <!-- Detection Box -->
+            <div data-id="255" class="detection-box" id="detection-box-db1">
+              <div data-id="256" class="detection-label" id="detection-label-dl1">Analyzing...</div>
+            </div>
+
+            <!-- Gemma watching indicator -->
+            <div data-id="257" style="position:absolute;bottom:16px;left:16px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.6);padding:6px 12px;border-radius:8px;">
+              <div data-id="258" style="width:6px;height:6px;border-radius:50%;background:var(--purp);animation:pulse-dot 1.5s infinite;"></div>
+              <span data-id="259" style="font-size:11px;color:var(--tp);font-weight:500;" id="gemma-watch-gw1">Gemma is watching...</span>
+            </div>
+
+            <!-- White flash overlay -->
+            <div data-id="260" class="flash-overlay" id="flash-overlay-fo1" style="background:#fff;"></div>
+
+            <!-- Captured state overlay -->
+            <div data-id="261" id="captured-state-cs2" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;">
+              <i data-id="262" data-lucide="check-circle" class="w-16 h-16" style="color:var(--grn);"></i>
+              <div data-id="263" style="font-size:16px;font-weight:700;color:var(--grn);">Evidence Captured</div>
+              <div data-id="264" style="font-size:13px;color:var(--ts);">EV-20260719-0023</div>
+              <div data-id="265" style="font-size:11px;color:var(--tm);">Hash: a7f4b2c1...8d3ec882</div>
+            </div>
+          </div>
+
+          <!-- AI Classification -->
+          <div data-id="266" id="ai-class-card-ac1" style="margin:0 12px;background:var(--card);border:1px solid rgba(191,90,242,.2);border-radius:14px;padding:12px;display:none;">
+            <div data-id="267" style="font-size:13px;font-weight:700;color:var(--purp);margin-bottom:8px;">🔬 Gemma-4-2B-IT Classification</div>
+            <div data-id="268" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;margin-bottom:8px;">
+              <div data-id="269"><span data-id="270" style="color:var(--ts);">Defect:</span> <span data-id="271" style="font-weight:600;color:var(--red);">CORROSION</span></div>
+              <div data-id="272"><span data-id="273" style="color:var(--ts);">Type:</span> <span data-id="274" style="font-weight:600;">Pitting</span></div>
+              <div data-id="275"><span data-id="276" style="color:var(--ts);">Severity:</span> <span data-id="277" style="font-weight:600;color:var(--amb);">MODERATE</span></div>
+              <div data-id="278"><span data-id="279" style="color:var(--ts);">Area:</span> <span data-id="280" style="font-weight:600;">~12cm²</span></div>
+            </div>
+            <div data-id="281" style="font-size:12px;color:var(--ts);margin-bottom:6px;">Depth est: 1.8–2.4mm (UT confirm required)</div>
+            <div data-id="282" style="font-size:12px;margin-bottom:8px;">
+              <span data-id="283" style="color:var(--ts);">Confidence:</span>
+              <div data-id="284" style="background:var(--bdr);border-radius:3px;height:5px;margin-top:4px;overflow:hidden;">
+                <div data-id="285" style="width:91%;height:100%;background:var(--purp);border-radius:3px;"></div>
+              </div>
+              <span data-id="286" style="font-size:11px;color:var(--purp);font-weight:600;">91%</span>
+            </div>
+            <div data-id="287" style="font-size:11px;color:var(--amb);margin-bottom:8px;">⚠ Exceeds threshold — regulatory flag recommended</div>
+            <div data-id="288" style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button data-id="289" class="chip" style="font-size:11px;padding:6px 10px;border-color:var(--grn);color:var(--grn);">✅ Accept</button>
+              <button data-id="290" class="chip" style="font-size:11px;padding:6px 10px;">✏️ Edit</button>
+              <button data-id="291" class="chip" style="font-size:11px;padding:6px 10px;border-color:var(--purp);color:var(--purp);">⬆️ Escalate</button>
+            </div>
+          </div>
+
+          <!-- Camera controls -->
+          <div data-id="292" style="display:flex;align-items:center;justify-content:center;gap:40px;padding:16px 0 24px;flex-shrink:0;">
+            <button data-id="293" style="width:44px;height:44px;background:rgba(255,255,255,.1);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <i data-id="294" data-lucide="image" class="w-5 h-5" style="color:#fff;"></i>
+            </button>
+            <button data-id="295" class="capture-btn" id="capture-shutter-btn-cs3"></button>
+            <button data-id="296" style="width:44px;height:44px;background:rgba(255,255,255,.1);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <i data-id="297" data-lucide="zap" class="w-5 h-5" style="color:#fff;"></i>
+            </button>
+          </div>
+          <div data-id="298" style="text-align:center;font-size:11px;color:var(--tm);padding-bottom:12px;">Evidence will be stored locally until sync</div>
+        </div>
+
+        <!-- ==================== AGENT SCREEN ==================== -->
+        <div data-id="299" class="screen" id="screen-agent-a1" data-screen="agent">
+          <div data-id="300" class="split-primary">
+            <!-- Agent Header -->
+            <div data-id="301" class="card" style="display:flex;align-items:center;gap:10px;">
+              <div data-id="302" style="width:40px;height:40px;border-radius:50%;background:rgba(191,90,242,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span data-id="303" style="color:var(--purp);font-weight:800;font-size:17px;">G</span>
+              </div>
+              <div data-id="304" style="flex:1;">
+                <div data-id="305" style="font-size:15px;font-weight:700;">Gemma · Field Agent</div>
+                <div data-id="306" style="font-size:11px;color:var(--ts);">4-2B-IT · On-device · INT4</div>
+              </div>
+              <button data-id="307" id="model-stats-btn-ms1" class="badge" style="background:var(--elevated);color:var(--ts);cursor:pointer;border:1px solid var(--bdr);font-size:10px;">
+                <i data-id="308" data-lucide="cpu" class="w-3 h-3"></i> Stats
+              </button>
+            </div>
+
+            <!-- Model Stats Popup -->
+            <div data-id="309" id="model-stats-popup-ms2" class="card" style="display:none;border:1px solid var(--purp);">
+              <div data-id="310" style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--purp);">Model Statistics</div>
+              <div data-id="311" style="font-size:12px;color:var(--ts);line-height:2;">
+                Parameters: <span data-id="312" style="color:var(--tp);font-weight:600;">2B</span><br data-id="313">
+                Quantization: <span data-id="314" style="color:var(--tp);font-weight:600;">INT4</span><br data-id="315">
+                Device RAM: <span data-id="316" style="color:var(--tp);font-weight:600;">6.2GB used</span><br data-id="317">
+                Avg Latency: <span data-id="318" style="color:var(--tp);font-weight:600;">847ms</span><br data-id="319">
+                Session tasks: <span data-id="320" style="color:var(--tp);font-weight:600;">14</span><br data-id="321">
+                Confidence cal: <span data-id="322" style="color:var(--tp);font-weight:600;">94.2%</span>
+              </div>
+            </div>
+
+            <!-- Connectivity Banner -->
+            <div data-id="323" id="agent-conn-banner-ab1" style="padding:8px 12px;border-radius:10px;margin-bottom:10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.15);color:var(--amb);">
+              <i data-id="324" data-lucide="cloud-off" class="w-4 h-4"></i>
+              Cloud agents unreachable · Gemma handling all queries · Escalation queued
+            </div>
+
+            <!-- Quick Commands -->
+            <div data-id="325" class="chips-scroll" style="margin-bottom:14px;">
+              <div data-id="326" class="chip">🔍 Analyze Defect</div>
+              <div data-id="327" class="chip">📏 Measurement Guide</div>
+              <div data-id="328" class="chip">⚠️ Risk Assessment</div>
+              <div data-id="329" class="chip">📋 Checklist</div>
+              <div data-id="330" class="chip">☁️ Escalate Planner</div>
+              <div data-id="331" class="chip">🚨 Escalate Supervisor</div>
+              <div data-id="332" class="chip">📜 Regulatory Lookup</div>
+              <div data-id="333" class="chip">🔧 Repair Guidance</div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div data-id="334" id="chat-thread-ct1" style="padding-bottom:80px;">
+              <!-- Message 1 - Inspector -->
+              <div data-id="335" class="chat-msg msg-inspector">
+                <div data-id="336" class="msg-header" style="text-align:right;color:var(--ts);">Inspector · 23:47</div>
+                <div data-id="337" class="msg-body">I'm seeing heavy pitting on SV-047. Depth looks like 2-3mm. Is this within API 653 limits?</div>
+              </div>
+
+              <!-- Message 2 - Gemma -->
+              <div data-id="338" class="chat-msg msg-gemma">
+                <div data-id="339" class="msg-header" style="color:var(--purp);display:flex;align-items:center;gap:6px;">
+                  <span data-id="340" style="width:18px;height:18px;border-radius:50%;background:rgba(191,90,242,.2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--purp);">G</span>
+                  Gemma · 847ms · Local
+                </div>
+                <div data-id="341" class="msg-body">
+                  <div data-id="342" style="margin-bottom:8px;">Based on API 653 Table 4.4.1, the minimum acceptable wall thickness for SV-047 class valve (assumed 1" NPT, carbon steel) is approximately 3.2mm nominal.</div>
+                  <div data-id="343" style="margin-bottom:8px;">At 2–3mm remaining wall thickness, this falls into the <strong data-id="344" style="color:var(--amb);">caution zone</strong> — not immediate shutdown, but mandatory engineer review.</div>
+                  <div data-id="345" style="margin-bottom:8px;font-weight:600;">My recommendation:</div>
+                  <div data-id="346" style="padding-left:8px;border-left:2px solid var(--purp);margin-bottom:8px;font-size:12.5px;line-height:1.6;">
+                    • Confirm with ultrasonic thickness gauge (3 readings min)<br data-id="347">
+                    • If any reading &lt; 2.8mm → mandatory escalation<br data-id="348">
+                    • Document corrosion map with 5+ photos from different angles
+                  </div>
+                  <div data-id="349" style="font-size:12px;color:var(--amb);padding:8px;background:rgba(255,159,10,.06);border-radius:8px;">⚠️ Note: I'm operating offline. This assessment is based on my training data. For regulatory sign-off, cloud verification is required.</div>
+                </div>
+                <div data-id="350" style="display:flex;gap:6px;margin-top:6px;margin-right:20px;flex-wrap:wrap;">
+                  <button data-id="351" class="chip" style="font-size:11px;padding:5px 10px;">👍 Helpful</button>
+                  <button data-id="352" class="chip" style="font-size:11px;padding:5px 10px;">📋 Add to Report</button>
+                  <button data-id="353" class="chip" style="font-size:11px;padding:5px 10px;">☁️ Cloud Verify</button>
+                </div>
+              </div>
+
+              <!-- Message 3 - Inspector -->
+              <div data-id="354" class="chat-msg msg-inspector">
+                <div data-id="355" class="msg-header" style="text-align:right;color:var(--ts);">Inspector · 23:51</div>
+                <div data-id="356" class="msg-body">UT readings: 2.6mm, 2.7mm, 2.5mm</div>
+              </div>
+
+              <!-- Message 4 - Gemma CRITICAL -->
+              <div data-id="357" class="chat-msg msg-gemma">
+                <div data-id="358" class="msg-header" style="color:var(--red);display:flex;align-items:center;gap:6px;">
+                  <span data-id="359" style="width:18px;height:18px;border-radius:50%;background:rgba(255,59,48,.2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--red);">G</span>
+                  Gemma · 1.1s · Local — 🚨 THRESHOLD BREACH
+                </div>
+                <div data-id="360" class="msg-body" style="border-color:rgba(255,59,48,.3);">
+                  <div data-id="361" style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;">⚠️ MANDATORY ESCALATION REQUIRED</div>
+                  <div data-id="362" style="margin-bottom:8px;">All three UT readings (2.5, 2.6, 2.7mm) are <strong data-id="363" style="color:var(--red);">below the 2.8mm threshold</strong>.</div>
+                  <div data-id="364" style="margin-bottom:8px;">Per API 653 §4.4 and your company procedure INT-047:</div>
+                  <div data-id="365" style="padding-left:8px;border-left:2px solid var(--red);margin-bottom:8px;font-size:12.5px;line-height:1.7;">
+                    → <strong data-id="366">Asset SV-047 must be flagged for immediate engineering review</strong><br data-id="367">
+                    → Continued operation requires written supervisor authorization<br data-id="368">
+                    → Regulatory notification may be required within 24 hours
+                  </div>
+                  <div data-id="369" style="margin-bottom:10px;font-size:12.5px;">I am queuing an escalation to your cloud Supervisor. This will transmit automatically when connectivity is restored.</div>
+                  <div data-id="370" style="font-size:12px;color:var(--ts);margin-bottom:10px;">
+                    Escalation package prepared:<br data-id="371">
+                    📷 3 evidence photos (hashed) · 📐 3 UT measurements<br data-id="372">
+                    🤖 My analysis + regulatory ref · 🕐 Timestamp + GPS + ID
+                  </div>
+
+                  <!-- Escalation Card -->
+                  <div data-id="373" style="background:rgba(255,59,48,.06);border:1px solid rgba(255,59,48,.2);border-radius:12px;padding:12px;">
+                    <div data-id="374" style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px;">🚨 Escalation Ready</div>
+                    <div data-id="375" style="font-size:12px;color:var(--ts);line-height:1.6;">
+                      To: Supervisor Workspace<br data-id="376">
+                      Priority: CRITICAL<br data-id="377">
+                      <span data-id="378" id="esc-status-es1" style="color:var(--amb);">Status: Queued (offline) — will send when connected</span>
+                    </div>
+                    <div data-id="379" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                      <button data-id="380" id="send-now-btn-sn1" class="chip" style="font-size:11px;padding:5px 10px;opacity:.4;cursor:not-allowed;">Send Now</button>
+                      <button data-id="381" class="chip" style="font-size:11px;padding:5px 10px;">Edit Package</button>
+                      <button data-id="382" class="chip" style="font-size:11px;padding:5px 10px;">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message 5 - Inspector -->
+              <div data-id="383" class="chat-msg msg-inspector">
+                <div data-id="384" class="msg-header" style="text-align:right;color:var(--ts);">Inspector · 23:54</div>
+                <div data-id="385" class="msg-body">How do I fill out the defect notification form?</div>
+              </div>
+
+              <!-- Message 6 - Gemma -->
+              <div data-id="386" class="chat-msg msg-gemma">
+                <div data-id="387" class="msg-header" style="color:var(--purp);display:flex;align-items:center;gap:6px;">
+                  <span data-id="388" style="width:18px;height:18px;border-radius:50%;background:rgba(191,90,242,.2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--purp);">G</span>
+                  Gemma · 620ms · Local
+                </div>
+                <div data-id="389" class="msg-body">
+                  <div data-id="390" style="margin-bottom:10px;">I can guide you through it step by step. Tap 'Start Form' and I'll pre-fill what I know from this inspection.</div>
+                  <button data-id="391" class="chip" style="background:rgba(191,90,242,.1);border-color:var(--purp);color:var(--purp);font-size:12px;padding:8px 14px;">📋 Start Form (Gemma-assisted)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Input (fixed within screen) -->
+            <div data-id="392" style="position:sticky;bottom:0;left:0;right:0;background:rgba(8,13,21,.95);backdrop-filter:blur(10px);padding:10px 0 4px;border-top:1px solid var(--bdr);">
+              <div data-id="393" style="display:flex;align-items:center;gap:8px;">
+                <button data-id="394" style="width:44px;height:44px;background:var(--elevated);border:1px solid var(--bdr);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+                  <i data-id="395" data-lucide="mic" class="w-5 h-5" style="color:var(--ts);"></i>
+                </button>
+                <input data-id="396" type="text" placeholder="Ask Gemma..." id="chat-input-ci1" style="flex:1;height:44px;background:var(--elevated);border:1px solid var(--bdr);border-radius:22px;padding:0 16px;color:var(--tp);font-size:15px;outline:none;font-family:inherit;" />
+                <button data-id="397" id="chat-send-btn-sb1" style="width:44px;height:44px;background:var(--purp);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+                  <i data-id="398" data-lucide="send" class="w-5 h-5" style="color:#fff;"></i>
+                </button>
+              </div>
+              <div data-id="399" style="text-align:center;font-size:10px;color:var(--tm);margin-top:4px;">Gemma · On-device · No data leaves your device</div>
+            </div>
+          </div>
+
+          <!-- Tablet Context -->
+          <div data-id="400" class="split-context">
+            <div data-id="401" style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--ts);">Referenced Assets</div>
+            <div data-id="402" class="card">
+              <div data-id="403" style="font-size:13px;font-weight:600;margin-bottom:4px;">SV-047 — Subsea Valve</div>
+              <div data-id="404" style="font-size:12px;color:var(--ts);line-height:1.5;">Class: API 653<br data-id="405">Material: Carbon Steel<br data-id="406">Nominal wall: 3.2mm<br data-id="407">Last reading: 2.9mm (Apr '26)<br data-id="408">Status: <span data-id="409" style="color:var(--red);font-weight:600;">CRITICAL</span></div>
+            </div>
+            <div data-id="410" class="card">
+              <div data-id="411" style="font-size:13px;font-weight:600;margin-bottom:4px;">Evidence Referenced</div>
+              <div data-id="412" style="font-size:12px;color:var(--ts);line-height:1.5;">• EV-0021 — UT readings (3)<br data-id="413">• EV-0022 — Corrosion photo<br data-id="414">• EV-0023 — Close-up pitting</div>
+            </div>
+            <div data-id="415" class="card">
+              <div data-id="416" style="font-size:13px;font-weight:600;margin-bottom:4px;">Regulatory Quick Ref</div>
+              <div data-id="417" style="font-size:12px;color:var(--ts);line-height:1.5;">API 653 §4.4 — Min wall thickness<br data-id="418">INT-047 — Corrosion escalation<br data-id="419">OSHA 1910.119 — PSM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== EVIDENCE SCREEN ==================== -->
+        <div data-id="420" class="screen" id="screen-evidence-e1" data-screen="evidence">
+          <div data-id="421" class="split-primary">
+            <div data-id="422" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <h2 data-id="423" style="font-size:18px;font-weight:700;">Evidence Cache</h2>
+              <span data-id="424" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">3 pending</span>
+            </div>
+
+            <!-- Filter Chips -->
+            <div data-id="425" class="chips-scroll" style="margin-bottom:12px;">
+              <div data-id="426" class="chip active">All</div>
+              <div data-id="427" class="chip">Pending Sync</div>
+              <div data-id="428" class="chip">Synced</div>
+              <div data-id="429" class="chip">Critical</div>
+              <div data-id="430" class="chip">Flagged</div>
+            </div>
+
+            <!-- Summary Card -->
+            <div data-id="431" class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div data-id="432" style="font-size:12px;color:var(--ts);">Total captured</div>
+              <div data-id="433" style="font-size:14px;font-weight:700;text-align:right;">23</div>
+              <div data-id="434" style="font-size:12px;color:var(--ts);">Synced</div>
+              <div data-id="435" style="font-size:14px;font-weight:700;text-align:right;color:var(--grn);">20 ✓</div>
+              <div data-id="436" style="font-size:12px;color:var(--ts);">Pending</div>
+              <div data-id="437" style="font-size:14px;font-weight:700;text-align:right;color:var(--amb);">3 🔄</div>
+              <div data-id="438" style="font-size:12px;color:var(--ts);">Failed</div>
+              <div data-id="439" style="font-size:14px;font-weight:700;text-align:right;">0</div>
+              <div data-id="440" style="font-size:12px;color:var(--ts);">Storage used</div>
+              <div data-id="441" style="font-size:14px;font-weight:700;text-align:right;">847 MB / 32 GB</div>
+              <div data-id="442" style="font-size:12px;color:var(--ts);">Hash integrity</div>
+              <div data-id="443" style="font-size:14px;font-weight:700;text-align:right;color:var(--grn);">23/23 verified ✓</div>
+            </div>
+
+            <!-- Evidence Records -->
+            <!-- EV-0023 Pending -->
+            <div data-id="444" class="card" id="ev-0023-card" style="cursor:pointer;">
+              <div data-id="445" style="display:flex;gap:10px;align-items:flex-start;">
+                <div data-id="446" style="width:56px;height:56px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
+                  <i data-id="447" data-lucide="image" class="w-6 h-6" style="color:var(--tm);"></i>
+                  <span data-id="448" style="position:absolute;bottom:2px;right:2px;font-size:8px;background:rgba(255,159,10,.8);color:#000;padding:1px 4px;border-radius:3px;font-weight:700;">CORR</span>
+                </div>
+                <div data-id="449" style="flex:1;min-width:0;">
+                  <div data-id="450" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <span data-id="451" style="font-size:13px;font-weight:700;">EV-20260719-0023</span>
+                    <span data-id="452" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);font-size:9px;">⏳ Pending</span>
+                  </div>
+                  <div data-id="453" style="font-size:12px;color:var(--ts);margin-top:2px;">WO-2847 · SV-047 · 00:18:32</div>
+                  <div data-id="454" style="font-size:11px;color:var(--ts);margin-top:2px;">CORROSION · MODERATE · 91% conf</div>
+                  <div data-id="455" style="font-size:10px;color:var(--tm);margin-top:2px;">Hash: a7f4b2c1...8d3e · 4.2 MB</div>
+                </div>
+              </div>
+              <div data-id="456" id="ev-0023-detail" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr);">
+                <div data-id="457" style="font-size:12px;color:var(--ts);line-height:1.6;margin-bottom:8px;">
+                  Full hash: a7f4b2c1d9e6f3a1b8c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d28d3e<br data-id="458">
+                  Classification: Pitting Corrosion<br data-id="459">
+                  Gemma confidence: 91%<br data-id="460">
+                  Capture GPS: 28.3847° N, 96.1234° W
+                </div>
+                <div data-id="461" style="display:flex;gap:6px;">
+                  <button data-id="462" class="chip" style="font-size:11px;padding:5px 10px;">View Full</button>
+                  <button data-id="463" class="chip" style="font-size:11px;padding:5px 10px;">Edit Annotation</button>
+                  <button data-id="464" class="chip" style="font-size:11px;padding:5px 10px;opacity:.4;cursor:not-allowed;">Force Sync</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- EV-0022 Synced -->
+            <div data-id="465" class="card">
+              <div data-id="466" style="display:flex;gap:10px;align-items:flex-start;">
+                <div data-id="467" style="width:56px;height:56px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i data-id="468" data-lucide="image" class="w-6 h-6" style="color:var(--tm);"></i>
+                </div>
+                <div data-id="469" style="flex:1;min-width:0;">
+                  <div data-id="470" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <span data-id="471" style="font-size:13px;font-weight:700;">EV-20260719-0022</span>
+                    <span data-id="472" class="badge" style="background:rgba(50,215,75,.15);color:var(--grn);font-size:9px;">✅ Synced</span>
+                  </div>
+                  <div data-id="473" style="font-size:12px;color:var(--ts);margin-top:2px;">FC-112 · NOMINAL · 99% conf</div>
+                  <div data-id="474" style="font-size:10px;color:var(--tm);margin-top:2px;">Hash verified ✓ · Synced 22:14:07</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EV-0021 Critical + Pending -->
+            <div data-id="475" class="card" style="border-left:3px solid var(--red);">
+              <div data-id="476" style="display:flex;gap:10px;align-items:flex-start;">
+                <div data-id="477" style="width:56px;height:56px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i data-id="478" data-lucide="ruler" class="w-6 h-6" style="color:var(--tm);"></i>
+                </div>
+                <div data-id="479" style="flex:1;min-width:0;">
+                  <div data-id="480" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <span data-id="481" style="font-size:13px;font-weight:700;">EV-20260719-0021</span>
+                    <span data-id="482" class="badge" style="background:rgba(255,59,48,.15);color:var(--red);font-size:9px;">🚨 CRITICAL</span>
+                    <span data-id="483" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);font-size:9px;">⏳ Pending</span>
+                  </div>
+                  <div data-id="484" style="font-size:12px;color:var(--ts);margin-top:2px;">SV-047 · UT Measurement Log · 3 readings</div>
+                  <div data-id="485" style="font-size:10px;color:var(--tm);margin-top:2px;">Escalation queued</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EV-0020 -->
+            <div data-id="486" class="card">
+              <div data-id="487" style="display:flex;gap:10px;align-items:flex-start;">
+                <div data-id="488" style="width:56px;height:56px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i data-id="489" data-lucide="gauge" class="w-6 h-6" style="color:var(--tm);"></i>
+                </div>
+                <div data-id="490" style="flex:1;min-width:0;">
+                  <div data-id="491" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <span data-id="492" style="font-size:13px;font-weight:700;">EV-20260719-0020</span>
+                    <span data-id="493" class="badge" style="background:rgba(50,215,75,.15);color:var(--grn);font-size:9px;">✅ Synced</span>
+                  </div>
+                  <div data-id="494" style="font-size:12px;color:var(--ts);margin-top:2px;">PG-034 · Calibration Reading</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EV-0019 -->
+            <div data-id="495" class="card">
+              <div data-id="496" style="display:flex;gap:10px;align-items:flex-start;">
+                <div data-id="497" style="width:56px;height:56px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i data-id="498" data-lucide="droplets" class="w-6 h-6" style="color:var(--tm);"></i>
+                </div>
+                <div data-id="499" style="flex:1;min-width:0;">
+                  <div data-id="500" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <span data-id="501" style="font-size:13px;font-weight:700;">EV-20260719-0019</span>
+                    <span data-id="502" class="badge" style="background:rgba(50,215,75,.15);color:var(--grn);font-size:9px;">✅ Synced</span>
+                  </div>
+                  <div data-id="503" style="font-size:12px;color:var(--ts);margin-top:2px;">FWP-02 · Flow measurement</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sync All Button -->
+            <button data-id="504" id="sync-all-btn-sa1" style="width:100%;height:52px;background:var(--pri);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;font-family:inherit;opacity:.4;cursor:not-allowed;">
+              <i data-id="505" data-lucide="refresh-cw" class="w-5 h-5"></i> Sync All Pending
+            </button>
+            <div data-id="506" id="sync-all-hint-sh2" style="text-align:center;font-size:11px;color:var(--amb);margin-top:4px;">Unavailable offline</div>
+          </div>
+
+          <!-- Tablet Context -->
+          <div data-id="507" class="split-context">
+            <div data-id="508" style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--ts);">Evidence Detail</div>
+            <div data-id="509" class="card">
+              <div data-id="510" style="font-size:13px;font-weight:600;margin-bottom:8px;">EV-20260719-0023</div>
+              <div data-id="511" style="width:100%;height:160px;background:var(--elevated);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                <div data-id="512" style="text-align:center;">
+                  <i data-id="513" data-lucide="image" class="w-10 h-10" style="color:var(--tm);margin:0 auto;display:block;"></i>
+                  <span data-id="514" style="font-size:11px;color:var(--tm);margin-top:4px;display:block;">Preview unavailable offline</span>
+                </div>
+              </div>
+              <div data-id="515" style="font-size:12px;color:var(--ts);line-height:1.6;">
+                Classification: Pitting Corrosion<br data-id="516">
+                Severity: MODERATE<br data-id="517">
+                Confidence: 91%<br data-id="518">
+                Area: ~12cm²<br data-id="519">
+                Depth est: 1.8–2.4mm<br data-id="520">
+                Capture time: 00:18:32<br data-id="521">
+                GPS: 28.3847°N, 96.1234°W
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== SYNC SCREEN ==================== -->
+        <div data-id="522" class="screen" id="screen-sync-s1" data-screen="sync">
+          <div data-id="523" class="split-primary">
+            <h2 data-id="524" style="font-size:18px;font-weight:700;margin-bottom:12px;">Connectivity & Escalation</h2>
+
+            <!-- Connectivity Status Card -->
+            <div data-id="525" class="card" id="conn-status-card-cc2" style="border-left:3px solid var(--amb);">
+              <div data-id="526" style="text-align:center;padding:12px 0;">
+                <div data-id="527" id="conn-big-icon-bi1" style="margin-bottom:8px;">
+                  <i data-id="528" data-lucide="wifi-off" class="w-10 h-10" style="color:var(--amb);margin:0 auto;display:block;"></i>
+                </div>
+                <div data-id="529" id="conn-big-label-bl1" style="font-size:28px;font-weight:800;color:var(--amb);">OFFLINE</div>
+                <div data-id="530" style="font-size:13px;color:var(--ts);margin-top:4px;">Last connected: 4h 23min ago</div>
+                <div data-id="531" style="font-size:12px;color:var(--tm);margin-top:2px;">Signal attempts: 47 (satellite: failed, cellular: failed, WiFi: scanning...)</div>
+                <div data-id="532" style="font-size:12px;color:var(--tm);margin-top:2px;">Estimated reconnect: Unknown — contact operations</div>
+              </div>
+              <div data-id="533" style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+                <span data-id="534" class="badge" style="background:rgba(255,59,48,.1);color:var(--red);">📡 Satellite ❌</span>
+                <span data-id="535" class="badge" style="background:rgba(255,59,48,.1);color:var(--red);">📶 Cellular ❌</span>
+                <span data-id="536" class="badge" style="background:rgba(255,159,10,.1);color:var(--amb);">📶 WiFi 🔄</span>
+              </div>
+              <div data-id="537" style="text-align:center;margin-top:10px;">
+                <span data-id="538" class="badge" style="background:rgba(50,215,75,.1);color:var(--grn);">Gemma local agent handling all tasks</span>
+              </div>
+            </div>
+
+            <!-- Sync progress (hidden by default, shown when online) -->
+            <div data-id="539" id="sync-progress-sp1" style="display:none;" class="card" style="border-left:3px solid var(--grn);">
+              <div data-id="540" style="font-size:14px;font-weight:700;color:var(--grn);margin-bottom:8px;">Syncing...</div>
+              <div data-id="541" style="background:var(--bdr);border-radius:4px;height:8px;overflow:hidden;">
+                <div data-id="542" id="sync-progress-bar-spb1" style="width:0%;height:100%;background:var(--grn);border-radius:4px;transition:width 1s ease;"></div>
+              </div>
+              <div data-id="543" id="sync-progress-text-spt1" style="font-size:12px;color:var(--ts);margin-top:4px;">Preparing...</div>
+            </div>
+
+            <!-- Local Agent Status -->
+            <div data-id="544" class="card">
+              <div data-id="545" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <div data-id="546" style="width:32px;height:32px;border-radius:50%;background:rgba(191,90,242,.2);display:flex;align-items:center;justify-content:center;">
+                  <span data-id="547" style="color:var(--purp);font-weight:800;font-size:14px;">G</span>
+                </div>
+                <div data-id="548">
+                  <div data-id="549" style="font-size:14px;font-weight:700;">Gemma-4-2B-IT · Active</div>
+                  <div data-id="550" style="font-size:11px;color:var(--ts);">2.1GB RAM · INT4 Quantized</div>
+                </div>
+              </div>
+              <div data-id="551" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;">
+                <div data-id="552" style="color:var(--ts);">Tasks this session</div><div data-id="553" style="text-align:right;font-weight:600;">14</div>
+                <div data-id="554" style="color:var(--ts);">Avg latency</div><div data-id="555" style="text-align:right;font-weight:600;">847ms</div>
+                <div data-id="556" style="color:var(--ts);">Confidence cal.</div><div data-id="557" style="text-align:right;font-weight:600;">94.2%</div>
+              </div>
+              <details data-id="558" style="margin-top:10px;">
+                <summary data-id="559" style="font-size:12px;color:var(--pri);cursor:pointer;font-weight:600;">Agent log (last 5)</summary>
+                <div data-id="560" style="font-size:11px;color:var(--ts);margin-top:6px;line-height:1.8;">
+                  00:26 — Classified EV-0023: Corrosion/Pitting 91%<br data-id="561">
+                  00:22 — Risk assessment: SV-047 threshold breach<br data-id="562">
+                  00:18 — Site condition analysis: humidity advisory<br data-id="563">
+                  00:14 — API 653 regulatory lookup<br data-id="564">
+                  00:08 — Work order priority ranking
+                </div>
+              </details>
+            </div>
+
+            <!-- Sync Queue -->
+            <div data-id="565" style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px;">
+              <h3 data-id="566" style="font-size:15px;font-weight:700;">Sync Queue</h3>
+              <span data-id="567" class="badge" style="background:rgba(255,159,10,.15);color:var(--amb);">3 pending</span>
+            </div>
+
+            <div data-id="568" class="card" style="display:flex;gap:10px;align-items:center;">
+              <div data-id="569" style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+              <div data-id="570" style="flex:1;min-width:0;">
+                <div data-id="571" style="font-size:13px;font-weight:600;">🚨 Escalation: SV-047 Critical Finding</div>
+                <div data-id="572" style="font-size:11px;color:var(--ts);">CRITICAL · Supervisor · 12.4MB</div>
+              </div>
+              <span data-id="573" style="font-size:10px;color:var(--red);font-weight:600;">FIRST</span>
+            </div>
+            <div data-id="574" class="card" style="display:flex;gap:10px;align-items:center;">
+              <div data-id="575" style="width:8px;height:8px;border-radius:50%;background:var(--amb);flex-shrink:0;"></div>
+              <div data-id="576" style="flex:1;min-width:0;">
+                <div data-id="577" style="font-size:13px;font-weight:600;">📷 Evidence: EV-0023 Corrosion Photo</div>
+                <div data-id="578" style="font-size:11px;color:var(--ts);">HIGH · 4.2MB</div>
+              </div>
+            </div>
+            <div data-id="579" class="card" style="display:flex;gap:10px;align-items:center;">
+              <div data-id="580" style="width:8px;height:8px;border-radius:50%;background:var(--amb);flex-shrink:0;"></div>
+              <div data-id="581" style="flex:1;min-width:0;">
+                <div data-id="582" style="font-size:13px;font-weight:600;">📐 Measurement: UT Readings SV-047</div>
+                <div data-id="583" style="font-size:11px;color:var(--ts);">HIGH · 0.1MB</div>
+              </div>
+            </div>
+            <div data-id="584" style="font-size:11px;color:var(--tm);margin-bottom:14px;">Sync order optimized by priority</div>
+
+            <!-- Escalation Queue -->
+            <div data-id="585" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <h3 data-id="586" style="font-size:15px;font-weight:700;">Escalation Queue</h3>
+              <span data-id="587" class="badge" style="background:rgba(255,59,48,.15);color:var(--red);">1 queued</span>
+            </div>
+
+            <div data-id="588" class="card" style="border-left:3px solid var(--red);" id="esc-card-ec1">
+              <div data-id="589" style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;">ESC-20260719-001</div>
+              <div data-id="590" style="font-size:12px;color:var(--ts);line-height:1.7;margin-bottom:8px;">
+                Priority: <span data-id="591" style="color:var(--red);font-weight:600;">CRITICAL</span><br data-id="592">
+                Routing: Inspector → ☁️ Supervisor Workspace<br data-id="593">
+                Reason: API 653 threshold breach · SV-047 · UT &lt; 2.8mm<br data-id="594">
+                Package: 3 photos + 3 measurements + Gemma analysis<br data-id="595">
+                <span data-id="596" id="esc-card-status-ecs1" style="color:var(--amb);">Status: Queued (offline)</span>
+              </div>
+              <div data-id="597" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button data-id="598" class="chip" style="font-size:11px;padding:5px 10px;">View Package</button>
+                <button data-id="599" class="chip" style="font-size:11px;padding:5px 10px;">Edit</button>
+                <button data-id="600" class="chip" style="font-size:11px;padding:5px 10px;">Cancel</button>
+              </div>
+            </div>
+
+            <!-- Cloud Agents Status -->
+            <div data-id="601" style="margin-top:14px;">
+              <h3 data-id="602" style="font-size:15px;font-weight:700;margin-bottom:8px;">Cloud Agents</h3>
+              <div data-id="603" class="card" style="padding:10px 14px;">
+                <div data-id="604" id="cloud-agents-list-ca1" style="font-size:12px;line-height:2.2;">
+                  <div data-id="605" style="display:flex;align-items:center;gap:8px;"><span data-id="606" style="color:var(--red);">🔴</span> SchedulerAgent — <span data-id="607" style="color:var(--red);">Unreachable</span></div>
+                  <div data-id="608" style="display:flex;align-items:center;gap:8px;"><span data-id="609" style="color:var(--red);">🔴</span> DispatchAgent — <span data-id="610" style="color:var(--red);">Unreachable</span></div>
+                  <div data-id="611" style="display:flex;align-items:center;gap:8px;"><span data-id="612" style="color:var(--red);">🔴</span> AnalysisAgent — <span data-id="613" style="color:var(--red);">Unreachable</span></div>
+                  <div data-id="614" style="display:flex;align-items:center;gap:8px;"><span data-id="615" style="color:var(--red);">🔴</span> ReviewAgent — <span data-id="616" style="color:var(--red);">Unreachable</span></div>
+                  <div data-id="617" style="display:flex;align-items:center;gap:8px;"><span data-id="618" style="color:var(--red);">🔴</span> SubmitAgent — <span data-id="619" style="color:var(--red);">Unreachable</span></div>
+                  <div data-id="620" style="display:flex;align-items:center;gap:8px;"><span data-id="621" style="color:var(--grn);">🟢</span> GemmaAgent (Local) — <span data-id="622" style="color:var(--grn);font-weight:600;">Active</span></div>
+                </div>
+                <div data-id="623" style="font-size:11px;color:var(--tm);margin-top:6px;">Gemma is your only active agent in offline mode. All cloud agent tasks are queued.</div>
+              </div>
+            </div>
+
+            <!-- Manual Escalation -->
+            <div data-id="624" style="display:flex;gap:8px;margin-top:12px;margin-bottom:8px;">
+              <button data-id="625" style="flex:1;height:48px;background:transparent;color:var(--tp);border:1px solid var(--bdr);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;">
+                <i data-id="626" data-lucide="radio" class="w-4 h-4"></i> Radio Supervisor
+              </button>
+              <button data-id="627" style="flex:1;height:48px;background:transparent;color:var(--red);border:1px solid rgba(255,59,48,.3);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;">
+                <i data-id="628" data-lucide="alert-triangle" class="w-4 h-4"></i> Emergency
+              </button>
+            </div>
+          </div>
+
+          <!-- Tablet Context -->
+          <div data-id="629" class="split-context">
+            <div data-id="630" style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--ts);">Escalation Detail</div>
+            <div data-id="631" class="card" style="border-left:3px solid var(--red);">
+              <div data-id="632" style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px;">ESC-20260719-001</div>
+              <div data-id="633" style="font-size:12px;color:var(--ts);line-height:1.6;">
+                <strong data-id="634">Inspector:</strong> Nalin Patel (Level 3)<br data-id="635">
+                <strong data-id="636">Asset:</strong> SV-047 Subsea Valve<br data-id="637">
+                <strong data-id="638">Finding:</strong> UT readings 2.5, 2.6, 2.7mm all below 2.8mm threshold<br data-id="639">
+                <strong data-id="640">Regulatory:</strong> API 653 §4.4<br data-id="641">
+                <strong data-id="642">Gemma Analysis:</strong> Mandatory escalation, engineering review required<br data-id="643">
+                <strong data-id="644">Recommendation:</strong> Immediate shutdown and tag-out
+              </div>
+            </div>
+            <div data-id="645" class="card">
+              <div data-id="646" style="font-size:13px;font-weight:600;margin-bottom:4px;">Package Contents</div>
+              <div data-id="647" style="font-size:12px;color:var(--ts);line-height:1.6;">
+                📷 EV-0021 — UT measurements<br data-id="648">
+                📷 EV-0022 — Corrosion overview<br data-id="649">
+                📷 EV-0023 — Pitting close-up<br data-id="650">
+                🤖 Gemma analysis report<br data-id="651">
+                📋 API 653 reference extract<br data-id="652">
+                Total: 12.4MB
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end screen-content -->
+
+      <!-- Bottom Tab Bar (phone only) -->
+      <div data-id="653" class="tab-bar" id="tab-bar-tb1">
+        <div data-id="654" class="tab-item active" data-tab="home">
+          <i data-id="655" data-lucide="home" class="tab-icon"></i>
+          <span data-id="656" class="tab-label">Home</span>
+        </div>
+        <div data-id="657" class="tab-item" data-tab="inspect">
+          <i data-id="658" data-lucide="search" class="tab-icon"></i>
+          <span data-id="659" class="tab-label">Inspect</span>
+        </div>
+        <div data-id="660" class="tab-item" data-tab="agent">
+          <i data-id="661" data-lucide="bot" class="tab-icon"></i>
+          <span data-id="662" class="tab-label">Agent</span>
+        </div>
+        <div data-id="663" class="tab-item" data-tab="evidence">
+          <i data-id="664" data-lucide="package" class="tab-icon"></i>
+          <span data-id="665" class="tab-label">Evidence</span>
+        </div>
+        <div data-id="666" class="tab-item" data-tab="sync">
+          <i data-id="667" data-lucide="cloud" class="tab-icon"></i>
+          <span data-id="668" class="tab-label">Sync</span>
+        </div>
+      </div>
+
+    </div><!-- end device-inner -->
+  </div><!-- end device-frame -->
+
+  <div data-id="669" style="text-align:center;margin-top:12px;font-size:12px;color:var(--tm);">Demo mode · AIMS Inspector v2.4.1</div>
+  <footer data-id="670" class="app-footer">Made by Copilot</footer>
+</div>
+
+<!-- Floating Gemma FAB (inside device frame, positioned absolutely) -->
+
+<script>
+// ===================== INITIALIZATION =====================
+if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+  lucide.createIcons();
+}
+
+// ===================== STATE =====================
+const state = {
+  screen: 'home',
+  isOnline: false,
+  deviceMode: localStorage.getItem('aims-device') || 'phone',
+  captureOpen: false,
+  detected: false,
+  captured: false,
+  statsOpen: false,
+  ev0023Open: false,
+  permitOn: false,
+  syncing: false
+};
+
+// ===================== DOM REFS =====================
+const frame = document.getElementById('device-frame-f1');
+const screens = document.querySelectorAll('.screen');
+const tabItems = document.querySelectorAll('.tab-item');
+const sidebarItems = document.querySelectorAll('.sb-item');
+const dynamicIsland = document.getElementById('dynamic-island-i1');
+const diDot = document.getElementById('di-dot-d2');
+const diText = document.getElementById('di-text-t1');
+const connPill = document.getElementById('conn-pill-cp1');
+const connDot = document.getElementById('conn-dot-cd1');
+const connLabel = document.getElementById('conn-label-cl1');
+const cloudStatus = document.getElementById('cloud-status-cs1');
+const agentBanner = document.getElementById('agent-conn-banner-ab1');
+const connStatusCard = document.getElementById('conn-status-card-cc2');
+const connBigLabel = document.getElementById('conn-big-label-bl1');
+const connBigIcon = document.getElementById('conn-big-icon-bi1');
+const captureOverlay = document.getElementById('capture-overlay-co2');
+const detectionBox = document.getElementById('detection-box-db1');
+const detectionLabel = document.getElementById('detection-label-dl1');
+const aiClassCard = document.getElementById('ai-class-card-ac1');
+const flashOverlay = document.getElementById('flash-overlay-fo1');
+const capturedState = document.getElementById('captured-state-cs2');
+const gemmaWatch = document.getElementById('gemma-watch-gw1');
+const notifBanner = document.getElementById('notif-banner-n1');
+const escStatus = document.getElementById('esc-status-es1');
+const escCardStatus = document.getElementById('esc-card-status-ecs1');
+const sendNowBtn = document.getElementById('send-now-btn-sn1');
+const syncAllBtn = document.getElementById('sync-all-btn-sa1');
+const syncAllHint = document.getElementById('sync-all-hint-sh2');
+const syncProgress = document.getElementById('sync-progress-sp1');
+const permitToggle = document.getElementById('permit-toggle-pt1');
+const permitWarn = document.getElementById('permit-warn-pw1');
+const modelStatsPopup = document.getElementById('model-stats-popup-ms2');
+const cloudAgentsList = document.getElementById('cloud-agents-list-ca1');
+
+// ===================== NAVIGATION =====================
+function navigateTo(screenName) {
+  state.screen = screenName;
+  screens.forEach(s => s.classList.remove('active'));
+  const target = document.querySelector(`[data-screen="${screenName}"]`);
+  if (target) target.classList.add('active');
+
+  tabItems.forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === screenName);
+  });
+  sidebarItems.forEach(s => {
+    s.classList.toggle('active', s.dataset.tab === screenName);
+  });
+
+  // Scroll to top
+  document.getElementById('screen-content-c1').scrollTop = 0;
+}
+
+tabItems.forEach(tab => {
+  tab.addEventListener('click', () => navigateTo(tab.dataset.tab));
+});
+
+sidebarItems.forEach(sb => {
+  sb.addEventListener('click', () => navigateTo(sb.dataset.tab));
+});
+
+// ===================== DEVICE FRAME TOGGLE =====================
+function setDeviceMode(mode) {
+  state.deviceMode = mode;
+  localStorage.setItem('aims-device', mode);
+  frame.classList.remove('phone', 'tablet');
+  frame.classList.add(mode);
+
+  const phoneBtn = document.getElementById('frame-phone-btn-x1');
+  const tabletBtn = document.getElementById('frame-tablet-btn-x2');
+  if (mode === 'phone') {
+    phoneBtn.style.background = '#0A84FF';
+    phoneBtn.style.color = '#fff';
+    tabletBtn.style.background = '#1E3048';
+    tabletBtn.style.color = '#F5F5F7';
+  } else {
+    tabletBtn.style.background = '#0A84FF';
+    tabletBtn.style.color = '#fff';
+    phoneBtn.style.background = '#1E3048';
+    phoneBtn.style.color = '#F5F5F7';
+  }
+
+  // Re-init icons
+  if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+    lucide.createIcons();
+  }
+}
+
+document.getElementById('frame-phone-btn-x1').addEventListener('click', () => setDeviceMode('phone'));
+document.getElementById('frame-tablet-btn-x2').addEventListener('click', () => setDeviceMode('tablet'));
+
+// ===================== CONNECTIVITY TOGGLE =====================
+const connToggle = document.getElementById('conn-toggle-btn-x3');
+
+function updateConnectivityUI() {
+  const online = state.isOnline;
+
+  // Toggle button
+  connToggle.textContent = online ? 'Go Offline' : 'Go Online';
+  connToggle.style.background = online ? '#FF9F0A' : '#32D74B';
+  connToggle.style.color = online ? '#080D15' : '#080D15';
+
+  // Conn pill
+  connDot.style.background = online ? 'var(--grn)' : 'var(--amb)';
+  connLabel.textContent = online ? 'ONLINE' : 'OFFLINE';
+  connPill.style.background = online ? 'rgba(50,215,75,.15)' : 'rgba(255,159,10,.15)';
+  connPill.style.color = online ? 'var(--grn)' : 'var(--amb)';
+
+  // Dynamic island
+  diDot.style.background = online ? 'var(--grn)' : 'var(--amb)';
+  diText.style.color = online ? 'var(--grn)' : 'var(--amb)';
+  diText.textContent = online ? '☁️ Syncing 3 records...' : 'OFFLINE · Gemma Active';
+
+  // Cloud status on home
+  cloudStatus.innerHTML = online
+    ? '<i data-lucide="cloud" class="w-3 h-3" style="display:inline;vertical-align:middle;color:var(--grn);"></i> Cloud escalation available'
+    : '<i data-lucide="cloud-off" class="w-3 h-3" style="display:inline;vertical-align:middle;"></i> Cloud agents unavailable — local agent active';
+  cloudStatus.style.color = online ? 'var(--grn)' : 'var(--amb)';
+
+  // Agent banner
+  agentBanner.style.background = online ? 'rgba(50,215,75,.08)' : 'rgba(255,159,10,.08)';
+  agentBanner.style.borderColor = online ? 'rgba(50,215,75,.15)' : 'rgba(255,159,10,.15)';
+  agentBanner.style.color = online ? 'var(--grn)' : 'var(--amb)';
+  agentBanner.innerHTML = online
+    ? '<i data-lucide="cloud" class="w-4 h-4"></i> Cloud connected · Escalation available in real-time'
+    : '<i data-lucide="cloud-off" class="w-4 h-4"></i> Cloud agents unreachable · Gemma handling all queries · Escalation queued';
+
+  // Sync screen connectivity card
+  connStatusCard.style.borderLeftColor = online ? 'var(--grn)' : 'var(--amb)';
+  connBigLabel.textContent = online ? 'ONLINE · 4G · 24Mbps' : 'OFFLINE';
+  connBigLabel.style.color = online ? 'var(--grn)' : 'var(--amb)';
+
+  // Wifi icon
+  const wifiIcon = document.getElementById('wifi-icon-w1');
+  wifiIcon.style.color = online ? 'var(--grn)' : 'var(--amb)';
+
+  // Send now button
+  sendNowBtn.style.opacity = online ? '1' : '.4';
+  sendNowBtn.style.cursor = online ? 'pointer' : 'not-allowed';
+
+  // Sync all button
+  syncAllBtn.style.opacity = online ? '1' : '.4';
+  syncAllBtn.style.cursor = online ? 'pointer' : 'not-allowed';
+  syncAllHint.textContent = online ? 'Ready to sync' : 'Unavailable offline';
+  syncAllHint.style.color = online ? 'var(--grn)' : 'var(--amb)';
+
+  // Cloud agents
+  if (online) {
+    cloudAgentsList.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> SchedulerAgent — <span style="color:var(--grn);">Connected</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> DispatchAgent — <span style="color:var(--grn);">Connected</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> AnalysisAgent — <span style="color:var(--grn);">Connected</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> ReviewAgent — <span style="color:var(--grn);">Connected</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> SubmitAgent — <span style="color:var(--grn);">Connected</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> GemmaAgent (Local) — <span style="color:var(--grn);font-weight:600;">Active</span></div>
+    `;
+  } else {
+    cloudAgentsList.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--red);">🔴</span> SchedulerAgent — <span style="color:var(--red);">Unreachable</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--red);">🔴</span> DispatchAgent — <span style="color:var(--red);">Unreachable</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--red);">🔴</span> AnalysisAgent — <span style="color:var(--red);">Unreachable</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--red);">🔴</span> ReviewAgent — <span style="color:var(--red);">Unreachable</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--red);">🔴</span> SubmitAgent — <span style="color:var(--red);">Unreachable</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--grn);">🟢</span> GemmaAgent (Local) — <span style="color:var(--grn);font-weight:600;">Active</span></div>
+    `;
+  }
+
+  // Re-render icons
+  if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+    lucide.createIcons();
+  }
+
+  // Escalation flow when going online
+  if (online && !state.syncing) {
+    runSyncAnimation();
+  }
+}
+
+function expandIsland(text, color, duration) {
+  dynamicIsland.classList.remove('default');
+  dynamicIsland.classList.add('expanded');
+  diDot.style.background = color;
+  diText.style.color = color;
+  diText.textContent = text;
+  if (duration) {
+    setTimeout(() => {
+      dynamicIsland.classList.remove('expanded');
+      dynamicIsland.classList.add('default');
+    }, duration);
+  }
+}
+
+function runSyncAnimation() {
+  state.syncing = true;
+
+  // Expand island
+  expandIsland('☁️ Syncing 3 records...', 'var(--grn)', 0);
+
+  // Show sync progress
+  syncProgress.style.display = 'block';
+  const bar = document.getElementById('sync-progress-bar-spb1');
+  const txt = document.getElementById('sync-progress-text-spt1');
+
+  // Escalation status update
+  escStatus.textContent = 'Status: Transmitting...';
+  escStatus.style.color = 'var(--pri)';
+  escCardStatus.textContent = 'Status: Transmitting...';
+  escCardStatus.style.color = 'var(--pri)';
+
+  setTimeout(() => { bar.style.width = '35%'; txt.textContent = 'Sending escalation...'; }, 500);
+  setTimeout(() => { bar.style.width = '70%'; txt.textContent = 'Uploading evidence...'; }, 2000);
+  setTimeout(() => {
+    bar.style.width = '100%';
+    txt.textContent = 'Sync complete!';
+
+    // Update escalation
+    escStatus.textContent = 'Status: Delivered ✓';
+    escStatus.style.color = 'var(--grn)';
+    escCardStatus.textContent = 'Status: Delivered ✓';
+    escCardStatus.style.color = 'var(--grn)';
+
+    expandIsland('☁️ Escalation delivered', 'var(--grn)', 3000);
+  }, 3500);
+
+  // Show notification
+  setTimeout(() => {
+    notifBanner.classList.add('show');
+    setTimeout(() => notifBanner.classList.remove('show'), 4000);
+  }, 5000);
+
+  setTimeout(() => { state.syncing = false; }, 6000);
+}
+
+connToggle.addEventListener('click', () => {
+  state.isOnline = !state.isOnline;
+  state.syncing = false;
+  if (!state.isOnline) {
+    syncProgress.style.display = 'none';
+    escStatus.textContent = 'Status: Queued (offline) — will send when connected';
+    escStatus.style.color = 'var(--amb)';
+    escCardStatus.textContent = 'Status: Queued (offline)';
+    escCardStatus.style.color = 'var(--amb)';
+  }
+  updateConnectivityUI();
+});
+
+// ===================== CAPTURE FLOW =====================
+document.getElementById('capture-open-btn-co1').addEventListener('click', () => {
+  state.captureOpen = true;
+  state.detected = false;
+  state.captured = false;
+  captureOverlay.classList.add('active');
+  detectionBox.classList.remove('detected');
+  detectionLabel.textContent = 'Analyzing...';
+  detectionLabel.style.color = 'var(--amb)';
+  aiClassCard.style.display = 'none';
+  capturedState.style.display = 'none';
+  gemmaWatch.textContent = 'Gemma is watching...';
+
+  // Simulate detection after 2s
+  setTimeout(() => {
+    state.detected = true;
+    detectionBox.classList.add('detected');
+    detectionLabel.textContent = 'CORROSION DETECTED · 91% · MODERATE';
+    detectionLabel.style.color = 'var(--red)';
+    gemmaWatch.textContent = 'Corrosion detected!';
+
+    // Show classification card
+    setTimeout(() => {
+      aiClassCard.style.display = 'block';
+    }, 500);
+  }, 2000);
+});
+
+document.getElementById('capture-close-btn-cc1').addEventListener('click', () => {
+  captureOverlay.classList.remove('active');
+  state.captureOpen = false;
+});
+
+document.getElementById('capture-shutter-btn-cs3').addEventListener('click', () => {
+  if (state.captured) return;
+  state.captured = true;
+
+  // Flash
+  flashOverlay.style.opacity = '0.8';
+  setTimeout(() => { flashOverlay.style.opacity = '0'; }, 200);
+
+  // Show captured state
+  setTimeout(() => {
+    capturedState.style.display = 'flex';
+    expandIsland('📷 Evidence captured', 'var(--grn)', 2500);
+  }, 300);
+});
+
+// ===================== WO-2847 TAP =====================
+document.getElementById('wo-2847-card').addEventListener('click', () => {
+  navigateTo('inspect');
+});
+
+// ===================== SYNC HINT TAP =====================
+document.getElementById('sync-hint-sh1').addEventListener('click', () => {
+  navigateTo('sync');
+});
+
+// ===================== PERMIT TOGGLE =====================
+permitToggle.addEventListener('click', () => {
+  state.permitOn = !state.permitOn;
+  permitToggle.classList.toggle('on', state.permitOn);
+  permitWarn.textContent = state.permitOn ? '✓ Permit verified' : '⚠ Permit not yet verified';
+  permitWarn.style.color = state.permitOn ? 'var(--grn)' : 'var(--amb)';
+});
+
+// ===================== MODEL STATS TOGGLE =====================
+document.getElementById('model-stats-btn-ms1').addEventListener('click', () => {
+  state.statsOpen = !state.statsOpen;
+  modelStatsPopup.style.display = state.statsOpen ? 'block' : 'none';
+});
+
+// ===================== EV-0023 EXPAND =====================
+document.getElementById('ev-0023-card').addEventListener('click', () => {
+  state.ev0023Open = !state.ev0023Open;
+  document.getElementById('ev-0023-detail').style.display = state.ev0023Open ? 'block' : 'none';
+});
+
+// ===================== CHAT SEND =====================
+const chatInput = document.getElementById('chat-input-ci1');
+const chatThread = document.getElementById('chat-thread-ct1');
+
+document.getElementById('chat-send-btn-sb1').addEventListener('click', () => {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  // Add inspector message
+  const inspMsg = document.createElement('div');
+  inspMsg.className = 'chat-msg msg-inspector';
+  inspMsg.innerHTML = `
+    <div class="msg-header" style="text-align:right;color:var(--ts);">Inspector · 00:29</div>
+    <div class="msg-body">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+  `;
+  chatThread.appendChild(inspMsg);
+  chatInput.value = '';
+
+  // Expand island for Gemma thinking
+  expandIsland('Gemma · Analyzing...', 'var(--purp)', 0);
+
+  // Show typing
+  const typingMsg = document.createElement('div');
+  typingMsg.className = 'chat-msg msg-gemma';
+  typingMsg.innerHTML = `
+    <div class="msg-header" style="color:var(--purp);display:flex;align-items:center;gap:6px;">
+      <span style="width:18px;height:18px;border-radius:50%;background:rgba(191,90,242,.2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--purp);">G</span>
+      Gemma · processing...
+    </div>
+    <div class="msg-body"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+  `;
+  chatThread.appendChild(typingMsg);
+  chatThread.scrollTop = chatThread.scrollHeight;
+
+  // Simulate response after delay
+  const responses = [
+    "I've analyzed your query against my local knowledge base. Based on the current inspection context for SV-047, I recommend documenting this finding with detailed photos and measurements. Would you like me to help structure the report?",
+    "Good question. Let me cross-reference with the regulatory database stored on-device. The relevant standard for this scenario is API 653 §4.4, which specifies minimum wall thickness requirements. Shall I walk you through the compliance checklist?",
+    "I've noted your observation. Based on the environmental conditions (24°C, 81% humidity) and the corrosion patterns we've documented, the rate of material loss appears consistent with microbiologically influenced corrosion (MIC). I recommend collecting a surface swab for lab analysis when available."
+  ];
+  const response = responses[Math.floor(Math.random() * responses.length)];
+
+  setTimeout(() => {
+    // Remove typing indicator
+    chatThread.removeChild(typingMsg);
+
+    // Add gemma response with streaming effect
+    const gemmaMsg = document.createElement('div');
+    gemmaMsg.className = 'chat-msg msg-gemma';
+    const latency = (600 + Math.random() * 800).toFixed(0);
+    gemmaMsg.innerHTML = `
+      <div class="msg-header" style="color:var(--purp);display:flex;align-items:center;gap:6px;">
+        <span style="width:18px;height:18px;border-radius:50%;background:rgba(191,90,242,.2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--purp);">G</span>
+        Gemma · ${latency}ms · Local
+      </div>
+      <div class="msg-body"><span id="streaming-text-st1"></span></div>
+    `;
+    chatThread.appendChild(gemmaMsg);
+
+    // Stream words
+    const words = response.split(' ');
+    let i = 0;
+    const streamEl = gemmaMsg.querySelector('#streaming-text-st1');
+    const streamInterval = setInterval(() => {
+      if (i < words.length) {
+        streamEl.textContent += (i > 0 ? ' ' : '') + words[i];
+        i++;
+        chatThread.scrollTop = chatThread.scrollHeight;
+      } else {
+        clearInterval(streamInterval);
+        streamEl.removeAttribute('id');
+        // Collapse island
+        dynamicIsland.classList.remove('expanded');
+        dynamicIsland.classList.add('default');
+      }
+    }, 40);
+
+  }, 1500 + Math.random() * 1000);
+});
+
+// Enter key to send
+chatInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    document.getElementById('chat-send-btn-sb1').click();
+  }
+});
+
+// ===================== FILTER CHIPS (Evidence) =====================
+document.querySelectorAll('#screen-evidence-e1 .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#screen-evidence-e1 .chips-scroll .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+
+// ===================== INITIAL SETUP =====================
+setDeviceMode(state.deviceMode);
+updateConnectivityUI();
+
+// Dynamic island default state
+setTimeout(() => {
+  expandIsland('OFFLINE · Gemma Active', 'var(--amb)', 3000);
+}, 1000);
+</script>
+</body>
+</html>

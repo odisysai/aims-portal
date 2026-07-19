@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>AIMS – Agentic Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              deep: '#070B12',
+              surface: '#0C1220',
+              card: '#111827',
+              elevated: '#161F30',
+              bsub: '#1E2D45',
+              bacc: '#1A3A5C',
+              pri: '#0A84FF',
+              teal: '#00C7BE',
+              amber: '#FF9F0A',
+              red: '#FF453A',
+              grn: '#30D158',
+              tp: '#F2F2F7',
+              ts: '#8E8E93',
+              tm: '#3A3A3C'
+            }
+          }
+        }
+      };
+    </script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      :root{--deep:#070B12;--surface:#0C1220;--card:#111827;--elevated:#161F30;--bsub:#1E2D45;--bacc:#1A3A5C;--pri:#0A84FF;--teal:#00C7BE;--amber:#FF9F0A;--red:#FF453A;--grn:#30D158;--tp:#F2F2F7;--ts:#8E8E93;--tm:#3A3A3C}
+      html,body{height:100%;overflow:hidden}
+      body{font-family:system-ui,-apple-system,'SF Pro Display','Segoe UI',sans-serif;background:var(--deep);color:var(--tp);font-size:14px;line-height:1.5}
+      .tabnum{font-variant-numeric:tabular-nums}
+      @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+      .pulse-dot{animation:pulse-dot 2s ease-in-out infinite}
+      @keyframes typing-dot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+      .dot-1{animation:typing-dot .8s ease-in-out infinite}
+      .dot-2{animation:typing-dot .8s ease-in-out .15s infinite}
+      .dot-3{animation:typing-dot .8s ease-in-out .3s infinite}
+      @keyframes fadeslide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+      .fadein{animation:fadeslide .4s ease-out both}
+      @keyframes radpulse{0%,100%{opacity:.15}50%{opacity:.3}}
+      .rad-pulse{animation:radpulse 4s ease-in-out infinite}
+      .card-role{transition:transform .25s,border-color .25s,box-shadow .25s}
+      .card-role:hover{transform:translateY(-4px)}
+      ::-webkit-scrollbar{width:5px;height:5px}
+      ::-webkit-scrollbar-track{background:transparent}
+      ::-webkit-scrollbar-thumb{background:var(--bsub);border-radius:8px}
+      .chip-cmd{transition:border-color .2s,transform .15s}
+      .chip-cmd:hover{border-color:var(--pri);transform:scale(1.02)}
+      .sidebar-icon{transition:background .2s}
+      .sidebar-icon:hover{background:rgba(255,255,255,.06)}
+      .sidebar-icon.active{background:rgba(10,132,255,.15)}
+      .sidebar-icon.active i{color:var(--pri) !important}
+      .tt{position:relative}
+      .tt::after{content:attr(data-tip);position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--card);color:var(--tp);font-size:11px;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid var(--bsub);z-index:100}
+      .tt:hover::after{opacity:1}
+      @keyframes flash{0%{opacity:0}15%{opacity:.4}100%{opacity:0}}
+      .role-flash{animation:flash .6s ease-out both}
+    </style>
+</head>
+<body data-id="0">
+    <app-icon data-id="1" hidden data-icon="shield-check" data-palette="Dark"></app-icon>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div data-id="2" id="login-screen-k3m1" class="fixed inset-0 z-[100] flex flex-col items-center justify-center px-4" style="background:var(--deep);">
+      <div data-id="3" class="absolute inset-0 rad-pulse" style="background:radial-gradient(ellipse at 50% 40%,rgba(10,132,255,.12) 0%,transparent 60%);pointer-events:none;"></div>
+      <div data-id="4" class="relative z-10 flex flex-col items-center w-full max-w-4xl">
+        <div data-id="5" class="flex items-center gap-2 mb-1">
+          <span data-id="6" class="font-mono text-2xl font-bold" style="color:var(--pri);">AIMS</span>
+        </div>
+        <span data-id="7" class="text-xs uppercase tracking-widest mb-10" style="color:var(--tm);letter-spacing:.08em;font-size:11px;">Asset Integrity Management System</span>
+        <h1 data-id="8" id="login-title-r4x2" class="text-3xl md:text-4xl font-bold mb-2" style="color:var(--tp);">Select Your Workspace</h1>
+        <p data-id="9" class="text-sm mb-10 text-center max-w-lg" style="color:var(--ts);">Your role determines your agentic workspace, available commands, and data scope.</p>
+        <div data-id="10" class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full mb-10">
+          <!-- Planner -->
+          <button data-id="11" id="role-planner-a1b2" class="card-role rounded-2xl p-5 text-left cursor-pointer" style="background:var(--card);border:2px solid var(--bsub);" data-role="planner">
+            <div data-id="12" class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(10,132,255,.15);">
+              <i data-id="13" data-lucide="clipboard-list" class="w-5 h-5" style="color:var(--pri);"></i>
+            </div>
+            <div data-id="14" class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--pri);letter-spacing:.06em;">Planner</div>
+            <div data-id="15" class="text-[10px] px-2 py-0.5 rounded inline-block mb-3" style="background:rgba(10,132,255,.1);color:var(--pri);">SchedulerAgent · DispatchAgent</div>
+            <p data-id="16" class="text-xs mb-4" style="color:var(--ts);">Generate work orders, optimize inspection routes, risk-rank asset queues, and deploy field agents.</p>
+            <div data-id="17" class="flex flex-wrap gap-1">
+              <span data-id="18" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Work Orders</span>
+              <span data-id="19" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Routes</span>
+              <span data-id="20" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Risk</span>
+              <span data-id="21" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Deploy</span>
+            </div>
+          </button>
+          <!-- Reviewer -->
+          <button data-id="22" id="role-reviewer-c3d4" class="card-role rounded-2xl p-5 text-left cursor-pointer" style="background:var(--card);border:2px solid var(--bsub);" data-role="reviewer">
+            <div data-id="23" class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(0,199,190,.15);">
+              <i data-id="24" data-lucide="shield-check" class="w-5 h-5" style="color:var(--teal);"></i>
+            </div>
+            <div data-id="25" class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--teal);letter-spacing:.06em;">Reviewer</div>
+            <div data-id="26" class="text-[10px] px-2 py-0.5 rounded inline-block mb-3" style="background:rgba(0,199,190,.1);color:var(--teal);">CaptureAgent · AnalysisAgent · ReviewAgent</div>
+            <p data-id="27" class="text-xs mb-4" style="color:var(--ts);">Examine field evidence, classify defects, verify hash chains, approve or reject inspection records.</p>
+            <div data-id="28" class="flex flex-wrap gap-1">
+              <span data-id="29" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Evidence</span>
+              <span data-id="30" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Defects</span>
+              <span data-id="31" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Hash</span>
+              <span data-id="32" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Approve</span>
+            </div>
+          </button>
+          <!-- Supervisor -->
+          <button data-id="33" id="role-supervisor-e5f6" class="card-role rounded-2xl p-5 text-left cursor-pointer" style="background:var(--card);border:2px solid var(--bsub);" data-role="supervisor">
+            <div data-id="34" class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(255,159,10,.15);">
+              <i data-id="35" data-lucide="gauge" class="w-5 h-5" style="color:var(--amber);"></i>
+            </div>
+            <div data-id="36" class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--amber);letter-spacing:.06em;">Supervisor</div>
+            <div data-id="37" class="text-[10px] px-2 py-0.5 rounded inline-block mb-3" style="background:rgba(255,159,10,.1);color:var(--amber);">All Agents · Override Authority</div>
+            <p data-id="38" class="text-xs mb-4" style="color:var(--ts);">Monitor fleet-wide agent health, track escalations, override decisions, and drive compliance reporting.</p>
+            <div data-id="39" class="flex flex-wrap gap-1">
+              <span data-id="40" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Fleet</span>
+              <span data-id="41" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Agents</span>
+              <span data-id="42" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Escalate</span>
+              <span data-id="43" class="text-[10px] px-2 py-0.5 rounded" style="background:var(--elevated);color:var(--ts);">Compliance</span>
+            </div>
+          </button>
+        </div>
+        <p data-id="44" class="text-[11px] text-center" style="color:var(--tm);">All workspaces are governed by AIMS evidence chain. Actions are logged.</p>
+      </div>
+    </div>
+
+    <!-- ===== ROLE FLASH OVERLAY ===== -->
+    <div data-id="45" id="role-flash-o9p0" class="fixed inset-0 z-[99] pointer-events-none" style="display:none;"></div>
+
+    <!-- ===== WORKSPACE SHELL ===== -->
+    <div data-id="46" id="workspace-shell-g7h8" class="fixed inset-0 flex" style="display:none;">
+      <!-- A: LEFT ICON SIDEBAR -->
+      <aside data-id="47" id="sidebar-left-i9j0" class="hidden md:flex flex-col items-center py-3 flex-shrink-0" style="width:56px;background:var(--deep);border-right:1px solid var(--bsub);">
+        <div data-id="48" class="font-mono text-lg font-bold mb-1" style="color:var(--pri);">A</div>
+        <div data-id="49" class="w-8 mb-3" style="border-top:1px solid var(--bsub);"></div>
+        <div data-id="50" class="flex flex-col items-center gap-1 flex-1">
+          <button data-id="51" class="sidebar-icon tt w-10 h-10 rounded-lg flex items-center justify-center" data-nav="home" data-tip="Switch Role"><i data-id="52" data-lucide="log-out" class="w-4 h-4" style="color:var(--ts);"></i></button>
+          <button data-id="53" class="sidebar-icon tt active w-10 h-10 rounded-lg flex items-center justify-center" data-nav="workspace" data-tip="Workspace"><i data-id="54" data-lucide="layout-dashboard" class="w-4 h-4" style="color:var(--pri);"></i></button>
+          <button data-id="55" class="sidebar-icon tt w-10 h-10 rounded-lg flex items-center justify-center" data-nav="agents" data-tip="Agent Status"><i data-id="56" data-lucide="bot" class="w-4 h-4" style="color:var(--ts);"></i></button>
+          <button data-id="57" class="sidebar-icon tt w-10 h-10 rounded-lg flex items-center justify-center" data-nav="evidence" data-tip="Evidence Chain"><i data-id="58" data-lucide="link" class="w-4 h-4" style="color:var(--ts);"></i></button>
+          <button data-id="59" class="sidebar-icon tt w-10 h-10 rounded-lg flex items-center justify-center" data-nav="settings" data-tip="Settings"><i data-id="60" data-lucide="settings" class="w-4 h-4" style="color:var(--ts);"></i></button>
+        </div>
+        <div data-id="61" id="sidebar-avatar-k1l2" class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold mt-2" style="background:rgba(10,132,255,.2);color:var(--pri);">N</div>
+      </aside>
+
+      <!-- B: CENTER WORKSPACE PANE -->
+      <div data-id="62" class="flex-1 flex flex-col min-w-0 overflow-hidden" style="background:var(--surface);">
+        <!-- Top bar -->
+        <div data-id="63" id="ws-topbar-m3n4" class="flex items-center justify-between px-4 md:px-5 flex-shrink-0" style="height:48px;border-bottom:1px solid var(--bsub);">
+          <div data-id="64" class="flex items-center gap-2 min-w-0">
+            <button data-id="65" id="ws-back-btn-z1z2" class="hidden p-1 rounded hover:bg-white/5" style="color:var(--ts);"><i data-id="66" data-lucide="arrow-left" class="w-4 h-4"></i></button>
+            <span data-id="67" id="ws-breadcrumb-o5p6" class="text-[11px] truncate" style="color:var(--tm);">AIMS / Workspace</span>
+          </div>
+          <div data-id="68" class="flex items-center gap-3">
+            <span data-id="69" id="ws-agent-badge-q7r8" class="hidden md:inline text-[10px] px-2 py-0.5 rounded-full font-bold" style="background:rgba(0,199,190,.1);color:var(--teal);">Rendered by SchedulerAgent</span>
+            <span data-id="70" class="text-[10px] font-mono hidden md:inline" style="color:var(--tm);">22:23 PDT</span>
+          </div>
+        </div>
+        <!-- Workspace content -->
+        <div data-id="71" id="ws-content-s9t0" class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-5">
+        </div>
+      </div>
+
+      <!-- C: AGENT STATUS MINI-PANEL -->
+      <aside data-id="72" id="agent-panel-u1v2" class="hidden lg:flex flex-col flex-shrink-0 overflow-y-auto" style="width:200px;background:var(--deep);border-left:1px solid var(--bsub);">
+        <div data-id="73" class="flex items-center justify-between px-3 pt-3 pb-2">
+          <span data-id="74" class="text-[11px] font-bold uppercase tracking-widest" style="color:var(--tm);letter-spacing:.06em;">Agent Mesh</span>
+          <button data-id="75" id="collapse-agents-w3x4" class="p-1 rounded hover:bg-white/5"><i data-id="76" data-lucide="panel-right-close" class="w-3.5 h-3.5" style="color:var(--tm);"></i></button>
+        </div>
+        <div data-id="77" class="flex flex-col gap-1 px-3 mb-4">
+          <div data-id="78" class="flex items-center gap-2 py-1.5"><span data-id="79" class="w-2 h-2 rounded-full pulse-dot" style="background:var(--grn);"></span><span data-id="80" class="text-[11px]" style="color:var(--ts);">SchedulerAgent</span><span data-id="81" class="text-[9px] ml-auto" style="color:var(--grn);">Running</span></div>
+          <div data-id="82" class="flex items-center gap-2 py-1.5"><span data-id="83" class="w-2 h-2 rounded-full pulse-dot" style="background:var(--grn);"></span><span data-id="84" class="text-[11px]" style="color:var(--ts);">DispatchAgent</span><span data-id="85" class="text-[9px] ml-auto" style="color:var(--grn);">Running</span></div>
+          <div data-id="86" class="flex items-center gap-2 py-1.5"><span data-id="87" class="w-2 h-2 rounded-full" style="background:var(--amber);"></span><span data-id="88" class="text-[11px]" style="color:var(--ts);">CaptureAgent</span><span data-id="89" class="text-[9px] ml-auto" style="color:var(--amber);">Syncing</span></div>
+          <div data-id="90" class="flex items-center gap-2 py-1.5"><span data-id="91" class="w-2 h-2 rounded-full pulse-dot" style="background:var(--grn);"></span><span data-id="92" class="text-[11px]" style="color:var(--ts);">AnalysisAgent</span><span data-id="93" class="text-[9px] ml-auto" style="color:var(--grn);">Running</span></div>
+          <div data-id="94" class="flex items-center gap-2 py-1.5"><span data-id="95" class="w-2 h-2 rounded-full" style="background:var(--tm);"></span><span data-id="96" class="text-[11px]" style="color:var(--ts);">ReviewAgent</span><span data-id="97" class="text-[9px] ml-auto" style="color:var(--tm);">Idle</span></div>
+          <div data-id="98" class="flex items-center gap-2 py-1.5"><span data-id="99" class="w-2 h-2 rounded-full pulse-dot" style="background:var(--grn);"></span><span data-id="100" class="text-[11px]" style="color:var(--ts);">SubmitAgent</span><span data-id="101" class="text-[9px] ml-auto" style="color:var(--grn);">Running</span></div>
+        </div>
+        <div data-id="102" class="px-3 mb-4">
+          <div data-id="103" class="text-[10px] uppercase font-bold tracking-widest mb-1.5" style="color:var(--tm);letter-spacing:.06em;">Evidence Integrity</div>
+          <div data-id="104" class="w-full h-1.5 rounded-full overflow-hidden mb-1" style="background:var(--card);"><div data-id="105" class="h-full rounded-full" style="width:100%;background:var(--grn);"></div></div>
+          <div data-id="106" class="text-[10px] font-mono" style="color:var(--grn);">847 / 847 verified</div>
+        </div>
+        <div data-id="107" class="px-3"><span data-id="108" class="text-[10px]" style="color:var(--tm);">Last sync: 2 min ago</span></div>
+      </aside>
+
+      <!-- D: RIGHT CHAT PANEL -->
+      <aside data-id="109" id="chat-panel-y5z6" class="hidden md:flex flex-col flex-shrink-0" style="width:340px;background:var(--surface);border-left:1px solid var(--bsub);">
+        <!-- Chat header -->
+        <div data-id="110" class="flex items-center justify-between px-4 flex-shrink-0" style="height:48px;border-bottom:1px solid var(--bsub);">
+          <div data-id="111" class="flex items-center gap-2">
+            <span data-id="112" class="w-2 h-2 rounded-full pulse-dot" style="background:var(--grn);"></span>
+            <span data-id="113" class="text-sm font-semibold" style="color:var(--tp);">AIMS Agent</span>
+            <span data-id="114" id="chat-role-badge-a2b3" class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background:rgba(10,132,255,.1);color:var(--pri);">PLANNER</span>
+          </div>
+          <button data-id="115" id="chat-toggle-c4d5" class="p-1 rounded hover:bg-white/5"><i data-id="116" data-lucide="panel-right-close" class="w-4 h-4" style="color:var(--tm);"></i></button>
+        </div>
+        <!-- Quick command chips -->
+        <div data-id="117" id="chat-chips-e6f7" class="flex gap-2 px-3 py-2.5 overflow-x-auto flex-shrink-0" style="border-bottom:1px solid var(--bsub);"></div>
+        <!-- Messages -->
+        <div data-id="118" id="chat-messages-g8h9" class="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-3"></div>
+        <!-- Input -->
+        <div data-id="119" class="px-3 pb-3 pt-2 flex-shrink-0" style="border-top:1px solid var(--bsub);">
+          <div data-id="120" class="flex items-center gap-2">
+            <input data-id="121" id="chat-input-i0j1" type="text" placeholder="Ask AIMS Agent..." class="flex-1 text-sm rounded-full px-4 py-2.5 outline-none" style="background:var(--card);border:1px solid var(--bsub);color:var(--tp);">
+            <button data-id="122" id="chat-send-k2l3" class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--pri);"><i data-id="123" data-lucide="send" class="w-4 h-4" style="color:#fff;"></i></button>
+          </div>
+          <div data-id="124" class="text-[10px] text-center mt-1.5" style="color:var(--tm);">Agent actions are logged to evidence chain</div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ===== MOBILE BOTTOM NAV ===== -->
+    <nav data-id="125" id="mobile-bottom-nav-m4n5" class="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around" style="display:none;height:56px;background:var(--deep);border-top:1px solid var(--bsub);">
+      <button data-id="126" class="flex flex-col items-center gap-0.5 p-2 mob-tab" data-mtab="workspace"><i data-id="127" data-lucide="layout-dashboard" class="w-5 h-5" style="color:var(--pri);"></i><span data-id="128" class="text-[10px]" style="color:var(--pri);">Workspace</span></button>
+      <button data-id="129" class="flex flex-col items-center gap-0.5 p-2 mob-tab" data-mtab="chat"><i data-id="130" data-lucide="message-square" class="w-5 h-5" style="color:var(--ts);"></i><span data-id="131" class="text-[10px]" style="color:var(--ts);">Chat</span></button>
+      <button data-id="132" class="flex flex-col items-center gap-0.5 p-2 mob-tab" data-mtab="agents"><i data-id="133" data-lucide="bot" class="w-5 h-5" style="color:var(--ts);"></i><span data-id="134" class="text-[10px]" style="color:var(--ts);">Agents</span></button>
+      <button data-id="135" class="flex flex-col items-center gap-0.5 p-2 mob-tab" data-mtab="settings"><i data-id="136" data-lucide="settings" class="w-5 h-5" style="color:var(--ts);"></i><span data-id="137" class="text-[10px]" style="color:var(--ts);">Settings</span></button>
+    </nav>
+
+    <footer data-id="138" class="hidden"><span data-id="139">Made by Copilot</span></footer>
+
+<script>
+if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function"){lucide.createIcons();}
+
+(function(){
+"use strict";
+
+/* ===== STATE ===== */
+var S={
+  role:null,
+  view:'default',
+  viewStack:[],
+  chat:[],
+  agentPanelOpen:true,
+  chatPanelOpen:true
+};
+
+var COLORS={planner:'#0A84FF',reviewer:'#00C7BE',supervisor:'#FF9F0A'};
+var ROLE_AGENTS={planner:'SchedulerAgent',reviewer:'ReviewAgent',supervisor:'FleetOverseerAgent'};
+
+var CHIPS={
+  planner:[
+    {icon:'clipboard-list',label:'Generate Work Orders',cmd:'generate_wo'},
+    {icon:'map',label:'Optimize Routes',cmd:'optimize_routes'},
+    {icon:'zap',label:'Risk-Rank Queue',cmd:'risk_rank'},
+    {icon:'radio-tower',label:'Deploy Agents',cmd:'deploy_agents'},
+    {icon:'calendar',label:'View Schedule',cmd:'view_schedule'},
+    {icon:'search',label:'Asset Search',cmd:'asset_search'}
+  ],
+  reviewer:[
+    {icon:'image',label:'Review Evidence',cmd:'review_evidence'},
+    {icon:'check-circle',label:'Approve Record',cmd:'approve_record'},
+    {icon:'alert-triangle',label:'Flag Anomaly',cmd:'flag_anomaly'},
+    {icon:'refresh-cw',label:'Request Rework',cmd:'request_rework'},
+    {icon:'link',label:'Verify Hash',cmd:'verify_hash'},
+    {icon:'bar-chart-3',label:'Defect Analysis',cmd:'defect_analysis'}
+  ],
+  supervisor:[
+    {icon:'globe',label:'Fleet Status',cmd:'fleet_status'},
+    {icon:'cpu',label:'Agent Health',cmd:'agent_health'},
+    {icon:'alert-circle',label:'Escalations',cmd:'escalations'},
+    {icon:'scroll-text',label:'Compliance Report',cmd:'compliance_report'},
+    {icon:'shield-off',label:'Override Decision',cmd:'override_decision'},
+    {icon:'bar-chart-3',label:'KPI Dashboard',cmd:'kpi_dashboard'}
+  ]
+};
+
+/* ===== ELEMENTS ===== */
+var $=function(id){return document.getElementById(id);};
+var loginScreen=$('login-screen-k3m1');
+var flashOverlay=$('role-flash-o9p0');
+var shell=$('workspace-shell-g7h8');
+var wsContent=$('ws-content-s9t0');
+var wsBreadcrumb=$('ws-breadcrumb-o5p6');
+var wsAgentBadge=$('ws-agent-badge-q7r8');
+var wsBackBtn=$('ws-back-btn-z1z2');
+var chatMessages=$('chat-messages-g8h9');
+var chatChips=$('chat-chips-e6f7');
+var chatInput=$('chat-input-i0j1');
+var chatSend=$('chat-send-k2l3');
+var chatRoleBadge=$('chat-role-badge-a2b3');
+var sidebarAvatar=$('sidebar-avatar-k1l2');
+var mobileNav=$('mobile-bottom-nav-m4n5');
+var agentPanel=$('agent-panel-u1v2');
+var chatPanel=$('chat-panel-y5z6');
+
+/* ===== HELPERS ===== */
+function h(tag,cls,style,inner){
+  var el=document.createElement(tag);
+  if(cls)el.className=cls;
+  if(style)el.setAttribute('style',style);
+  if(typeof inner==='string')el.innerHTML=inner;
+  return el;
+}
+function reicons(){if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function")lucide.createIcons();}
+
+/* ===== PERSIST ROLE ===== */
+function saveRole(r){try{localStorage.setItem('aims_role',r);}catch(e){}}
+function loadRole(){try{return localStorage.getItem('aims_role');}catch(e){return null;}}
+
+/* ===== ROLE SELECT ===== */
+document.querySelectorAll('[data-role]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var role=btn.dataset.role;
+    selectRole(role);
+  });
+  btn.addEventListener('mouseenter',function(){
+    var c=COLORS[btn.dataset.role];
+    btn.style.borderColor=c;
+    btn.style.boxShadow='0 0 20px '+c+'33';
+  });
+  btn.addEventListener('mouseleave',function(){
+    btn.style.borderColor='var(--bsub)';
+    btn.style.boxShadow='none';
+  });
+});
+
+function selectRole(role){
+  S.role=role;S.view='default';S.viewStack=[];S.chat=[];
+  saveRole(role);
+  var c=COLORS[role];
+  flashOverlay.style.background=c;
+  flashOverlay.style.display='block';
+  flashOverlay.className='role-flash';
+  setTimeout(function(){
+    loginScreen.style.display='none';
+    flashOverlay.style.display='none';
+    shell.style.display='flex';
+    mobileNav.style.display='';
+    initWorkspace();
+  },500);
+}
+
+/* ===== INIT WORKSPACE ===== */
+function initWorkspace(){
+  var c=COLORS[S.role];
+  chatRoleBadge.textContent=S.role.toUpperCase();
+  chatRoleBadge.style.background=c+'1A';
+  chatRoleBadge.style.color=c;
+  sidebarAvatar.style.background=c+'33';
+  sidebarAvatar.style.color=c;
+  renderChips();
+  renderDefaultView();
+  addAgentMessage(getWelcomeMessage());
+  reicons();
+  // Highlight first 3 chips
+  setTimeout(function(){
+    var chips=chatChips.querySelectorAll('.chip-cmd');
+    for(var i=0;i<Math.min(3,chips.length);i++){
+      (function(ch){
+        ch.style.borderColor='var(--pri)';
+        setTimeout(function(){ch.style.borderColor='var(--bsub)';},1200);
+      })(chips[i]);
+    }
+  },800);
+}
+
+/* ===== CHIPS ===== */
+function renderChips(){
+  chatChips.innerHTML='';
+  var chips=CHIPS[S.role]||[];
+  chips.forEach(function(ch){
+    var btn=h('button','chip-cmd flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap flex-shrink-0','background:var(--card);border:1px solid var(--bsub);color:var(--ts);cursor:pointer;');
+    btn.innerHTML='<i data-lucide="'+ch.icon+'" class="w-3.5 h-3.5"></i> '+ch.label;
+    btn.addEventListener('click',function(){handleCommand(ch.cmd,ch.label);});
+    chatChips.appendChild(btn);
+  });
+  reicons();
+}
+
+/* ===== WELCOME MESSAGES ===== */
+function getWelcomeMessage(){
+  if(S.role==='planner') return "Good evening, Nalin. I'm your SchedulerAgent. You have 6 high-risk assets due for inspection this week and 23 work orders pending. How would you like to start?";
+  if(S.role==='reviewer') return "Good evening, Nalin. I'm your ReviewAgent. There are 14 evidence records in your queue — 3 marked CRITICAL. Shall I open the highest priority first?";
+  return "Good evening, Nalin. I'm monitoring all 6 agents across 14 active inspection sites. You have 3 open escalations requiring supervisor attention. Ready to review?";
+}
+
+/* ===== CHAT ===== */
+function addUserMessage(text){
+  var div=h('div','flex justify-end fadein','');
+  div.innerHTML='<div class="max-w-[75%] px-4 py-2.5 rounded-2xl text-sm" style="background:var(--pri);color:#fff;">'+escHtml(text)+'</div>';
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+
+function addAgentMessage(text,card){
+  var agent=ROLE_AGENTS[S.role]||'Agent';
+  var c=COLORS[S.role];
+  // Typing indicator
+  var typing=h('div','flex justify-start fadein','');
+  typing.innerHTML='<div class="flex flex-col gap-1 max-w-[85%]"><span class="text-[10px] font-bold" style="color:'+c+';">'+agent+'</span><div class="px-4 py-3 rounded-2xl" style="background:var(--card);border:1px solid var(--bsub);"><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full dot-1" style="background:var(--ts);"></span><span class="w-1.5 h-1.5 rounded-full dot-2" style="background:var(--ts);"></span><span class="w-1.5 h-1.5 rounded-full dot-3" style="background:var(--ts);"></span></div></div></div>';
+  chatMessages.appendChild(typing);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+
+  setTimeout(function(){
+    var html='<div class="flex justify-start fadein"><div class="flex flex-col gap-1 max-w-[85%]"><span class="text-[10px] font-bold" style="color:'+c+';">'+agent+'</span><div class="px-4 py-2.5 rounded-2xl text-sm" style="background:var(--card);border:1px solid var(--bsub);color:var(--tp);">'+escHtml(text)+'</div>';
+    if(card){
+      html+='<div class="mt-1 px-3 py-2 rounded-lg flex items-center gap-2 cursor-pointer" style="background:var(--elevated);border:1px solid var(--bsub);">';
+      html+='<i data-lucide="layout-dashboard" class="w-3 h-3" style="color:var(--pri);"></i>';
+      html+='<span class="text-[10px]" style="color:var(--pri);">'+card+' — View in Workspace →</span></div>';
+    }
+    html+='</div></div>';
+    typing.remove();
+    var msg=h('div','','');
+    msg.innerHTML=html;
+    chatMessages.appendChild(msg.firstElementChild);
+    chatMessages.scrollTop=chatMessages.scrollHeight;
+    reicons();
+  },1200);
+}
+
+function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ===== COMMAND HANDLER ===== */
+function handleCommand(cmd,label){
+  addUserMessage(label);
+  var agentResponses={
+    generate_wo:{msg:"I've generated 5 new work orders based on risk ranking and calendar constraints. Top priority: VL-0987 at Gulf Platform C with a critical corrosion finding.",card:"5 Work Orders Generated"},
+    optimize_routes:{msg:"Routes optimized for 3 field teams. Achieved 22% reduction in travel time by clustering adjacent zone inspections. Route Alpha covers North Sea B7 through B9.",card:"3 Routes Optimized"},
+    risk_rank:{msg:"Asset queue re-ranked. VL-0987 moved to position #1 (risk score: 91). 6 assets flagged as high-risk requiring immediate scheduling.",card:"Risk Queue Updated"},
+    deploy_agents:{msg:"Deploying 4 agents to field assignments. SchedulerAgent confirmed work orders, DispatchAgent assigning Edge-07 and Edge-12 to Gulf Platform C.",card:"4 Agents Deployed"},
+    view_schedule:{msg:"Displaying the weekly inspection schedule. 23 work orders across 5 zones. 3 inspections overdue — highlighted in red.",card:"Weekly Schedule"},
+    asset_search:{msg:"Asset search interface ready. Use filters to narrow by risk level, zone, or inspection status. 847 assets in registry.",card:"Asset Search"},
+    review_evidence:{msg:"Opening highest priority evidence record. Asset VL-0987, Zone C — CaptureAgent classified CRACK at 94% confidence. Hash chain verified.",card:"Critical Evidence Record"},
+    approve_record:{msg:"Approval workflow initiated for record VL-0987-R3. Review checklist loaded with 5 verification items. Your digital signature is required.",card:"Approval Flow"},
+    flag_anomaly:{msg:"Anomaly report builder loaded. Pre-filled from CaptureAgent classification: CRACK defect, severity CRITICAL, affected component: pressure vessel wall.",card:"Anomaly Report"},
+    request_rework:{msg:"Rework request form ready. Original record TK-2241 has insufficient measurement data — 2 fields highlighted for re-capture.",card:"Rework Request"},
+    verify_hash:{msg:"Hash chain verification running for evidence chain 0xA3F...7B2. All 5 records verified — SHA-256 hashes match, timestamps sequential, no breaches detected.",card:"Hash Verification Complete"},
+    defect_analysis:{msg:"Defect analytics loaded. Corrosion accounts for 42% of all findings this quarter. Zone C has the highest defect density. Trend shows 12% improvement month-over-month.",card:"Defect Analytics"},
+    fleet_status:{msg:"Fleet overview loaded. 14 active inspections across 4 zones. North Sea and Gulf operations running nominal. Chemical West has 1 delayed inspection.",card:"Fleet Status Map"},
+    agent_health:{msg:"Agent health dashboard loaded. All 6 agents operational. CaptureAgent showing elevated latency (340ms, threshold: 200ms). Recommend model cache refresh.",card:"Agent Health Dashboard"},
+    escalations:{msg:"3 open escalations loaded. Highest priority: VL-0987 critical crack finding awaiting supervisor review. Open for 2.4 hours.",card:"Escalation Board"},
+    compliance_report:{msg:"Compliance report generated. Overall score: 98%. API 653 and ISO 55001 at 100%. PSSR at 94% — 2 items pending field verification.",card:"Compliance Report"},
+    override_decision:{msg:"Override console loaded. 2 recent agent decisions available for override. Warning: all override actions are permanently logged to evidence chain.",card:"Override Console"},
+    kpi_dashboard:{msg:"KPI dashboard loaded with 6 metric views. Inspection completion trending up 8% this quarter. Mean closeout time: 2.8 days, down from 4.1.",card:"KPI Dashboard"}
+  };
+  var resp=agentResponses[cmd]||{msg:"Processing your request...",card:"Result"};
+  setTimeout(function(){
+    renderCommandView(cmd);
+  },1400);
+  addAgentMessage(resp.msg,resp.card);
+  wsAgentBadge.textContent='Rendered by '+(ROLE_AGENTS[S.role]||'Agent');
+  wsAgentBadge.style.display='';
+}
+
+/* ===== FREE TEXT PARSE ===== */
+chatSend.addEventListener('click',sendChat);
+chatInput.addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
+function sendChat(){
+  var t=chatInput.value.trim();
+  if(!t)return;
+  chatInput.value='';
+  var low=t.toLowerCase();
+  var cmd=null,label=t;
+  if(/schedul|work.?order|generat/i.test(low)){cmd='generate_wo';label='Generate Work Orders';}
+  else if(/route|optimi/i.test(low)){cmd='optimize_routes';label='Optimize Routes';}
+  else if(/risk|rank|queue/i.test(low)){cmd='risk_rank';label='Risk-Rank Queue';}
+  else if(/deploy|assign/i.test(low)){cmd='deploy_agents';label='Deploy Agents';}
+  else if(/evidence|review/i.test(low)){cmd='review_evidence';label='Review Evidence';}
+  else if(/approv/i.test(low)){cmd='approve_record';label='Approve Record';}
+  else if(/flag|anomal/i.test(low)){cmd='flag_anomaly';label='Flag Anomaly';}
+  else if(/hash|verif/i.test(low)){cmd='verify_hash';label='Verify Hash';}
+  else if(/fleet|status/i.test(low)){cmd='fleet_status';label='Fleet Status';}
+  else if(/escalat/i.test(low)){cmd='escalations';label='Escalations';}
+  else if(/complian/i.test(low)){cmd='compliance_report';label='Compliance Report';}
+  else if(/kpi|dashboard|metric/i.test(low)){cmd='kpi_dashboard';label='KPI Dashboard';}
+  else if(/agent|health/i.test(low)){cmd='agent_health';label='Agent Health';}
+  else if(/defect|analy/i.test(low)){cmd='defect_analysis';label='Defect Analysis';}
+  else if(/overrid/i.test(low)){cmd='override_decision';label='Override Decision';}
+  if(cmd){
+    handleCommand(cmd,label);
+  } else {
+    addUserMessage(t);
+    var chips=CHIPS[S.role].map(function(c){return c.label;}).join(', ');
+    addAgentMessage("I can help you with: "+chips+". Try clicking a command chip or describe what you need.");
+  }
+}
+
+/* ===== WORKSPACE VIEWS ===== */
+function setWsContent(html,title,agent){
+  wsContent.style.opacity='0';
+  wsContent.style.transform='translateY(12px)';
+  setTimeout(function(){
+    wsContent.innerHTML=html;
+    wsContent.style.transition='opacity .4s ease-out, transform .4s ease-out';
+    wsContent.style.opacity='1';
+    wsContent.style.transform='translateY(0)';
+    if(title)wsBreadcrumb.textContent='AIMS / '+cap(S.role)+' / '+title;
+    if(agent){wsAgentBadge.textContent='Rendered by '+agent;wsAgentBadge.style.display='';}
+    reicons();
+    initCounters();
+  },150);
+}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+/* ===== DEFAULT VIEWS ===== */
+function renderDefaultView(){
+  S.view='default';
+  wsBackBtn.classList.add('hidden');
+  if(S.role==='planner') renderPlannerDefault();
+  else if(S.role==='reviewer') renderReviewerDefault();
+  else renderSupervisorDefault();
+}
+
+function statCard(val,label,color){
+  return '<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-2xl font-black tabnum" style="color:'+(color||'var(--tp)')+';">'+val+'</div><div class="text-[11px] mt-1" style="color:var(--ts);">'+label+'</div></div>';
+}
+
+/* -- PLANNER DEFAULT -- */
+function renderPlannerDefault(){
+  var html='<div class="mb-5"><h2 class="text-lg font-semibold mb-1" style="color:var(--tp);">Inspection Planning Hub</h2><p class="text-xs" style="color:var(--ts);">Week of July 13 – July 19, 2026</p></div>';
+  html+='<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">';
+  html+=statCard('23','Work Orders This Week','var(--pri)');
+  html+=statCard('8/12','Agents Deployed','var(--teal)');
+  html+=statCard('6','High-Risk Assets','var(--red)');
+  html+=statCard('78%','Schedule Completion','var(--amber)');
+  html+='</div>';
+  html+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">';
+  // Schedule
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);letter-spacing:.06em;">Active Schedule</div>';
+  html+='<div class="overflow-x-auto"><table class="w-full text-[11px]" style="min-width:360px;"><thead><tr style="color:var(--tm);"><th class="text-left py-1.5 font-medium">Asset</th><th class="text-center py-1.5 font-medium">Mon</th><th class="text-center py-1.5 font-medium">Tue</th><th class="text-center py-1.5 font-medium">Wed</th><th class="text-center py-1.5 font-medium">Thu</th><th class="text-center py-1.5 font-medium">Fri</th><th class="text-center py-1.5 font-medium">Sat</th><th class="text-center py-1.5 font-medium">Sun</th></tr></thead><tbody style="color:var(--ts);">';
+  var assets=[['PL-4412','grn','pri','','','','',''],['VL-0987','','','red','red','','',''],['TK-2241','','','','pri','pri','',''],['PP-7790','grn','','','','','pri',''],['HX-3356','','','','','grn','grn','']];
+  assets.forEach(function(a){
+    html+='<tr style="border-top:1px solid rgba(30,45,69,.4);"><td class="py-1.5 font-mono">'+a[0]+'</td>';
+    for(var i=1;i<=7;i++){
+      var bg=a[i]?'background:var(--'+a[i]+');':'';
+      html+='<td class="text-center py-1.5"><div class="w-5 h-2.5 rounded mx-auto" style="'+bg+(a[i]?'':'background:var(--elevated);')+'"></div></td>';
+    }
+    html+='</tr>';
+  });
+  html+='</tbody></table></div>';
+  html+='<div class="flex items-center gap-3 mt-3">';
+  html+='<div class="flex items-center gap-1.5"><div class="w-3 h-2 rounded" style="background:var(--pri);"></div><span class="text-[10px]" style="color:var(--tm);">Scheduled</span></div>';
+  html+='<div class="flex items-center gap-1.5"><div class="w-3 h-2 rounded" style="background:var(--grn);"></div><span class="text-[10px]" style="color:var(--tm);">Complete</span></div>';
+  html+='<div class="flex items-center gap-1.5"><div class="w-3 h-2 rounded" style="background:var(--red);"></div><span class="text-[10px]" style="color:var(--tm);">Critical</span></div>';
+  html+='</div></div>';
+  // Priority Queue
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);letter-spacing:.06em;">Priority Asset Queue</div>';
+  html+='<div class="overflow-x-auto"><table class="w-full text-[11px]" style="min-width:320px;"><thead><tr style="color:var(--tm);"><th class="text-left py-1.5 font-medium">#</th><th class="text-left py-1.5 font-medium">Asset</th><th class="text-left py-1.5 font-medium">Zone</th><th class="text-left py-1.5 font-medium">Risk</th><th class="text-right py-1.5 font-medium">Action</th></tr></thead><tbody style="color:var(--ts);">';
+  var queue=[{r:1,id:'VL-0987',z:'Gulf Platform C',risk:91,rc:'red'},{r:2,id:'HX-3356',z:'Chemical West',risk:84,rc:'red'},{r:3,id:'TK-2241',z:'Refinery East',risk:58,rc:'amber'},{r:4,id:'PL-4412',z:'North Sea B7',risk:28,rc:'grn'},{r:5,id:'PP-7790',z:'Midstream Hub',risk:15,rc:'grn'},{r:6,id:'SS-1102',z:'Maritime Dock',risk:12,rc:'grn'}];
+  queue.forEach(function(q){
+    html+='<tr style="border-top:1px solid rgba(30,45,69,.4);"><td class="py-1.5 font-mono">'+q.r+'</td><td class="py-1.5 font-mono">'+q.id+'</td><td class="py-1.5">'+q.z+'</td><td class="py-1.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background:var(--'+q.rc+')1A;color:var(--'+q.rc+');">'+q.risk+'</span></td><td class="py-1.5 text-right"><span class="text-[10px] font-semibold cursor-pointer" style="color:var(--pri);">Assign</span></td></tr>';
+  });
+  html+='</tbody></table></div></div>';
+  html+='</div>';
+  setWsContent(html,'Planning Hub','SchedulerAgent');
+}
+
+/* -- REVIEWER DEFAULT -- */
+function renderReviewerDefault(){
+  var html='<div class="mb-5"><h2 class="text-lg font-semibold mb-1" style="color:var(--tp);">Evidence Review Queue</h2><p class="text-xs" style="color:var(--ts);">Saturday, July 18, 2026 · 22:23 PDT</p></div>';
+  html+='<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">';
+  html+=statCard('14','Pending Review','var(--amber)');
+  html+=statCard('8','Approved Today','var(--grn)');
+  html+=statCard('3','Flagged','var(--red)');
+  html+=statCard('4.2m','Avg Review Time','var(--teal)');
+  html+='</div>';
+  html+='<div class="grid grid-cols-1 lg:grid-cols-5 gap-4">';
+  // Queue
+  html+='<div class="lg:col-span-2 rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);letter-spacing:.06em;">Review Queue</div>';
+  var items=[{id:'VL-0987-R3',asset:'VL-0987',type:'CRACK',sev:'CRITICAL',sevC:'red',time:'09:13'},{id:'HX-3356-R1',asset:'HX-3356',type:'CORROSION',sev:'CRITICAL',sevC:'red',time:'10:22'},{id:'TK-2241-R2',asset:'TK-2241',type:'WEAR',sev:'REVIEW',sevC:'amber',time:'11:45'},{id:'PL-4412-R5',asset:'PL-4412',type:'NOMINAL',sev:'PASS',sevC:'grn',time:'13:01'},{id:'PP-7790-R4',asset:'PP-7790',type:'NOMINAL',sev:'PASS',sevC:'grn',time:'14:30'}];
+  items.forEach(function(it,i){
+    html+='<div class="flex items-center gap-3 py-2.5'+(i?'" style="border-top:1px solid rgba(30,45,69,.4);':'"')+'>';
+    html+='<div class="w-9 h-9 rounded-lg flex-shrink-0" style="background:var(--elevated);border:1px solid var(--'+it.sevC+')33;"></div>';
+    html+='<div class="flex-1 min-w-0"><div class="text-xs font-mono font-semibold truncate" style="color:var(--tp);">'+it.asset+'</div><div class="text-[10px]" style="color:var(--tm);">'+it.time+' · '+it.type+'</div></div>';
+    html+='<span class="text-[9px] px-1.5 py-0.5 rounded font-bold flex-shrink-0" style="background:var(--'+it.sevC+')1A;color:var(--'+it.sevC+');">'+it.sev+'</span>';
+    html+='</div>';
+  });
+  html+='</div>';
+  // Active record
+  html+='<div class="lg:col-span-3 rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="flex items-center justify-between mb-3"><div class="text-xs font-bold uppercase tracking-widest" style="color:var(--tm);letter-spacing:.06em;">Active Record</div><span class="text-[10px] font-mono" style="color:var(--tm);">sha256:b7d2e...4f1a</span></div>';
+  html+='<div class="w-full rounded-lg mb-3 flex items-center justify-center" style="height:140px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--red)33;"><div class="text-center"><div class="text-xs font-bold mb-1" style="color:var(--red);">CRACK DETECTED</div><div class="text-[10px] font-mono" style="color:var(--ts);">94% confidence · CaptureAgent</div></div></div>';
+  html+='<div class="grid grid-cols-2 gap-2 mb-3"><div class="p-2 rounded-lg" style="background:var(--elevated);"><div class="text-[10px] uppercase font-bold mb-0.5" style="color:var(--tm);">Severity</div><div class="text-xs font-bold" style="color:var(--red);">Critical</div></div><div class="p-2 rounded-lg" style="background:var(--elevated);"><div class="text-[10px] uppercase font-bold mb-0.5" style="color:var(--tm);">Component</div><div class="text-xs" style="color:var(--ts);">Pressure Vessel</div></div><div class="p-2 rounded-lg" style="background:var(--elevated);"><div class="text-[10px] uppercase font-bold mb-0.5" style="color:var(--tm);">Inspector</div><div class="text-xs font-mono" style="color:var(--ts);">FT-Delta-07</div></div><div class="p-2 rounded-lg" style="background:var(--elevated);"><div class="text-[10px] uppercase font-bold mb-0.5" style="color:var(--tm);">Device</div><div class="text-xs font-mono" style="color:var(--ts);">Edge-07</div></div></div>';
+  html+='<div class="flex flex-wrap gap-2">';
+  html+='<button class="px-4 py-2 rounded-lg text-xs font-semibold" style="background:var(--grn);color:#000;">✓ Approve</button>';
+  html+='<button class="px-4 py-2 rounded-lg text-xs font-semibold" style="border:1px solid var(--amber);color:var(--amber);">⚠ Flag Anomaly</button>';
+  html+='<button class="px-4 py-2 rounded-lg text-xs font-semibold" style="border:1px solid var(--pri);color:var(--pri);">↻ Rework</button>';
+  html+='<button class="px-4 py-2 rounded-lg text-xs font-semibold" style="border:1px solid var(--red);color:var(--red);">✗ Reject</button>';
+  html+='</div></div>';
+  html+='</div>';
+  setWsContent(html,'Evidence Queue','ReviewAgent');
+}
+
+/* -- SUPERVISOR DEFAULT -- */
+function renderSupervisorDefault(){
+  var html='<div class="mb-5"><h2 class="text-lg font-semibold mb-1" style="color:var(--tp);">Fleet Operations Center</h2><p class="text-xs" style="color:var(--ts);">Live view · Saturday, July 18, 2026 · 22:23 PDT</p></div>';
+  html+='<div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">';
+  html+=statCard('14','Active Inspections','var(--pri)');
+  html+=statCard('76%','Agent Utilization','var(--teal)');
+  html+=statCard('3','Open Escalations','var(--red)');
+  html+=statCard('98%','Compliance Score','var(--grn)');
+  html+=statCard('0','Unplanned Events','var(--tp)');
+  html+='</div>';
+  html+='<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">';
+  // Agent mesh
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);letter-spacing:.06em;">Agent Mesh Health</div>';
+  var agents=[{n:'SchedulerAgent',s:'Running',c:'grn',tasks:47,err:0,up:99.8},{n:'DispatchAgent',s:'Running',c:'grn',tasks:32,err:0,up:99.9},{n:'CaptureAgent',s:'Syncing',c:'amber',tasks:28,err:1,up:97.2},{n:'AnalysisAgent',s:'Running',c:'grn',tasks:41,err:0,up:99.5},{n:'ReviewAgent',s:'Idle',c:'tm',tasks:0,err:0,up:100},{n:'SubmitAgent',s:'Running',c:'grn',tasks:12,err:0,up:99.7}];
+  agents.forEach(function(a){
+    html+='<div class="flex items-center gap-2 py-2" style="border-bottom:1px solid rgba(30,45,69,.3);">';
+    html+='<span class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--'+a.c+');"></span>';
+    html+='<span class="text-[11px] flex-1 truncate" style="color:var(--ts);">'+a.n+'</span>';
+    html+='<span class="text-[10px] font-mono" style="color:var(--tm);">'+a.tasks+'</span>';
+    if(a.err>0) html+='<span class="text-[9px] px-1 rounded font-bold" style="background:var(--red)1A;color:var(--red);">'+a.err+'</span>';
+    html+='</div>';
+  });
+  html+='</div>';
+  // Escalation feed
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);letter-spacing:.06em;">Live Escalation Feed</div>';
+  var esc=[{time:'22:01',asset:'VL-0987',type:'CRITICAL DEFECT',agent:'CaptureAgent',status:'Open',sc:'red'},{time:'20:45',asset:'HX-3356',type:'THRESHOLD EXCEEDED',agent:'AnalysisAgent',status:'Open',sc:'red'},{time:'19:12',asset:'CaptureAgent',type:'AGENT TIMEOUT',agent:'System',status:'Open',sc:'amber'},{time:'16:30',asset:'TK-2241',type:'HASH MISMATCH',agent:'SubmitAgent',status:'Resolved',sc:'grn'}];
+  esc.forEach(function(e){
+    html+='<div class="py-2.5" style="border-bottom:1px solid rgba(30,45,69,.3);">';
+    html+='<div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-mono" style="color:var(--tm);">'+e.time+'</span><span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:var(--'+e.sc+')1A;color:var(--'+e.sc+');">'+e.status.toUpperCase()+'</span></div>';
+    html+='<div class="text-xs font-semibold mb-0.5" style="color:var(--tp);">'+e.type+'</div>';
+    html+='<div class="text-[10px]" style="color:var(--tm);">'+e.asset+' · '+e.agent+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  // Compliance tracker
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);letter-spacing:.06em;">Compliance Tracker</div>';
+  var regs=[{n:'API 653',p:100,c:'grn'},{n:'PSSR',p:94,c:'amber'},{n:'ATEX',p:100,c:'grn'},{n:'ISO 55001',p:100,c:'grn'},{n:'DNV GL',p:97,c:'grn'}];
+  regs.forEach(function(r){
+    html+='<div class="mb-3"><div class="flex justify-between text-[10px] mb-1"><span style="color:var(--ts);">'+r.n+'</span><span class="font-mono font-bold" style="color:var(--'+r.c+');">'+r.p+'%</span></div>';
+    html+='<div class="w-full h-1.5 rounded-full overflow-hidden" style="background:var(--elevated);"><div class="h-full rounded-full" style="width:'+r.p+'%;background:var(--'+r.c+');"></div></div></div>';
+  });
+  html+='<div class="flex items-center gap-2 mt-4 p-2 rounded-lg" style="background:var(--elevated);"><i data-lucide="clock" class="w-3.5 h-3.5" style="color:var(--amber);"></i><span class="text-[10px]" style="color:var(--ts);">Next regulatory submission: <strong style="color:var(--amber);">8 days</strong></span></div>';
+  html+='</div>';
+  html+='</div>';
+  setWsContent(html,'Operations Center','FleetOverseerAgent');
+}
+
+/* ===== COMMAND VIEWS ===== */
+function renderCommandView(cmd){
+  S.viewStack.push(S.view);
+  S.view=cmd;
+  wsBackBtn.classList.remove('hidden');
+  var views={
+    generate_wo:renderGenerateWO,
+    optimize_routes:renderOptimizeRoutes,
+    risk_rank:renderRiskRank,
+    deploy_agents:renderDeployAgents,
+    view_schedule:renderViewSchedule,
+    asset_search:renderAssetSearch,
+    review_evidence:renderReviewEvidence,
+    approve_record:renderApproveRecord,
+    flag_anomaly:renderFlagAnomaly,
+    request_rework:renderRequestRework,
+    verify_hash:renderVerifyHash,
+    defect_analysis:renderDefectAnalysis,
+    fleet_status:renderFleetStatus,
+    agent_health:renderAgentHealth,
+    escalations:renderEscalations,
+    compliance_report:renderComplianceReport,
+    override_decision:renderOverrideDecision,
+    kpi_dashboard:renderKpiDashboard
+  };
+  if(views[cmd])views[cmd]();
+}
+
+function woCard(num,asset,zone,agent,pri,dur){
+  return '<div class="rounded-xl p-4 mb-3" style="background:var(--card);border:1px solid var(--bsub);"><div class="flex items-center justify-between mb-2"><span class="text-sm font-mono font-semibold" style="color:var(--tp);">WO-'+num+'</span><span class="text-[10px] px-2 py-0.5 rounded font-bold" style="background:var(--'+pri+')1A;color:var(--'+pri+');">'+(pri==='red'?'HIGH':pri==='amber'?'MEDIUM':'LOW')+'</span></div><div class="grid grid-cols-2 gap-2 mb-3"><div><span class="text-[10px] uppercase" style="color:var(--tm);">Asset</span><div class="text-xs font-mono" style="color:var(--ts);">'+asset+'</div></div><div><span class="text-[10px] uppercase" style="color:var(--tm);">Zone</span><div class="text-xs" style="color:var(--ts);">'+zone+'</div></div><div><span class="text-[10px] uppercase" style="color:var(--tm);">Agent</span><div class="text-xs" style="color:var(--ts);">'+agent+'</div></div><div><span class="text-[10px] uppercase" style="color:var(--tm);">Duration</span><div class="text-xs" style="color:var(--ts);">'+dur+'</div></div></div><div class="flex gap-2"><button class="px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:var(--pri);color:#fff;">Confirm</button><button class="px-3 py-1.5 rounded-lg text-xs font-semibold" style="border:1px solid var(--bsub);color:var(--ts);">Modify</button></div></div>';
+}
+function renderGenerateWO(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="clipboard-list" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Work Order Generator</h2></div><p class="text-xs" style="color:var(--ts);">SchedulerAgent generated 5 work orders based on risk ranking and calendar constraints.</p></div>';
+  html+=woCard('2026-0719','VL-0987','Gulf Platform C','Edge-07','red','6h');
+  html+=woCard('2026-0720','HX-3356','Chemical West','Edge-12','red','4h');
+  html+=woCard('2026-0721','TK-2241','Refinery East','Edge-03','amber','3h');
+  html+=woCard('2026-0722','PL-4412','North Sea B7','Edge-09','grn','2h');
+  html+=woCard('2026-0723','PP-7790','Midstream Hub','Edge-05','grn','2h');
+  setWsContent(html,'Work Orders','SchedulerAgent');
+}
+
+function renderOptimizeRoutes(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="map" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Route Optimization</h2></div><p class="text-xs" style="color:var(--ts);">DispatchAgent optimized 3 field routes — 22% reduction in travel time.</p></div>';
+  html+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">';
+  // Map grid
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Zone Map</div><div class="grid grid-cols-4 gap-1">';
+  var zones=['','pri','','','teal','teal','pri','','','pri','','amber','','','amber',''];
+  zones.forEach(function(z){
+    html+='<div class="aspect-square rounded" style="background:var(--'+(z||'elevated')+');'+(z?'opacity:.4;':'')+'"></div>';
+  });
+  html+='</div><div class="flex flex-wrap gap-2 mt-3"><div class="flex items-center gap-1"><div class="w-3 h-2 rounded" style="background:var(--pri);opacity:.4;"></div><span class="text-[10px]" style="color:var(--tm);">Route Alpha</span></div><div class="flex items-center gap-1"><div class="w-3 h-2 rounded" style="background:var(--teal);opacity:.4;"></div><span class="text-[10px]" style="color:var(--tm);">Route Beta</span></div><div class="flex items-center gap-1"><div class="w-3 h-2 rounded" style="background:var(--amber);opacity:.4;"></div><span class="text-[10px]" style="color:var(--tm);">Route Gamma</span></div></div></div>';
+  // Route table
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Route Details</div><div class="overflow-x-auto"><table class="w-full text-[11px]"><thead><tr style="color:var(--tm);"><th class="text-left py-1.5">Route</th><th class="text-left py-1.5">Agent</th><th class="text-left py-1.5">Zones</th><th class="text-right py-1.5">Assets</th></tr></thead><tbody style="color:var(--ts);"><tr style="border-top:1px solid rgba(30,45,69,.4);"><td class="py-2 font-bold" style="color:var(--pri);">Alpha</td><td class="py-2">Edge-07</td><td class="py-2">B7, B8, B9</td><td class="py-2 text-right">3</td></tr><tr style="border-top:1px solid rgba(30,45,69,.4);"><td class="py-2 font-bold" style="color:var(--teal);">Beta</td><td class="py-2">Edge-12</td><td class="py-2">Gulf C, D</td><td class="py-2 text-right">2</td></tr><tr style="border-top:1px solid rgba(30,45,69,.4);"><td class="py-2 font-bold" style="color:var(--amber);">Gamma</td><td class="py-2">Edge-03</td><td class="py-2">Refinery E, Chem W</td><td class="py-2 text-right">2</td></tr></tbody></table></div></div>';
+  html+='</div>';
+  setWsContent(html,'Route Optimization','DispatchAgent');
+}
+
+function renderRiskRank(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="zap" class="w-4 h-4" style="color:var(--red);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Risk-Ranked Asset Queue</h2></div><p class="text-xs" style="color:var(--ts);">Assets ranked by composite risk score. Factors: age, last finding severity, environmental exposure.</p></div>';
+  var items=[{id:'VL-0987',score:91,age:14,finding:'Critical',env:'Offshore',c:'red'},{id:'HX-3356',score:84,age:11,finding:'Major',env:'Chemical',c:'red'},{id:'SS-1102',score:72,age:9,finding:'Moderate',env:'Maritime',c:'amber'},{id:'TK-2241',score:58,age:7,finding:'Minor',env:'Refinery',c:'amber'},{id:'PL-4412',score:28,age:4,finding:'None',env:'Offshore',c:'grn'},{id:'PP-7790',score:15,age:2,finding:'None',env:'Midstream',c:'grn'}];
+  items.forEach(function(it){
+    html+='<div class="rounded-xl p-4 mb-3 flex items-center gap-4" style="background:var(--card);border:1px solid var(--bsub);">';
+    html+='<div class="text-2xl font-black tabnum" style="color:var(--'+it.c+');min-width:48px;">'+it.score+'</div>';
+    html+='<div class="flex-1"><div class="w-full h-2 rounded-full overflow-hidden mb-2" style="background:var(--elevated);"><div class="h-full rounded-full" style="width:'+it.score+'%;background:var(--'+it.c+');"></div></div><div class="flex flex-wrap gap-3 text-[10px]" style="color:var(--ts);"><span class="font-mono font-bold" style="color:var(--tp);">'+it.id+'</span><span>Age: '+it.age+'yr</span><span>Finding: '+it.finding+'</span><span>Env: '+it.env+'</span></div></div>';
+    html+='<span class="text-[10px] font-semibold cursor-pointer flex-shrink-0" style="color:var(--pri);">Schedule →</span></div>';
+  });
+  setWsContent(html,'Risk Queue','SchedulerAgent');
+}
+
+function renderDeployAgents(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="radio-tower" class="w-4 h-4" style="color:var(--teal);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Agent Deployment Console</h2></div><p class="text-xs" style="color:var(--ts);">12 agent slots. Assign edge devices to field work orders.</p></div>';
+  html+='<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">';
+  var slots=[{n:'Edge-01',a:'PL-4412',s:'Active'},{n:'Edge-02',a:null,s:'Available'},{n:'Edge-03',a:'TK-2241',s:'Active'},{n:'Edge-04',a:null,s:'Available'},{n:'Edge-05',a:'PP-7790',s:'Active'},{n:'Edge-06',a:null,s:'Maintenance'},{n:'Edge-07',a:'VL-0987',s:'Active'},{n:'Edge-08',a:null,s:'Available'},{n:'Edge-09',a:'PL-4412',s:'Active'},{n:'Edge-10',a:null,s:'Available'},{n:'Edge-11',a:null,s:'Available'},{n:'Edge-12',a:'HX-3356',s:'Active'}];
+  slots.forEach(function(sl){
+    var isActive=sl.s==='Active';
+    var isMaint=sl.s==='Maintenance';
+    html+='<div class="rounded-xl p-3" style="background:var(--card);border:1px solid '+(isActive?'var(--grn)33':isMaint?'var(--red)33':'var(--bsub)')+';">';
+    html+='<div class="flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full'+(isActive?' pulse-dot':'')+'" style="background:var(--'+(isActive?'grn':isMaint?'red':'tm')+');"></span><span class="text-xs font-mono font-semibold" style="color:var(--tp);">'+sl.n+'</span></div>';
+    if(sl.a) html+='<div class="text-[10px] mb-2" style="color:var(--ts);">Assigned: <span class="font-mono" style="color:var(--pri);">'+sl.a+'</span></div>';
+    else if(isMaint) html+='<div class="text-[10px] mb-2" style="color:var(--red);">Under maintenance</div>';
+    else html+='<div class="text-[10px] mb-2" style="color:var(--tm);">No assignment</div>';
+    if(!isActive&&!isMaint) html+='<button class="w-full py-1.5 rounded-lg text-[10px] font-semibold" style="background:var(--pri)1A;color:var(--pri);border:1px solid var(--pri)33;">Assign</button>';
+    html+='</div>';
+  });
+  html+='</div>';
+  setWsContent(html,'Deploy Agents','DispatchAgent');
+}
+
+function renderViewSchedule(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="calendar" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">July 2026 Schedule</h2></div><p class="text-xs" style="color:var(--ts);">23 inspections scheduled · 3 overdue · 8 completed</p></div>';
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="grid grid-cols-7 gap-1 text-center">';
+  var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  days.forEach(function(d){html+='<div class="text-[10px] font-bold py-1" style="color:var(--tm);">'+d+'</div>';});
+  var schedule={1:'grn',2:'grn',3:'pri',7:'pri',8:'grn',9:'red',10:'pri',13:'pri',14:'pri',15:'grn',16:'pri',17:'grn',18:'pri',20:'pri',21:'pri',22:'pri'};
+  // July 2026 starts on Wednesday, offset=2
+  for(var i=0;i<2;i++) html+='<div class="aspect-square rounded"></div>';
+  for(var d=1;d<=31;d++){
+    var col=schedule[d]||'';
+    html+='<div class="aspect-square rounded flex items-center justify-center text-[11px] font-mono cursor-pointer" style="background:var(--'+(col||'elevated')+');'+(col?'color:#000;font-weight:700;':'color:var(--tm);')+'">'+d+'</div>';
+  }
+  html+='</div></div>';
+  html+='<div class="flex items-center gap-4 mt-3"><div class="flex items-center gap-1.5"><div class="w-3 h-2 rounded" style="background:var(--pri);"></div><span class="text-[10px]" style="color:var(--tm);">Scheduled</span></div><div class="flex items-center gap-1.5"><div class="w-3 h-2 rounded" style="background:var(--grn);"></div><span class="text-[10px]" style="color:var(--tm);">Completed</span></div><div class="flex items-center gap-1.5"><div class="w-3 h-2 rounded" style="background:var(--red);"></div><span class="text-[10px]" style="color:var(--tm);">Overdue</span></div></div>';
+  setWsContent(html,'Schedule','SchedulerAgent');
+}
+
+function renderAssetSearch(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="search" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Asset Search</h2></div><div class="flex items-center gap-2 mt-3"><input class="flex-1 text-sm rounded-lg px-4 py-2.5 outline-none" style="background:var(--card);border:1px solid var(--bsub);color:var(--tp);" placeholder="Search by Asset ID, zone, or type..."><button class="px-4 py-2.5 rounded-lg text-xs font-semibold" style="background:var(--pri);color:#fff;">Search</button></div></div>';
+  html+='<div class="flex gap-2 mb-4 overflow-x-auto">';
+  ['All','High Risk','Overdue','Unassigned'].forEach(function(f,i){
+    html+='<button class="text-[11px] px-3 py-1.5 rounded-full font-semibold whitespace-nowrap" style="background:'+(i===0?'var(--pri)':'var(--card)')+';color:'+(i===0?'#fff':'var(--ts)')+';border:1px solid var(--bsub);">'+f+'</button>';
+  });
+  html+='</div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">';
+  var assets=[{id:'VL-0987',type:'Valve',zone:'Gulf Platform C',risk:91,status:'Critical',c:'red'},{id:'HX-3356',type:'Heat Exchanger',zone:'Chemical West',risk:84,status:'At Risk',c:'red'},{id:'TK-2241',type:'Storage Tank',zone:'Refinery East',risk:58,status:'Review',c:'amber'},{id:'PL-4412',type:'Pipeline',zone:'North Sea B7',risk:28,status:'Nominal',c:'grn'},{id:'PP-7790',type:'Pump',zone:'Midstream Hub',risk:15,status:'Nominal',c:'grn'},{id:'SS-1102',type:'Ship Hull',zone:'Maritime Dock',risk:72,status:'At Risk',c:'amber'}];
+  assets.forEach(function(a){
+    html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="flex items-center justify-between mb-2"><span class="text-sm font-mono font-bold" style="color:var(--tp);">'+a.id+'</span><span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:var(--'+a.c+')1A;color:var(--'+a.c+');">'+a.status.toUpperCase()+'</span></div><div class="text-xs mb-1" style="color:var(--ts);">'+a.type+' · '+a.zone+'</div><div class="flex items-center gap-2"><span class="text-[10px]" style="color:var(--tm);">Risk:</span><div class="flex-1 h-1.5 rounded-full overflow-hidden" style="background:var(--elevated);"><div class="h-full rounded-full" style="width:'+a.risk+'%;background:var(--'+a.c+');"></div></div><span class="text-[10px] font-mono font-bold" style="color:var(--'+a.c+');">'+a.risk+'</span></div></div>';
+  });
+  html+='</div>';
+  setWsContent(html,'Asset Search','SchedulerAgent');
+}
+
+function renderReviewEvidence(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="image" class="w-4 h-4" style="color:var(--teal);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Critical Evidence Viewer</h2></div><p class="text-xs" style="color:var(--ts);">VL-0987 · Gulf Platform C · Captured 2026-07-18 09:13 PDT</p></div>';
+  html+='<div class="rounded-xl overflow-hidden mb-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="flex gap-0 text-[11px] font-semibold" style="border-bottom:1px solid var(--bsub);"><button class="px-4 py-2.5" style="background:var(--pri);color:#fff;">Image</button><button class="px-4 py-2.5" style="color:var(--ts);">Sensor Data</button><button class="px-4 py-2.5" style="color:var(--ts);">Agent Notes</button><button class="px-4 py-2.5" style="color:var(--ts);">Hash Chain</button></div>';
+  html+='<div class="p-4"><div class="w-full rounded-lg flex items-center justify-center relative" style="height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--red)33;"><div class="absolute inset-0 flex items-center justify-center"><div class="text-center"><div class="text-sm font-bold mb-1" style="color:var(--red);">CRACK DETECTED</div><div class="text-[11px] font-mono" style="color:var(--ts);">Confidence: 94% · Model: ONNX-DefectV4.2</div></div></div><div class="absolute top-3 left-3 px-2 py-1 rounded text-[10px] font-mono" style="background:rgba(0,0,0,.6);color:var(--amber);">VL-0987-ZoneC-IMG-0042</div></div></div></div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--tm);">CaptureAgent Classification</div><div class="grid grid-cols-2 gap-2"><div><span class="text-[10px] uppercase" style="color:var(--tm);">Defect</span><div class="text-xs font-bold" style="color:var(--red);">Crack</div></div><div><span class="text-[10px] uppercase" style="color:var(--tm);">Severity</span><div class="text-xs font-bold" style="color:var(--red);">Critical</div></div><div><span class="text-[10px] uppercase" style="color:var(--tm);">Area</span><div class="text-xs" style="color:var(--ts);">Pressure vessel wall</div></div><div><span class="text-[10px] uppercase" style="color:var(--tm);">Action</span><div class="text-xs" style="color:var(--amber);">Immediate repair</div></div></div></div>';
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--tm);">AnalysisAgent Assessment</div><div class="text-xs mb-2" style="color:var(--ts);">Cross-referenced with fleet baseline: crack exceeds threshold by 2.3× standard deviation. Similar defect pattern observed in HX-3356 (adjacent zone).</div><div class="text-[10px] font-bold" style="color:var(--red);">Regulatory implication: Mandatory reporting under API 653 §6.4.2</div></div>';
+  html+='</div>';
+  setWsContent(html,'Evidence Viewer','CaptureAgent');
+}
+
+function renderApproveRecord(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="check-circle" class="w-4 h-4" style="color:var(--grn);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Approval Flow — VL-0987-R3</h2></div><p class="text-xs" style="color:var(--ts);">Complete the checklist and provide your digital signature to approve.</p></div>';
+  html+='<div class="rounded-xl p-4 mb-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Verification Checklist</div>';
+  var checks=['Defect classification reviewed and confirmed','Severity assessment is appropriate for finding','Evidence photographs are clear and properly documented','Hash chain integrity verified — no gaps','Recommended action is technically sound'];
+  checks.forEach(function(ch,i){
+    html+='<label class="flex items-center gap-3 py-2 cursor-pointer" style="border-bottom:1px solid rgba(30,45,69,.3);"><input type="checkbox" class="w-4 h-4 rounded accent-[#30D158]"><span class="text-sm" style="color:var(--ts);">'+ch+'</span></label>';
+  });
+  html+='</div>';
+  html+='<div class="rounded-xl p-4 mb-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--tm);">Digital Signature</div><input class="w-full text-sm rounded-lg px-4 py-2.5 outline-none mb-3" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);" placeholder="Type your full name to sign..."><button class="w-full py-2.5 rounded-lg text-sm font-semibold" style="background:var(--grn);color:#000;">Submit Approval</button></div>';
+  setWsContent(html,'Approval Flow','ReviewAgent');
+}
+
+function renderFlagAnomaly(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="alert-triangle" class="w-4 h-4" style="color:var(--amber);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Anomaly Report Builder</h2></div><p class="text-xs" style="color:var(--ts);">Pre-filled from CaptureAgent classification. Edit fields as needed.</p></div>';
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">';
+  html+='<div><label class="text-[10px] uppercase font-bold block mb-1" style="color:var(--tm);">Anomaly Type</label><select class="w-full text-sm rounded-lg px-3 py-2 outline-none" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);"><option>Crack — Structural</option><option>Corrosion — Surface</option><option>Wear — Mechanical</option></select></div>';
+  html+='<div><label class="text-[10px] uppercase font-bold block mb-1" style="color:var(--tm);">Severity</label><select class="w-full text-sm rounded-lg px-3 py-2 outline-none" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);"><option>Critical</option><option>Major</option><option>Minor</option></select></div>';
+  html+='<div><label class="text-[10px] uppercase font-bold block mb-1" style="color:var(--tm);">Affected Component</label><input class="w-full text-sm rounded-lg px-3 py-2 outline-none" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);" value="Pressure Vessel Wall"></div>';
+  html+='<div><label class="text-[10px] uppercase font-bold block mb-1" style="color:var(--tm);">Recommended Action</label><input class="w-full text-sm rounded-lg px-3 py-2 outline-none" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);" value="Immediate repair required"></div>';
+  html+='</div>';
+  html+='<label class="text-[10px] uppercase font-bold block mb-1" style="color:var(--tm);">Additional Notes</label><textarea class="w-full text-sm rounded-lg px-3 py-2 outline-none mb-4" rows="3" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);resize:vertical;" placeholder="Add notes..."></textarea>';
+  html+='<div class="flex items-center gap-3 mb-4"><input type="checkbox" class="w-4 h-4 rounded accent-[#FF9F0A]" checked><span class="text-sm" style="color:var(--ts);">Escalate to Supervisor</span></div>';
+  html+='<button class="w-full py-2.5 rounded-lg text-sm font-semibold" style="background:var(--amber);color:#000;">Submit Anomaly Report</button>';
+  html+='</div>';
+  setWsContent(html,'Flag Anomaly','ReviewAgent');
+}
+
+function renderRequestRework(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="refresh-cw" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Rework Request — TK-2241-R2</h2></div><p class="text-xs" style="color:var(--ts);">Insufficient measurement data. 2 fields require re-capture.</p></div>';
+  html+='<div class="rounded-xl p-4 mb-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Missing/Insufficient Fields</div>';
+  html+='<div class="p-3 rounded-lg mb-2" style="background:var(--elevated);border-left:3px solid var(--amber);"><div class="text-xs font-semibold" style="color:var(--amber);">Wall Thickness Measurement</div><div class="text-[10px]" style="color:var(--ts);">Reading not captured at required grid points 4, 7, and 12.</div></div>';
+  html+='<div class="p-3 rounded-lg mb-4" style="background:var(--elevated);border-left:3px solid var(--amber);"><div class="text-xs font-semibold" style="color:var(--amber);">Coating Condition Assessment</div><div class="text-[10px]" style="color:var(--ts);">Photo evidence missing for substrate preparation area.</div></div>';
+  html+='<label class="text-[10px] uppercase font-bold block mb-1" style="color:var(--tm);">Notes to Field Team</label><textarea class="w-full text-sm rounded-lg px-3 py-2 outline-none mb-4" rows="2" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);resize:vertical;" placeholder="Add instructions for re-capture..."></textarea>';
+  html+='<div class="flex items-center gap-3 mb-4"><input type="checkbox" class="w-4 h-4 rounded accent-[#0A84FF]" checked><span class="text-sm" style="color:var(--ts);">Notify Field Team immediately</span></div>';
+  html+='<button class="w-full py-2.5 rounded-lg text-sm font-semibold" style="background:var(--pri);color:#fff;">Submit Rework Request</button>';
+  html+='</div>';
+  setWsContent(html,'Rework Request','ReviewAgent');
+}
+
+function renderVerifyHash(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="link" class="w-4 h-4" style="color:var(--grn);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Hash Chain Verification</h2></div><p class="text-xs" style="color:var(--ts);">Chain ID: 0xA3F...7B2 · 5 records · All verified</p></div>';
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  var chain=[{hash:'sha256:a3f8c...1d4e',action:'Field capture',agent:'CaptureAgent',time:'09:12'},{hash:'sha256:b7d2e...4f1a',action:'Defect classification',agent:'CaptureAgent',time:'09:13'},{hash:'sha256:c9f1a...7b2c',action:'Analysis report',agent:'AnalysisAgent',time:'09:18'},{hash:'sha256:d4e7b...3a9f',action:'Engineer co-sign',agent:'ReviewAgent',time:'10:42'},{hash:'sha256:e2f9c...8d5b',action:'Regulatory package',agent:'SubmitAgent',time:'11:05'}];
+  chain.forEach(function(c,i){
+    html+='<div class="flex items-start gap-3 pb-4'+(i<chain.length-1?'':'')+'">';
+    html+='<div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full flex-shrink-0" style="background:var(--grn);border:2px solid var(--deep);"></div>'+(i<chain.length-1?'<div class="w-0.5 flex-1 mt-1" style="background:var(--grn)33;min-height:32px;"></div>':'')+'</div>';
+    html+='<div class="flex-1 p-3 rounded-lg" style="background:var(--elevated);border:1px solid var(--bsub);"><div class="flex items-center justify-between mb-1"><span class="text-[10px] font-mono" style="color:var(--tm);">'+c.hash+'</span><span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:rgba(48,209,88,.12);color:var(--grn);">VERIFIED</span></div><div class="text-xs font-semibold" style="color:var(--tp);">'+c.action+'</div><div class="text-[10px]" style="color:var(--tm);">'+c.agent+' · 2026-07-18 '+c.time+'</div></div>';
+    html+='</div>';
+  });
+  html+='<button class="w-full py-2.5 rounded-lg text-sm font-semibold mt-2 flex items-center justify-center gap-2" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--grn);"><i data-lucide="check-circle" class="w-4 h-4"></i> Full Verification Complete</button>';
+  html+='</div>';
+  setWsContent(html,'Hash Verification','ReviewAgent');
+}
+
+function renderDefectAnalysis(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="bar-chart-3" class="w-4 h-4" style="color:var(--teal);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Defect Analytics — Q3 2026</h2></div><p class="text-xs" style="color:var(--ts);">Aggregated defect data across all zones.</p></div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+  // Bar chart
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Defect Types by Frequency</div>';
+  var types=[{n:'Corrosion',v:42,c:'amber'},{n:'Crack',v:28,c:'red'},{n:'Wear',v:18,c:'pri'},{n:'Coating',v:8,c:'teal'},{n:'Other',v:4,c:'tm'}];
+  types.forEach(function(t){
+    html+='<div class="flex items-center gap-2 mb-2"><span class="text-[10px] w-16 text-right flex-shrink-0" style="color:var(--ts);">'+t.n+'</span><div class="flex-1 h-4 rounded-full overflow-hidden" style="background:var(--elevated);"><div class="h-full rounded-full" style="width:'+t.v+'%;background:var(--'+t.c+');"></div></div><span class="text-[10px] font-mono w-8 font-bold" style="color:var(--'+t.c+');">'+t.v+'%</span></div>';
+  });
+  html+='</div>';
+  // Severity heatmap
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Severity by Zone</div><div class="grid grid-cols-5 gap-1 mb-2">';
+  html+='<div></div><div class="text-[9px] text-center" style="color:var(--tm);">NS</div><div class="text-[9px] text-center" style="color:var(--tm);">Gulf</div><div class="text-[9px] text-center" style="color:var(--tm);">Ref</div><div class="text-[9px] text-center" style="color:var(--tm);">Chem</div>';
+  var heatmap=[['Crit','grn','red','amber','red'],['Major','amber','amber','grn','amber'],['Minor','grn','grn','grn','amber'],['None','grn','grn','grn','grn']];
+  heatmap.forEach(function(r){
+    html+='<div class="text-[9px] flex items-center" style="color:var(--tm);">'+r[0]+'</div>';
+    for(var i=1;i<5;i++) html+='<div class="aspect-square rounded" style="background:var(--'+r[i]+');opacity:.5;"></div>';
+  });
+  html+='</div></div>';
+  // Top worst assets
+  html+='<div class="rounded-xl p-4 md:col-span-2" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Top 5 Worst Assets by Defect Count</div><div class="overflow-x-auto"><table class="w-full text-[11px]"><thead><tr style="color:var(--tm);"><th class="text-left py-1.5">#</th><th class="text-left py-1.5">Asset</th><th class="text-left py-1.5">Zone</th><th class="text-right py-1.5">Defects</th><th class="text-right py-1.5">Trend</th></tr></thead><tbody style="color:var(--ts);"><tr style="border-top:1px solid rgba(30,45,69,.4);"><td class="py-1.5">1</td><td class="py-1.5 font-mono">VL-0987</td><td>Gulf C</td><td class="text-right font-bold" style="color:var(--red);">12</td><td class="text-right" style="color:var(--red);">↑</td></tr><tr style="border-top:1px solid rgba(30,45,69,.4);"><td>2</td><td class="font-mono">HX-3356</td><td>Chemical W</td><td class="text-right font-bold" style="color:var(--red);">9</td><td class="text-right" style="color:var(--amber);">→</td></tr><tr style="border-top:1px solid rgba(30,45,69,.4);"><td>3</td><td class="font-mono">SS-1102</td><td>Maritime</td><td class="text-right font-bold" style="color:var(--amber);">6</td><td class="text-right" style="color:var(--grn);">↓</td></tr><tr style="border-top:1px solid rgba(30,45,69,.4);"><td>4</td><td class="font-mono">TK-2241</td><td>Refinery E</td><td class="text-right">4</td><td class="text-right" style="color:var(--grn);">↓</td></tr><tr style="border-top:1px solid rgba(30,45,69,.4);"><td>5</td><td class="font-mono">PL-4412</td><td>NS B7</td><td class="text-right">2</td><td class="text-right" style="color:var(--grn);">↓</td></tr></tbody></table></div></div>';
+  html+='</div>';
+  setWsContent(html,'Defect Analysis','AnalysisAgent');
+}
+
+function renderFleetStatus(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="globe" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Fleet Status Overview</h2></div><p class="text-xs" style="color:var(--ts);">All operational zones · Live status</p></div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+  var zones=[{n:'North Sea Offshore',insp:4,risk:'Low',agents:'Edge-01, Edge-09',last:'18 min ago',c:'grn'},{n:'Gulf Platforms',insp:3,risk:'High',agents:'Edge-07',last:'4 min ago',c:'red'},{n:'Refinery Complex',insp:3,risk:'Medium',agents:'Edge-03',last:'22 min ago',c:'amber'},{n:'Chemical West',insp:2,risk:'High',agents:'Edge-12',last:'8 min ago',c:'red'},{n:'Midstream Hub',insp:1,risk:'Low',agents:'Edge-05',last:'1 hr ago',c:'grn'},{n:'Maritime Docks',insp:1,risk:'Medium',agents:'—',last:'3 hr ago',c:'amber'}];
+  zones.forEach(function(z){
+    html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="flex items-center justify-between mb-2"><span class="text-sm font-semibold" style="color:var(--tp);">'+z.n+'</span><span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:var(--'+z.c+')1A;color:var(--'+z.c+');">'+z.risk.toUpperCase()+' RISK</span></div><div class="grid grid-cols-2 gap-2 text-[10px]" style="color:var(--ts);"><div>Active: <strong>'+z.insp+'</strong></div><div>Agents: '+z.agents+'</div><div>Last activity: '+z.last+'</div></div></div>';
+  });
+  html+='</div>';
+  setWsContent(html,'Fleet Status','FleetOverseerAgent');
+}
+
+function renderAgentHealth(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="cpu" class="w-4 h-4" style="color:var(--teal);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Agent Health Dashboard</h2></div></div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">';
+  var agents=[{n:'SchedulerAgent',tasks:47,acc:'99.2%',err:0,lat:'42ms',ver:'v4.2.1',up:99.8,c:'grn'},{n:'DispatchAgent',tasks:32,acc:'98.7%',err:0,lat:'68ms',ver:'v4.2.0',up:99.9,c:'grn'},{n:'CaptureAgent',tasks:28,acc:'94.1%',err:1,lat:'340ms',ver:'v4.2.1',up:97.2,c:'amber'},{n:'AnalysisAgent',tasks:41,acc:'97.8%',err:0,lat:'120ms',ver:'v4.2.1',up:99.5,c:'grn'},{n:'ReviewAgent',tasks:0,acc:'—',err:0,lat:'—',ver:'v4.2.0',up:100,c:'tm'},{n:'SubmitAgent',tasks:12,acc:'100%',err:0,lat:'95ms',ver:'v4.2.1',up:99.7,c:'grn'}];
+  agents.forEach(function(a){
+    html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);">';
+    html+='<div class="flex items-center gap-2 mb-3"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--'+a.c+');"></span><span class="text-sm font-semibold" style="color:var(--tp);">'+a.n+'</span></div>';
+    html+='<div class="grid grid-cols-2 gap-2 text-[10px] mb-3"><div><span style="color:var(--tm);">Tasks/day</span><div class="font-mono font-bold" style="color:var(--tp);">'+a.tasks+'</div></div><div><span style="color:var(--tm);">Accuracy</span><div class="font-mono font-bold" style="color:var(--tp);">'+a.acc+'</div></div><div><span style="color:var(--tm);">Latency</span><div class="font-mono font-bold" style="color:'+(a.lat==='340ms'?'var(--amber)':'var(--tp)')+';">'+a.lat+'</div></div><div><span style="color:var(--tm);">Version</span><div class="font-mono" style="color:var(--ts);">'+a.ver+'</div></div></div>';
+    html+='<div class="flex justify-between text-[10px] mb-1"><span style="color:var(--tm);">Uptime</span><span class="font-mono font-bold" style="color:var(--'+a.c+');">'+a.up+'%</span></div>';
+    html+='<div class="w-full h-1.5 rounded-full overflow-hidden" style="background:var(--elevated);"><div class="h-full rounded-full" style="width:'+a.up+'%;background:var(--'+a.c+');"></div></div>';
+    html+='<div class="flex gap-2 mt-3"><button class="flex-1 py-1.5 rounded-lg text-[10px] font-semibold" style="border:1px solid var(--bsub);color:var(--ts);">View Logs</button><button class="flex-1 py-1.5 rounded-lg text-[10px] font-semibold" style="border:1px solid var(--bsub);color:var(--ts);">Restart</button></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  setWsContent(html,'Agent Health','FleetOverseerAgent');
+}
+
+function renderEscalations(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="alert-circle" class="w-4 h-4" style="color:var(--red);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Escalation Management Board</h2></div></div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-4 gap-3">';
+  var cols=[{title:'Open',items:[{asset:'VL-0987',type:'CRITICAL DEFECT',sev:'Critical',time:'2.4h',c:'red'},{asset:'HX-3356',type:'THRESHOLD EXCEEDED',sev:'Major',time:'4.1h',c:'amber'}]},{title:'Acknowledged',items:[{asset:'CaptureAgent',type:'AGENT TIMEOUT',sev:'Warning',time:'5.8h',c:'amber'}]},{title:'Investigating',items:[]},{title:'Resolved',items:[{asset:'TK-2241',type:'HASH MISMATCH',sev:'Minor',time:'Closed',c:'grn'}]}];
+  cols.forEach(function(col){
+    html+='<div class="rounded-xl p-3" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-2" style="color:var(--tm);"><span>'+col.title+'</span><span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold" style="background:var(--elevated);color:var(--ts);">'+col.items.length+'</span></div>';
+    if(col.items.length===0) html+='<div class="text-[10px] text-center py-4" style="color:var(--tm);">No items</div>';
+    col.items.forEach(function(it){
+      html+='<div class="rounded-lg p-3 mb-2" style="background:var(--elevated);border:1px solid var(--'+it.c+')33;"><div class="text-xs font-semibold mb-1" style="color:var(--tp);">'+it.type+'</div><div class="text-[10px] mb-1" style="color:var(--ts);">'+it.asset+'</div><div class="flex items-center justify-between"><span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:var(--'+it.c+')1A;color:var(--'+it.c+');">'+it.sev+'</span><span class="text-[10px] font-mono" style="color:var(--tm);">'+it.time+'</span></div></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  setWsContent(html,'Escalations','FleetOverseerAgent');
+}
+
+function renderComplianceReport(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="scroll-text" class="w-4 h-4" style="color:var(--grn);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Compliance Report — Q3 2026</h2></div><div class="flex gap-2 mt-2"><span class="text-[10px] px-2 py-0.5 rounded font-mono" style="background:var(--card);color:var(--tm);border:1px solid var(--bsub);">SOC 2 Type II</span><span class="text-[10px] px-2 py-0.5 rounded font-mono" style="background:var(--card);color:var(--tm);border:1px solid var(--bsub);">ISO 27001</span></div></div>';
+  html+='<div class="rounded-xl p-4 mb-4" style="background:var(--card);border:1px solid var(--bsub);">';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--tm);">Executive Summary</div>';
+  html+='<p class="text-sm mb-3" style="color:var(--ts);">Overall compliance score: <strong style="color:var(--grn);">98%</strong>. 14 active inspection sites monitored with 847 evidence records verified. Zero hash chain breaches. 2 items pending field verification under PSSR framework.</p>';
+  html+='</div>';
+  var sections=[{t:'Inspection Completion Rate',v:'94%',c:'grn'},{t:'Anomaly Summary',v:'3 critical, 7 major, 12 minor',c:'amber'},{t:'Evidence Integrity',v:'847/847 verified — 0 breaches',c:'grn'},{t:'Regulatory Submissions',v:'4 submitted, 0 rejected',c:'grn'}];
+  sections.forEach(function(s){
+    html+='<div class="rounded-xl p-4 mb-3 flex items-center justify-between" style="background:var(--card);border:1px solid var(--bsub);"><div><div class="text-xs font-semibold" style="color:var(--tp);">'+s.t+'</div></div><span class="text-sm font-bold" style="color:var(--'+s.c+');">'+s.v+'</span></div>';
+  });
+  html+='<div class="flex gap-3 mt-4"><button class="px-4 py-2.5 rounded-lg text-xs font-semibold flex items-center gap-2" style="background:var(--pri);color:#fff;"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button><button class="px-4 py-2.5 rounded-lg text-xs font-semibold flex items-center gap-2" style="border:1px solid var(--grn);color:var(--grn);"><i data-lucide="send" class="w-3.5 h-3.5"></i> Submit to Regulator</button></div>';
+  setWsContent(html,'Compliance Report','SubmitAgent');
+}
+
+function renderOverrideDecision(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="shield-off" class="w-4 h-4" style="color:var(--red);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">Supervisor Override Console</h2></div><div class="p-3 rounded-lg mt-2 flex items-center gap-2" style="background:var(--red)1A;border:1px solid var(--red)33;"><i data-lucide="alert-triangle" class="w-4 h-4 flex-shrink-0" style="color:var(--red);"></i><span class="text-xs" style="color:var(--red);">Override actions are permanently logged to the evidence chain.</span></div></div>';
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Recent Agent Decisions Available for Override</div>';
+  var decisions=[{agent:'CaptureAgent',decision:'Classified defect as MINOR — Wall thickness reading 4.2mm',time:'2 hours ago',asset:'TK-2241'},{agent:'AnalysisAgent',decision:'Cleared asset for continued operation — risk score 58',time:'3 hours ago',asset:'SS-1102'}];
+  decisions.forEach(function(d){
+    html+='<div class="rounded-xl p-4 mb-3" style="background:var(--card);border:1px solid var(--bsub);"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold" style="color:var(--teal);">'+d.agent+'</span><span class="text-[10px] font-mono" style="color:var(--tm);">'+d.time+'</span></div><div class="text-sm mb-2" style="color:var(--tp);">'+d.decision+'</div><div class="text-[10px] mb-3" style="color:var(--tm);">Asset: '+d.asset+'</div><textarea class="w-full text-sm rounded-lg px-3 py-2 outline-none mb-2" rows="2" style="background:var(--elevated);border:1px solid var(--bsub);color:var(--tp);resize:vertical;" placeholder="Justification for override (required)..."></textarea><button class="px-4 py-2 rounded-lg text-xs font-semibold" style="background:var(--red)1A;border:1px solid var(--red)33;color:var(--red);">Override Decision</button></div>';
+  });
+  html+='<div class="text-xs font-bold uppercase tracking-widest mb-3 mt-6" style="color:var(--tm);">Override Audit Trail</div>';
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] text-center py-2" style="color:var(--tm);">No overrides in the current reporting period.</div></div>';
+  setWsContent(html,'Override Console','FleetOverseerAgent');
+}
+
+function renderKpiDashboard(){
+  var html='<div class="mb-4"><div class="flex items-center gap-2 mb-1"><i data-lucide="bar-chart-3" class="w-4 h-4" style="color:var(--pri);"></i><h2 class="text-lg font-semibold" style="color:var(--tp);">KPI Dashboard — Q3 2026</h2></div></div>';
+  html+='<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">';
+  // 1 - Completion trend
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Inspection Completion Trend</div><svg viewBox="0 0 200 80" class="w-full"><polyline points="10,60 40,55 70,48 100,40 130,35 160,28 190,22" fill="none" stroke="var(--pri)" stroke-width="2"/><polyline points="10,60 40,55 70,48 100,40 130,35 160,28 190,22" fill="url(#grad1)" stroke="none" opacity=".2"/><defs><linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--pri)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg><div class="text-xs font-bold mt-1" style="color:var(--pri);">↑ 8% this quarter</div></div>';
+  // 2 - Defect rate
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Defect Rate by Zone</div>';
+  var dzones=[{n:'NS',v:12,c:'grn'},{n:'Gulf',v:34,c:'red'},{n:'Ref',v:22,c:'amber'},{n:'Chem',v:28,c:'amber'},{n:'Mid',v:8,c:'grn'}];
+  html+='<div class="flex items-end gap-2 h-16">';
+  dzones.forEach(function(z){
+    html+='<div class="flex-1 flex flex-col items-center"><div class="w-full rounded-t" style="height:'+Math.max(z.v*1.4,6)+'px;background:var(--'+z.c+');"></div><span class="text-[9px] mt-1" style="color:var(--tm);">'+z.n+'</span></div>';
+  });
+  html+='</div></div>';
+  // 3 - Agent utilization donut
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Agent Utilization</div><div class="flex items-center justify-center"><svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="30" fill="none" stroke="var(--elevated)" stroke-width="8"/><circle cx="40" cy="40" r="30" fill="none" stroke="var(--teal)" stroke-width="8" stroke-dasharray="143 188" stroke-dashoffset="0" transform="rotate(-90 40 40)"/><text x="40" y="44" text-anchor="middle" fill="var(--tp)" font-size="14" font-weight="bold">76%</text></svg></div><div class="text-xs text-center mt-2" style="color:var(--ts);">5 of 6 agents active</div></div>';
+  // 4 - Mean time to closeout
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Mean Time to Closeout</div><svg viewBox="0 0 200 80" class="w-full"><polyline points="10,65 40,58 70,50 100,45 130,38 160,32 190,28" fill="none" stroke="var(--grn)" stroke-width="2"/></svg><div class="text-xs font-bold mt-1" style="color:var(--grn);">2.8 days (↓ from 4.1)</div></div>';
+  // 5 - Compliance gauge
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Regulatory Compliance</div><div class="flex items-center justify-center"><svg viewBox="0 0 80 50" width="100" height="60"><path d="M 10 45 A 30 30 0 0 1 70 45" fill="none" stroke="var(--elevated)" stroke-width="8" stroke-linecap="round"/><path d="M 10 45 A 30 30 0 0 1 70 45" fill="none" stroke="var(--grn)" stroke-width="8" stroke-linecap="round" stroke-dasharray="90 94.25" stroke-dashoffset="0"/><text x="40" y="44" text-anchor="middle" fill="var(--tp)" font-size="14" font-weight="bold">98%</text></svg></div></div>';
+  // 6 - Evidence integrity
+  html+='<div class="rounded-xl p-4" style="background:var(--card);border:1px solid var(--bsub);"><div class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:var(--tm);">Evidence Integrity Over Time</div><svg viewBox="0 0 200 80" class="w-full"><defs><linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--grn)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--grn)" stop-opacity="0"/></linearGradient></defs><polygon points="10,12 40,10 70,12 100,10 130,10 160,10 190,10 190,70 10,70" fill="url(#grad2)"/><polyline points="10,12 40,10 70,12 100,10 130,10 160,10 190,10" fill="none" stroke="var(--grn)" stroke-width="2"/></svg><div class="text-xs font-bold mt-1" style="color:var(--grn);">100% integrity — 0 breaches</div></div>';
+  html+='</div>';
+  setWsContent(html,'KPI Dashboard','FleetOverseerAgent');
+}
+
+/* ===== COUNTER ANIMATION ===== */
+function initCounters(){
+  // Placeholder for counter animations if needed
+}
+
+/* ===== BACK BUTTON ===== */
+wsBackBtn.addEventListener('click',function(){
+  if(S.viewStack.length>0){
+    S.view=S.viewStack.pop();
+    if(S.view==='default'){
+      renderDefaultView();
+    }
+  }
+  if(S.viewStack.length===0) wsBackBtn.classList.add('hidden');
+});
+
+/* ===== SIDEBAR NAV ===== */
+document.querySelectorAll('.sidebar-icon[data-nav]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var nav=btn.dataset.nav;
+    if(nav==='home'){
+      shell.style.display='none';
+      mobileNav.style.display='none';
+      loginScreen.style.display='';
+      S.role=null;
+      try{localStorage.removeItem('aims_role');}catch(e){}
+      return;
+    }
+    if(nav==='workspace'){
+      document.querySelectorAll('.sidebar-icon').forEach(function(s){s.classList.remove('active');});
+      btn.classList.add('active');
+      S.viewStack=[];
+      renderDefaultView();
+    }
+    if(nav==='agents'){
+      document.querySelectorAll('.sidebar-icon').forEach(function(s){s.classList.remove('active');});
+      btn.classList.add('active');
+      S.viewStack.push(S.view);
+      S.view='agent_health';
+      wsBackBtn.classList.remove('hidden');
+      renderAgentHealth();
+    }
+    if(nav==='evidence'){
+      document.querySelectorAll('.sidebar-icon').forEach(function(s){s.classList.remove('active');});
+      btn.classList.add('active');
+      S.viewStack.push(S.view);
+      S.view='verify_hash';
+      wsBackBtn.classList.remove('hidden');
+      renderVerifyHash();
+    }
+  });
+});
+
+/* ===== COLLAPSE PANELS ===== */
+$('collapse-agents-w3x4').addEventListener('click',function(){
+  agentPanel.style.display=agentPanel.style.display==='none'?'':'none';
+});
+$('chat-toggle-c4d5').addEventListener('click',function(){
+  chatPanel.style.display=chatPanel.style.display==='none'?'':'none';
+});
+
+/* ===== MOBILE TABS ===== */
+document.querySelectorAll('.mob-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    var t=tab.dataset.mtab;
+    // Show/hide panes for mobile
+    var wsPane=wsContent.parentElement;
+    if(t==='workspace'){
+      wsPane.style.display='';
+      chatPanel.style.display='none';
+    } else if(t==='chat'){
+      wsPane.style.display='none';
+      chatPanel.style.display='flex';
+      chatPanel.style.width='100%';
+    } else if(t==='agents'){
+      wsPane.style.display='';
+      chatPanel.style.display='none';
+      S.viewStack.push(S.view);
+      S.view='agent_health';
+      wsBackBtn.classList.remove('hidden');
+      renderAgentHealth();
+    }
+    // Highlight tab
+    document.querySelectorAll('.mob-tab i').forEach(function(ic){ic.style.color='var(--ts)';});
+    document.querySelectorAll('.mob-tab span').forEach(function(sp){sp.style.color='var(--ts)';});
+    tab.querySelector('i').style.color='var(--pri)';
+    tab.querySelector('span').style.color='var(--pri)';
+  });
+});
+
+/* ===== INIT FROM LOCALSTORAGE ===== */
+var saved=loadRole();
+if(saved&&(saved==='planner'||saved==='reviewer'||saved==='supervisor')){
+  S.role=saved;
+  loginScreen.style.display='none';
+  shell.style.display='flex';
+  mobileNav.style.display='';
+  initWorkspace();
+}
+
+})();
+</script>
+</body>
+</html>

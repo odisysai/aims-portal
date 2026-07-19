@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>AIMS – Developer & Architect Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{root:'#060A11',shell:'#090E18',surface:'#0C1421',card:'#101D30',elevated:'#152438',bdr:'#1C2E47','bdr-hi':'#1E3D5C',pri:'#0A84FF',tl:'#00C7BE',amb:'#FF9F0A',rd:'#FF3B30',grn:'#32D74B',pur:'#BF5AF2',ind:'#5E5CE6','t-pri':'#F5F5F7','t-sec':'#8E8E93','t-mut':'#48484A','t-code':'#64D2FF'}}}}};
+</script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg-root:#060A11;--bg-shell:#090E18;--bg-surface:#0C1421;--bg-card:#101D30;--bg-elevated:#152438;--bdr:#1C2E47;--bdr-hi:#1E3D5C;--pri:#0A84FF;--tl:#00C7BE;--amb:#FF9F0A;--rd:#FF3B30;--grn:#32D74B;--pur:#BF5AF2;--ind:#5E5CE6;--t-pri:#F5F5F7;--t-sec:#8E8E93;--t-mut:#48484A;--t-code:#64D2FF}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,'SF Pro Display',sans-serif;background:var(--bg-root);color:var(--t-pri);overflow:hidden;height:100vh}
+.mono{font-family:'JetBrains Mono','SF Mono','Fira Code',monospace}
+.code-block{background:var(--bg-root);border:1px solid var(--bdr);border-radius:12px;padding:16px;font-family:'JetBrains Mono','SF Mono','Fira Code',monospace;font-size:13px;line-height:1.7;overflow-x:auto;position:relative;tab-size:2}
+.code-block .kw{color:#0A84FF}.code-block .tp{color:#00C7BE}.code-block .str{color:#FF9F0A}.code-block .cm{color:#48484A}.code-block .fn{color:#BF5AF2}.code-block .num{color:#32D74B}
+.code-copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:6px;padding:4px 10px;color:var(--t-sec);font-size:11px;cursor:pointer;font-family:system-ui;transition:all .2s}
+.code-copy:hover{background:rgba(10,132,255,.15);color:var(--pri)}
+.nav-item{height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--t-sec);transition:all .15s;border-left:2px solid transparent;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.04)}
+.nav-item.active{background:rgba(10,132,255,.12);color:var(--pri);border-left-color:var(--pri)}
+.nav-item.active i{color:var(--pri)}
+.nav-group-hdr{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t-mut);padding:16px 12px 6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.nav-group-hdr:hover{color:var(--t-sec)}
+.panel{display:none;animation:panelIn .3s ease}
+.panel.active{display:block}
+@keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;line-height:1.4}
+.badge-green{background:rgba(50,215,75,.12);color:#32D74B}
+.badge-amber{background:rgba(255,159,10,.12);color:#FF9F0A}
+.badge-blue{background:rgba(10,132,255,.12);color:#0A84FF}
+.badge-purple{background:rgba(191,90,242,.12);color:#BF5AF2}
+.badge-red{background:rgba(255,59,48,.12);color:#FF3B30}
+.badge-grey{background:rgba(142,142,147,.12);color:#8E8E93}
+.badge-teal{background:rgba(0,199,190,.12);color:#00C7BE}
+.layer-band{border-left:3px solid;padding:12px 16px;border-radius:8px;background:var(--bg-card);cursor:pointer;transition:all .2s}
+.layer-band:hover{filter:brightness(1.15)}
+.intent-card{background:var(--bg-card);border:1px solid var(--bdr);border-radius:12px;padding:16px;transition:all .2s}
+.intent-card:hover{border-color:var(--bdr-hi)}
+.contract-card{background:var(--bg-card);border:1px solid var(--bdr);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s}
+.contract-card:hover{border-color:var(--pri);transform:translateY(-2px)}
+.drawer{position:fixed;top:0;right:-500px;width:480px;max-width:90vw;height:100vh;background:var(--bg-root);border-left:1px solid var(--bdr);z-index:100;transition:right .3s ease;overflow-y:auto;padding:24px}
+.drawer.open{right:0}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none}
+.drawer-overlay.open{display:block}
+.status-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.matrix-cell{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:14px;cursor:default;position:relative}
+.matrix-cell .tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--bdr);border-radius:6px;padding:6px 10px;font-size:11px;white-space:nowrap;z-index:10;margin-bottom:4px}
+.matrix-cell:hover .tooltip{display:block}
+.search-results{position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--bdr);border-radius:8px;max-height:320px;overflow-y:auto;z-index:60;display:none}
+.search-results.show{display:block}
+.search-result-item{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(28,46,71,.5)}
+.search-result-item:hover{background:rgba(10,132,255,.08)}
+.schema-block{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.schema-block.expanded{max-height:600px}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--bg-root);flex-shrink:0}
+.progress-fill{transition:width 1.2s ease}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--bdr-hi)}
+.sidebar-collapsed .sidebar-text{display:none}
+.sidebar-collapsed .nav-group-hdr span{display:none}
+.sidebar-collapsed .nav-group-hdr .badge{display:none}
+@media(max-width:1023px){#sidebar{width:48px!important}#sidebar .sidebar-text,.nav-group-hdr span,.nav-group-hdr .badge,.sidebar-label{display:none!important}#main-content{margin-left:48px!important}}
+@media(max-width:767px){#sidebar{display:none!important}#main-content{margin-left:0!important}#mobile-menu-btn-x3k9{display:flex!important}.drawer{width:100%!important}}
+.tab-btn{padding:6px 16px;border-radius:6px;font-size:13px;cursor:pointer;transition:all .15s;color:var(--t-sec);background:transparent;border:none}
+.tab-btn.active{background:rgba(10,132,255,.15);color:var(--pri)}
+</style>
+</head>
+<body data-id="0">
+<app-icon data-id="1" hidden data-icon="layout-dashboard" data-palette="Dark"></app-icon>
+
+<!-- HEADER -->
+<header data-id="2" id="header-bar-h1x2" class="fixed top-0 left-0 right-0 h-14 bg-root border-b border-bdr flex items-center px-4 z-50">
+  <button data-id="3" id="mobile-menu-btn-x3k9" class="hidden mr-3 p-2 text-t-sec hover:text-t-pri"><i data-id="4" data-lucide="menu" class="w-5 h-5"></i></button>
+  <div data-id="5" class="flex items-center gap-2 min-w-[180px]">
+    <span data-id="6" class="mono font-bold text-pri text-lg tracking-tight">AIMS</span>
+    <span data-id="7" class="text-t-mut text-xs hidden sm:inline">Engineering Portal</span>
+  </div>
+  <div data-id="8" class="flex-1 flex justify-center">
+    <div data-id="9" class="relative w-full max-w-[300px]">
+      <i data-id="10" data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-t-mut"></i>
+      <input data-id="11" id="search-input-s1a2" type="text" placeholder="Search portal..." class="w-full bg-surface border border-bdr rounded-lg pl-9 pr-3 py-1.5 text-sm text-t-pri placeholder-t-mut focus:outline-none focus:border-pri"/>
+      <div data-id="12" id="search-results-s1a2" class="search-results"></div>
+    </div>
+  </div>
+  <div data-id="13" class="flex items-center gap-3 ml-4">
+    <span data-id="14" class="badge badge-grey hidden sm:inline-flex">v1.0</span>
+    <div data-id="15" class="hidden md:flex items-center gap-1.5">
+      <span data-id="16" class="w-2 h-2 rounded-full bg-grn status-pulse"></span>
+      <span data-id="17" class="text-xs text-t-sec">12 online</span>
+    </div>
+    <div data-id="18" class="hidden lg:flex items-center -space-x-2">
+      <div data-id="19" class="avatar" style="background:#0A84FF">NR</div>
+      <div data-id="20" class="avatar" style="background:#00C7BE">JD</div>
+      <div data-id="21" class="avatar" style="background:#BF5AF2">AK</div>
+      <div data-id="22" class="avatar" style="background:#FF9F0A">ML</div>
+      <div data-id="23" class="avatar" style="background:#32D74B">SC</div>
+    </div>
+    <button data-id="24" id="invite-btn-i1v2" class="hidden sm:flex items-center gap-1 border border-bdr text-t-sec text-xs px-3 py-1 rounded-lg hover:border-pri hover:text-pri transition-all">
+      <i data-id="25" data-lucide="user-plus" class="w-3 h-3"></i><span data-id="26">Invite</span>
+    </button>
+  </div>
+</header>
+
+<!-- MOBILE NAV OVERLAY -->
+<nav data-id="27" id="mobile-nav-m1n2" class="hidden fixed inset-0 bg-root z-[60] flex flex-col p-4 overflow-y-auto">
+  <div data-id="28" class="flex justify-between items-center mb-4">
+    <span data-id="29" class="mono font-bold text-pri text-lg">AIMS</span>
+    <button data-id="30" id="mobile-nav-close-m1n2" class="p-2 text-t-sec hover:text-t-pri"><i data-id="31" data-lucide="x" class="w-6 h-6"></i></button>
+  </div>
+  <div data-id="32" id="mobile-nav-items-m1n2"></div>
+</nav>
+
+<!-- SIDEBAR -->
+<aside data-id="33" id="sidebar" class="fixed top-14 left-0 bottom-0 w-[240px] bg-root border-r border-bdr overflow-y-auto z-40 pt-2 pb-8">
+  <div data-id="34" class="px-3 mb-2 sidebar-label"><span data-id="35" class="text-[10px] uppercase tracking-widest text-t-mut">Navigation</span></div>
+  <div data-id="36" id="sidebar-nav-s1n2"></div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main data-id="37" id="main-content" class="ml-[240px] mt-14 h-[calc(100vh-56px)] overflow-y-auto" style="scroll-behavior:smooth">
+  <div data-id="38" id="panels-container" class="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto pb-24"></div>
+</main>
+
+<!-- CONTRACT DRAWER -->
+<div data-id="39" id="drawer-overlay-d1o2" class="drawer-overlay"></div>
+<div data-id="40" id="drawer-d1r2" class="drawer">
+  <div data-id="41" class="flex justify-between items-center mb-6">
+    <h3 data-id="42" id="drawer-title-d1t2" class="text-lg font-bold mono text-pri"></h3>
+    <button data-id="43" id="drawer-close-d1c2" class="p-1 text-t-sec hover:text-t-pri"><i data-id="44" data-lucide="x" class="w-5 h-5"></i></button>
+  </div>
+  <div data-id="45" class="flex justify-end mb-3">
+    <button data-id="46" id="drawer-copy-all-d1a2" class="code-copy" style="position:static">Copy all</button>
+  </div>
+  <div data-id="47" id="drawer-content-d1c3" class="code-block text-xs"></div>
+</div>
+
+<!-- FOOTER inside main scroll area is appended per panel -->
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const NAV_STRUCTURE = [
+  { group: 'OVERVIEW', items: [
+    { id: 'dashboard', icon: 'home', label: 'Portal Dashboard' },
+    { id: 'project-status', icon: 'clipboard-list', label: 'Project Status' },
+    { id: 'team-roles', icon: 'users', label: 'Team & Roles' },
+  ]},
+  { group: 'ARCHITECTURE', items: [
+    { id: 'system-overview', icon: 'layers', label: 'System Overview' },
+    { id: 'ag-ui', icon: 'refresh-cw', label: 'AG-UI Transport' },
+    { id: 'a2ui', icon: 'puzzle', label: 'A2UI Workspace Layer' },
+    { id: 'auth-matrix', icon: 'lock', label: 'Authorization Matrix' },
+  ]},
+  { group: 'INTENT CATALOGS', badge: '34 intents', items: [
+    { id: 'planner-intents', icon: 'calendar', label: 'Planner', badge: '9' },
+    { id: 'reviewer-intents', icon: 'search', label: 'Reviewer', badge: '7' },
+    { id: 'supervisor-intents', icon: 'telescope', label: 'Supervisor', badge: '8' },
+    { id: 'inspector-intents', icon: 'smartphone', label: 'Inspector / Gemma', badge: '10' },
+  ]},
+  { group: 'CONTRACTS', badge: '8 contracts', items: [
+    { id: 'contract-envelope', icon: 'mail', label: 'Request/Response Envelope' },
+    { id: 'contract-evidence', icon: 'link', label: 'Evidence Chain' },
+    { id: 'contract-escalation', icon: 'arrow-up-circle', label: 'Escalation Protocol' },
+    { id: 'contract-sync', icon: 'refresh-cw', label: 'Offline Sync (CRDT)' },
+    { id: 'contract-handoff', icon: 'handshake', label: 'A2A Handoff' },
+    { id: 'contract-router', icon: 'brain', label: 'Multimodal Router' },
+    { id: 'contract-reg', icon: 'scroll', label: 'Regulatory Schema' },
+    { id: 'contract-auth', icon: 'key', label: 'Auth Token' },
+  ]},
+  { group: 'COMPONENT REGISTRY', items: [
+    { id: 'renderer-catalog', icon: 'box', label: 'Renderer Catalog', badge: '20' },
+    { id: 'component-map', icon: 'map', label: 'Component Map' },
+  ]},
+  { group: 'IMPLEMENTATION', items: [
+    { id: 'sprint-1', icon: 'check-circle', label: 'Sprint 1 (approved)' },
+    { id: 'sprint-2-3', icon: 'arrow-right', label: 'Sprint 2-3 (next)' },
+    { id: 'sprint-4-6', icon: 'sparkles', label: 'Sprint 4-6 (planned)' },
+  ]},
+  { group: 'DELIVERABLES', items: [
+    { id: 'deliverables', icon: 'globe', label: 'All Deliverables' },
+  ]},
+  { group: 'REVIEW BOARD', items: [
+    { id: 'review-board', icon: 'message-square', label: 'Team Comments' },
+    { id: 'decisions', icon: 'check-square', label: 'Decisions Log' },
+    { id: 'open-questions', icon: 'flag', label: 'Open Questions' },
+  ]},
+];
+
+const INTENTS = {
+  planner: [
+    { id:'planner_session_brief', name:'planner_session_brief', status:'PRODUCTION', agent:'SchedulerAgent', component:'PlannerBriefCard', desc:'Opens a new planner session with a brief of today\'s top priorities, field readiness score, and pending work orders.', trust:'READ', req:'{ plannerUserId, siteId, date }', res:'{ briefSummary, readinessScore, topPriorities[], pendingWOs: number }' },
+    { id:'show_field_ready_assignments', name:'show_field_ready_assignments', status:'PRODUCTION', agent:'DispatchAgent', component:'AssignmentListView', desc:'Returns a filterable list of assignments that have passed all pre-conditions and are ready for field dispatch.', trust:'CONFIRM', req:'{ siteId, assetClass?, priority? }', res:'{ assignments[]: { id, asset, inspector, status, eta } }' },
+    { id:'prepare_assignment_release', name:'prepare_assignment_release', status:'PRODUCTION', agent:'DispatchAgent', component:'AssignmentReleaseModal', desc:'Prepares an assignment package for release to the field — bundles work instructions, safety docs, and equipment checklist.', trust:'ACTION', req:'{ assignmentId, inspectorId }', res:'{ package: { docs[], checklist[], safetyNotes } }' },
+    { id:'generate_work_orders', name:'generate_work_orders', status:'NEXT', agent:'SchedulerAgent', component:'WorkOrderWizard', desc:'AI-assisted generation of work orders from asset risk profiles and maintenance schedules.', trust:'ACTION', req:'{ assetIds[], scheduleWindow }', res:'{ workOrders[]: { id, tasks[], estimatedHours } }' },
+    { id:'optimize_field_routes', name:'optimize_field_routes', status:'NEXT', agent:'SchedulerAgent', component:'RouteMapView', desc:'Optimizes daily field routes for inspectors based on asset locations, priority, and travel constraints.', trust:'READ', req:'{ inspectorIds[], date, siteId }', res:'{ routes[]: { inspectorId, stops[], totalDistance, eta } }' },
+    { id:'risk_rank_asset_queue', name:'risk_rank_asset_queue', status:'NEXT', agent:'AnalysisAgent', component:'RiskRankTable', desc:'Ranks assets by composite risk score combining inspection history, age, environment factors, and failure probability.', trust:'READ', req:'{ siteId, assetClass? }', res:'{ rankedAssets[]: { id, name, riskScore, factors } }' },
+    { id:'deploy_agent_assignments', name:'deploy_agent_assignments', status:'BACKLOG', agent:'DispatchAgent', component:'DeployConfirmCard', desc:'Batch-deploys confirmed assignments to inspector devices with all required offline packages.', trust:'ACTION', req:'{ assignmentIds[] }', res:'{ deployed: number, failed: number, errors[] }' },
+    { id:'schedule_calendar_view', name:'schedule_calendar_view', status:'BACKLOG', agent:'SchedulerAgent', component:'CalendarGrid', desc:'Interactive calendar view showing scheduled inspections, maintenance windows, and team availability.', trust:'READ', req:'{ siteId, month, year }', res:'{ events[]: { date, type, assignmentId, inspector } }' },
+    { id:'asset_search_filter', name:'asset_search_filter', status:'BACKLOG', agent:'AnalysisAgent', component:'AssetSearchPanel', desc:'Full-text and faceted search across the asset registry with filters for class, location, risk, and status.', trust:'READ', req:'{ query, filters: { class?, zone?, riskMin? } }', res:'{ results[]: { id, name, class, zone, riskScore } }' },
+  ],
+  reviewer: [
+    { id:'load_evidence_review_queue', name:'load_evidence_review_queue', status:'NEXT', agent:'ReviewAgent', component:'EvidenceQueueList', desc:'Loads the reviewer\'s queue of evidence records awaiting review, sorted by priority and submission time.', trust:'READ', req:'{ reviewerId, siteId }', res:'{ queue[]: { evidenceId, asset, inspector, submitted, priority } }' },
+    { id:'open_evidence_record', name:'open_evidence_record', status:'NEXT', agent:'ReviewAgent', component:'EvidenceDetailView', desc:'Opens a full evidence record with photos, measurements, Gemma analysis, hash verification status, and inspector notes.', trust:'READ', req:'{ evidenceId }', res:'{ record: { photos[], measurements, gemmaAnalysis, hashValid, notes } }' },
+    { id:'approve_evidence_record', name:'approve_evidence_record', status:'NEXT', agent:'ReviewAgent', component:'ApprovalActionCard', desc:'Approves an evidence record, finalizing the hash chain entry and triggering downstream regulatory mapping.', trust:'SIGN', req:'{ evidenceId, reviewerSignature }', res:'{ approved: boolean, chainHash, regulatoryMapped: boolean }' },
+    { id:'flag_anomaly', name:'flag_anomaly', status:'BACKLOG', agent:'AnalysisAgent', component:'AnomalyFlagForm', desc:'Flags an anomaly in evidence — triggers notification to supervisor and optionally requests field rework.', trust:'ACTION', req:'{ evidenceId, anomalyType, severity, notes }', res:'{ flagId, notified: string[], reworkRequested: boolean }' },
+    { id:'request_field_rework', name:'request_field_rework', status:'BACKLOG', agent:'DispatchAgent', component:'ReworkRequestCard', desc:'Sends a rework request back to the field inspector with specific instructions on what to re-inspect.', trust:'ACTION', req:'{ evidenceId, inspectorId, instructions }', res:'{ reworkAssignmentId, eta }' },
+    { id:'verify_hash_chain', name:'verify_hash_chain', status:'BACKLOG', agent:'ReviewAgent', component:'HashChainViewer', desc:'Displays the full hash chain for an evidence record, allowing the reviewer to verify integrity from capture to submission.', trust:'READ', req:'{ evidenceId }', res:'{ chain[]: { step, hash, timestamp, actor, valid } }' },
+    { id:'defect_analytics_view', name:'defect_analytics_view', status:'BACKLOG', agent:'AnalysisAgent', component:'DefectAnalyticsDash', desc:'Dashboard showing defect trends, common failure modes, and site-level quality metrics over time.', trust:'READ', req:'{ siteId, dateRange }', res:'{ trends[], topDefects[], qualityScore }' },
+  ],
+  supervisor: [
+    { id:'load_fleet_operations_brief', name:'load_fleet_operations_brief', status:'NEXT', agent:'SchedulerAgent', component:'FleetBriefCard', desc:'Executive brief of fleet-wide operations: active inspectors, completion rates, escalations pending, and compliance status.', trust:'READ', req:'{ supervisorId }', res:'{ activeInspectors, completionRate, escalationsPending, complianceStatus }' },
+    { id:'review_escalation_queue', name:'review_escalation_queue', status:'NEXT', agent:'ReviewAgent', component:'EscalationQueueView', desc:'Shows all escalated items from inspectors and Gemma edge agents awaiting supervisor decision.', trust:'READ', req:'{ supervisorId }', res:'{ escalations[]: { id, source, priority, reason, timestamp } }' },
+    { id:'agent_health_dashboard', name:'agent_health_dashboard', status:'NEXT', agent:'SchedulerAgent', component:'AgentHealthGrid', desc:'Real-time health dashboard showing status of all AI agents — response times, error rates, queue depths.', trust:'READ', req:'{}', res:'{ agents[]: { name, status, avgLatency, errorRate, queueDepth } }' },
+    { id:'compliance_report_view', name:'compliance_report_view', status:'BACKLOG', agent:'SubmitAgent', component:'ComplianceReportPanel', desc:'Generates and displays compliance reports against configured regulatory frameworks (API 570, ASME, etc.).', trust:'READ', req:'{ siteId, framework, dateRange }', res:'{ report: { score, findings[], gaps[], recommendations[] } }' },
+    { id:'supervisor_override', name:'supervisor_override', status:'BACKLOG', agent:'ReviewAgent', component:'OverrideActionCard', desc:'Allows supervisor to override a reviewer decision or Gemma classification. Requires MFA re-authentication.', trust:'OVERRIDE', req:'{ targetId, overrideType, justification, mfaToken }', res:'{ overridden: boolean, auditLogId }' },
+    { id:'kpi_analytics_dashboard', name:'kpi_analytics_dashboard', status:'BACKLOG', agent:'AnalysisAgent', component:'KPIDashboard', desc:'Interactive KPI dashboard with drill-down into inspection throughput, quality metrics, and SLA adherence.', trust:'READ', req:'{ siteId, dateRange }', res:'{ kpis: { throughput, quality, slaAdherence }, drilldown[] }' },
+    { id:'fleet_zone_map', name:'fleet_zone_map', status:'BACKLOG', agent:'DispatchAgent', component:'ZoneMapView', desc:'Geographic map view of all active field zones with inspector locations, asset density, and risk heat overlay.', trust:'READ', req:'{ siteId }', res:'{ zones[]: { id, inspectors[], assetCount, riskLevel, bounds } }' },
+    { id:'regulatory_submission_view', name:'regulatory_submission_view', status:'BACKLOG', agent:'SubmitAgent', component:'RegSubmissionPanel', desc:'Prepares and previews regulatory submission packages with all required evidence, signatures, and compliance attestations.', trust:'SIGN', req:'{ siteId, framework, submissionType }', res:'{ package: { docs[], signatures[], attestations[], readyToSubmit: boolean } }' },
+  ],
+  inspector: [
+    { id:'load_my_work_queue', name:'load_my_work_queue', status:'PRODUCTION', agent:'Gemma-4-2B-IT', component:'WorkQueueList', desc:'Loads the inspector\'s personal work queue from local SQLite cache. Fully offline-capable.', trust:'READ', offline:true, req:'{ inspectorId }', res:'{ assignments[]: { id, asset, priority, status, instructions } }' },
+    { id:'guide_inspection_step', name:'guide_inspection_step', status:'PRODUCTION', agent:'Gemma-4-2B-IT', component:'StepGuideCard', desc:'Step-by-step inspection guidance powered by Gemma. Provides context-aware instructions based on asset type and inspection standard.', trust:'READ', offline:true, req:'{ assignmentId, stepIndex }', res:'{ step: { instruction, safetyNote, requiredPhotos, measurements } }' },
+    { id:'classify_defect_image', name:'classify_defect_image', status:'PRODUCTION', agent:'Gemma-4-2B-IT', component:'DefectClassCard', desc:'On-device image classification using Gemma multimodal. Identifies defect type, severity, and recommended action.', trust:'CONFIRM', offline:true, req:'{ imageBase64, assetClass }', res:'{ defectType, severity, confidence, recommendedAction }' },
+    { id:'assess_measurement_threshold', name:'assess_measurement_threshold', status:'NEXT', agent:'Gemma-4-2B-IT', component:'ThresholdGauge', desc:'Evaluates a measurement against configurable thresholds. Flags exceedances and suggests escalation if confidence is low.', trust:'READ', offline:true, req:'{ measurementType, value, assetId }', res:'{ withinThreshold: boolean, margin, escalationSuggested: boolean }' },
+    { id:'generate_defect_report_draft', name:'generate_defect_report_draft', status:'NEXT', agent:'Gemma-4-2B-IT', component:'ReportDraftView', desc:'Auto-generates a defect report draft from captured evidence, measurements, and Gemma classifications.', trust:'CONFIRM', offline:true, req:'{ assignmentId, evidenceIds[] }', res:'{ draft: { summary, findings[], photos[], measurements[] } }' },
+    { id:'verify_local_evidence_hash', name:'verify_local_evidence_hash', status:'NEXT', agent:'Gemma-4-2B-IT', component:'HashVerifyBadge', desc:'Verifies the local evidence hash chain integrity on-device before queuing for sync.', trust:'READ', offline:true, req:'{ evidenceId }', res:'{ valid: boolean, chainLength, lastHash }' },
+    { id:'regulatory_lookup', name:'regulatory_lookup', status:'BACKLOG', agent:'Gemma-4-2B-IT', component:'RegLookupCard', desc:'Local regulatory reference lookup using cached RAG data. Searches relevant standards for the current inspection context.', trust:'READ', offline:true, req:'{ query, framework? }', res:'{ results[]: { clause, text, relevance } }' },
+    { id:'escalate_to_reviewer', name:'escalate_to_reviewer', status:'NEXT', agent:'Gemma-4-2B-IT', component:'EscalationForm', desc:'Queues an escalation to a cloud-based reviewer agent. Triggered when Gemma confidence drops below threshold or anomaly detected.', trust:'ACTION', offline:false, escalation:true, req:'{ evidenceId, reason, gemmaConfidence, priority }', res:'{ escalationId, queuePosition, estimatedReviewTime }' },
+    { id:'escalate_to_supervisor', name:'escalate_to_supervisor', status:'NEXT', agent:'Gemma-4-2B-IT', component:'CriticalEscalation', desc:'Critical escalation directly to supervisor. Bypasses reviewer queue for safety-critical or compliance-critical findings.', trust:'ACTION', offline:false, escalation:true, req:'{ evidenceId, reason, severity: "CRITICAL", photos[] }', res:'{ escalationId, supervisorNotified: boolean }' },
+    { id:'request_planner_rescheduling', name:'request_planner_rescheduling', status:'BACKLOG', agent:'Gemma-4-2B-IT', component:'RescheduleRequest', desc:'Requests planner to reschedule remaining assignments when field conditions prevent completion (weather, access, equipment).', trust:'ACTION', offline:false, escalation:true, req:'{ assignmentIds[], reason, suggestedDate? }', res:'{ rescheduled: boolean, newDates[] }' },
+  ]
+};
+
+const COMPONENTS = [
+  { id:'PlannerBriefCard',name:'Planner Brief Card',roles:['Planner'],trust:'READ',executes:'Display',escalates:'—',status:'Production' },
+  { id:'AssignmentListView',name:'Assignment List View',roles:['Planner'],trust:'CONFIRM',executes:'Filter/Sort',escalates:'—',status:'Production' },
+  { id:'AssignmentReleaseModal',name:'Assignment Release Modal',roles:['Planner'],trust:'ACTION',executes:'releaseAssignment()',escalates:'—',status:'Production' },
+  { id:'WorkOrderWizard',name:'Work Order Wizard',roles:['Planner'],trust:'ACTION',executes:'createWorkOrder()',escalates:'—',status:'Next Sprint' },
+  { id:'RouteMapView',name:'Route Map View',roles:['Planner'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'RiskRankTable',name:'Risk Rank Table',roles:['Planner'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'EvidenceQueueList',name:'Evidence Queue List',roles:['Reviewer'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'EvidenceDetailView',name:'Evidence Detail View',roles:['Reviewer'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'ApprovalActionCard',name:'Approval Action Card',roles:['Reviewer'],trust:'SIGN',executes:'approveEvidence()',escalates:'—',status:'Next Sprint' },
+  { id:'AnomalyFlagForm',name:'Anomaly Flag Form',roles:['Reviewer'],trust:'ACTION',executes:'flagAnomaly()',escalates:'Supervisor',status:'Backlog' },
+  { id:'FleetBriefCard',name:'Fleet Brief Card',roles:['Supervisor'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'EscalationQueueView',name:'Escalation Queue View',roles:['Supervisor'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'AgentHealthGrid',name:'Agent Health Grid',roles:['Supervisor'],trust:'READ',executes:'Display',escalates:'—',status:'Next Sprint' },
+  { id:'OverrideActionCard',name:'Override Action Card',roles:['Supervisor'],trust:'OVERRIDE',executes:'overrideDecision()',escalates:'Audit',status:'Backlog' },
+  { id:'WorkQueueList',name:'Work Queue List',roles:['Inspector'],trust:'READ',executes:'Display',escalates:'—',status:'Production' },
+  { id:'StepGuideCard',name:'Step Guide Card',roles:['Inspector'],trust:'READ',executes:'Display',escalates:'—',status:'Production' },
+  { id:'DefectClassCard',name:'Defect Classification Card',roles:['Inspector'],trust:'CONFIRM',executes:'classifyImage()',escalates:'Reviewer',status:'Production' },
+  { id:'ThresholdGauge',name:'Threshold Gauge',roles:['Inspector'],trust:'READ',executes:'Display',escalates:'Reviewer',status:'Next Sprint' },
+  { id:'EscalationForm',name:'Escalation Form',roles:['Inspector'],trust:'ACTION',executes:'queueEscalation()',escalates:'Reviewer',status:'Next Sprint' },
+  { id:'CriticalEscalation',name:'Critical Escalation Card',roles:['Inspector'],trust:'ACTION',executes:'criticalEscalate()',escalates:'Supervisor',status:'Next Sprint' },
+];
+
+const CONTRACTS = [
+  { id:'envelope', name:'Request/Response Envelope', icon:'mail', desc:'BaseIntentRequest and BaseIntentResponse — the universal wrapper for all agent-workspace communication.', roles:['All Roles'],
+    code:`<span class="cm">// Base envelope for all intent communication</span>\n<span class="kw">interface</span> <span class="tp">BaseIntentRequest</span> {\n  <span class="tp">intentId</span>:    <span class="tp">string</span>;       <span class="cm">// e.g. "planner_session_brief"</span>\n  <span class="tp">threadId</span>:    <span class="tp">string</span>;       <span class="cm">// UUIDv7 — time-ordered</span>\n  <span class="tp">role</span>:        <span class="str">"planner"</span> | <span class="str">"reviewer"</span> | <span class="str">"supervisor"</span> | <span class="str">"inspector"</span>;\n  <span class="tp">userId</span>:      <span class="tp">string</span>;\n  <span class="tp">siteId</span>:      <span class="tp">string</span>;\n  <span class="tp">timestamp</span>:   <span class="tp">number</span>;       <span class="cm">// epoch ms</span>\n  <span class="tp">payload</span>:     <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">unknown</span>&gt;;\n  <span class="tp">authToken</span>:   <span class="tp">string</span>;       <span class="cm">// JWT scoped to role</span>\n}\n\n<span class="kw">interface</span> <span class="tp">BaseIntentResponse</span> {\n  <span class="tp">threadId</span>:       <span class="tp">string</span>;\n  <span class="tp">intentId</span>:       <span class="tp">string</span>;\n  <span class="tp">status</span>:         <span class="str">"success"</span> | <span class="str">"error"</span> | <span class="str">"partial"</span>;\n  <span class="tp">componentId</span>:    <span class="tp">string</span>;       <span class="cm">// from trusted catalog</span>\n  <span class="tp">componentProps</span>: <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">unknown</span>&gt;;\n  <span class="tp">actions</span>?:       <span class="tp">ActionDef</span>[];  <span class="cm">// buttons the user can take</span>\n  <span class="tp">auditRef</span>:       <span class="tp">string</span>;       <span class="cm">// immutable audit log entry</span>\n}` },
+  { id:'evidence', name:'Evidence Chain', icon:'link', desc:'EvidenceRecord — tamper-evident hash chain from field capture through review to regulatory submission.', roles:['Inspector','Reviewer','Supervisor'],
+    code:`<span class="kw">interface</span> <span class="tp">EvidenceRecord</span> {\n  <span class="tp">evidenceId</span>:   <span class="tp">string</span>;           <span class="cm">// UUIDv7</span>\n  <span class="tp">assignmentId</span>: <span class="tp">string</span>;\n  <span class="tp">assetId</span>:      <span class="tp">string</span>;\n  <span class="tp">inspectorId</span>:  <span class="tp">string</span>;\n  <span class="tp">capturedAt</span>:   <span class="tp">number</span>;           <span class="cm">// epoch ms, device clock</span>\n  <span class="tp">deviceId</span>:     <span class="tp">string</span>;           <span class="cm">// hardware fingerprint</span>\n  <span class="tp">location</span>:     { <span class="tp">lat</span>: <span class="tp">number</span>; <span class="tp">lng</span>: <span class="tp">number</span> };\n  <span class="tp">photos</span>:       <span class="tp">PhotoEntry</span>[];     <span class="cm">// base64 + metadata</span>\n  <span class="tp">measurements</span>: <span class="tp">Measurement</span>[];   <span class="cm">// typed values</span>\n  <span class="tp">gemmaAnalysis</span>: {\n    <span class="tp">defectType</span>:  <span class="tp">string</span>;\n    <span class="tp">severity</span>:    <span class="str">"LOW"</span> | <span class="str">"MEDIUM"</span> | <span class="str">"HIGH"</span> | <span class="str">"CRITICAL"</span>;\n    <span class="tp">confidence</span>:  <span class="tp">number</span>;         <span class="cm">// 0–1</span>\n  };\n  <span class="tp">chainHash</span>:    <span class="tp">string</span>;           <span class="cm">// SHA-256 of prev + this</span>\n  <span class="tp">prevHash</span>:     <span class="tp">string</span>;\n  <span class="tp">tamperHooks</span>:  <span class="tp">TamperHook</span>[];    <span class="cm">// automated checks</span>\n}\n\n<span class="kw">interface</span> <span class="tp">TamperHook</span> {\n  <span class="tp">hookId</span>:    <span class="tp">string</span>;\n  <span class="tp">type</span>:      <span class="str">"hash_verify"</span> | <span class="str">"timestamp_drift"</span> | <span class="str">"gps_fence"</span>;\n  <span class="tp">trigger</span>:   <span class="str">"on_capture"</span> | <span class="str">"on_sync"</span> | <span class="str">"on_review"</span>;\n  <span class="tp">threshold</span>: <span class="tp">number</span>;\n  <span class="tp">action</span>:    <span class="str">"warn"</span> | <span class="str">"block"</span> | <span class="str">"escalate"</span>;\n}` },
+  { id:'escalation', name:'Escalation Protocol', icon:'arrow-up-circle', desc:'GemmaEscalationEnvelope — governs how the on-device Gemma agent escalates findings to cloud orchestrators.', roles:['Inspector','Reviewer','Supervisor'],
+    code:`<span class="kw">interface</span> <span class="tp">GemmaEscalationEnvelope</span> {\n  <span class="tp">escalationId</span>:  <span class="tp">string</span>;        <span class="cm">// UUIDv7</span>\n  <span class="tp">source</span>:         <span class="str">"gemma_edge"</span>;\n  <span class="tp">deviceId</span>:       <span class="tp">string</span>;\n  <span class="tp">inspectorId</span>:    <span class="tp">string</span>;\n  <span class="tp">evidenceId</span>:     <span class="tp">string</span>;\n  <span class="tp">reason</span>:         <span class="tp">EscalationReason</span>;\n  <span class="tp">priority</span>:       <span class="str">"LOW"</span> | <span class="str">"MEDIUM"</span> | <span class="str">"HIGH"</span> | <span class="str">"CRITICAL"</span>;\n  <span class="tp">gemmaConfidence</span>: <span class="tp">number</span>;     <span class="cm">// 0–1, below threshold triggers auto-escalation</span>\n  <span class="tp">localChainHash</span>: <span class="tp">string</span>;      <span class="cm">// for integrity verification on arrival</span>\n  <span class="tp">queuedAt</span>:       <span class="tp">number</span>;      <span class="cm">// device-local epoch ms</span>\n  <span class="tp">syncedAt</span>?:      <span class="tp">number</span>;      <span class="cm">// set when successfully transmitted</span>\n  <span class="tp">routing</span>: {\n    <span class="tp">target</span>:      <span class="str">"reviewer"</span> | <span class="str">"supervisor"</span>;\n    <span class="tp">skipQueue</span>:   <span class="tp">boolean</span>;     <span class="cm">// CRITICAL skips all queue items</span>\n    <span class="tp">a2aEnvelope</span>: <span class="tp">A2AHandoff</span>;  <span class="cm">// nested handoff contract</span>\n  };\n}\n\n<span class="kw">type</span> <span class="tp">EscalationReason</span> =\n  | <span class="str">"low_confidence"</span>\n  | <span class="str">"threshold_breach"</span>\n  | <span class="str">"anomaly_detected"</span>\n  | <span class="str">"safety_critical"</span>\n  | <span class="str">"manual_request"</span>;` },
+  { id:'sync', name:'Offline Sync (CRDT)', icon:'refresh-cw', desc:'SyncDelta — conflict-free replicated data type sync between Inspector edge and cloud, using vector clocks.', roles:['Inspector'],
+    code:`<span class="kw">interface</span> <span class="tp">SyncDelta</span> {\n  <span class="tp">deltaId</span>:      <span class="tp">string</span>;           <span class="cm">// UUIDv7</span>\n  <span class="tp">deviceId</span>:     <span class="tp">string</span>;\n  <span class="tp">vectorClock</span>:  <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">number</span>&gt;; <span class="cm">// { deviceA: 4, cloud: 7 }</span>\n  <span class="tp">operation</span>:    <span class="str">"INSERT"</span> | <span class="str">"UPDATE"</span> | <span class="str">"DELETE"</span>;\n  <span class="tp">entity</span>:       <span class="tp">string</span>;           <span class="cm">// table/collection name</span>\n  <span class="tp">entityId</span>:     <span class="tp">string</span>;\n  <span class="tp">patch</span>:        <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">unknown</span>&gt;; <span class="cm">// JSON merge patch</span>\n  <span class="tp">createdAt</span>:    <span class="tp">number</span>;           <span class="cm">// device-local epoch ms</span>\n  <span class="tp">syncStatus</span>:   <span class="str">"pending"</span> | <span class="str">"synced"</span> | <span class="str">"conflict"</span>;\n}\n\n<span class="kw">interface</span> <span class="tp">SyncConflict</span> {\n  <span class="tp">conflictId</span>:  <span class="tp">string</span>;\n  <span class="tp">entityId</span>:    <span class="tp">string</span>;\n  <span class="tp">localDelta</span>:  <span class="tp">SyncDelta</span>;\n  <span class="tp">remoteDelta</span>: <span class="tp">SyncDelta</span>;\n  <span class="tp">resolution</span>:  <span class="str">"local_wins"</span> | <span class="str">"remote_wins"</span> | <span class="str">"manual"</span>;\n  <span class="tp">resolvedBy</span>?: <span class="tp">string</span>;\n  <span class="tp">resolvedAt</span>?: <span class="tp">number</span>;\n}\n\n<span class="cm">// Vector clock merge: max(local[k], remote[k]) for all k</span>\n<span class="cm">// Conflict detection: if neither clock dominates, flag conflict</span>` },
+  { id:'handoff', name:'A2A Handoff', icon:'handshake', desc:'A2AHandoff — agent-to-agent communication envelope for cross-boundary orchestration.', roles:['All Agents'],
+    code:`<span class="kw">interface</span> <span class="tp">A2AHandoff</span> {\n  <span class="tp">handoffId</span>:    <span class="tp">string</span>;           <span class="cm">// UUIDv7</span>\n  <span class="tp">fromAgent</span>:    <span class="tp">string</span>;           <span class="cm">// e.g. "gemma_edge"</span>\n  <span class="tp">toAgent</span>:      <span class="tp">string</span>;           <span class="cm">// e.g. "ReviewAgent"</span>\n  <span class="tp">protocol</span>:     <span class="str">"ag-ui"</span> | <span class="str">"a2a-direct"</span>;\n  <span class="tp">threadId</span>:     <span class="tp">string</span>;           <span class="cm">// carries thread context</span>\n  <span class="tp">payload</span>:      <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">unknown</span>&gt;;\n  <span class="tp">priority</span>:     <span class="str">"LOW"</span> | <span class="str">"MEDIUM"</span> | <span class="str">"HIGH"</span> | <span class="str">"CRITICAL"</span>;\n  <span class="tp">context</span>: {\n    <span class="tp">originIntent</span>: <span class="tp">string</span>;       <span class="cm">// intent that triggered handoff</span>\n    <span class="tp">evidenceRefs</span>: <span class="tp">string</span>[];    <span class="cm">// evidence IDs for context</span>\n    <span class="tp">chainHash</span>:    <span class="tp">string</span>;       <span class="cm">// integrity anchor</span>\n  };\n  <span class="tp">ttl</span>:          <span class="tp">number</span>;           <span class="cm">// time-to-live in ms</span>\n  <span class="tp">retryPolicy</span>:  {\n    <span class="tp">maxRetries</span>: <span class="tp">number</span>;\n    <span class="tp">backoff</span>:    <span class="str">"exponential"</span> | <span class="str">"linear"</span>;\n  };\n}` },
+  { id:'router', name:'Multimodal Router', icon:'brain', desc:'MultiModalIntentRouter — routes text, voice, and image inputs to the correct intent handler.', roles:['All Roles'],
+    code:`<span class="kw">interface</span> <span class="tp">MultiModalIntentRouter</span> {\n  <span class="tp">inputModality</span>: <span class="str">"text"</span> | <span class="str">"voice"</span> | <span class="str">"image"</span> | <span class="str">"multimodal"</span>;\n  <span class="tp">rawInput</span>: {\n    <span class="tp">text</span>?:       <span class="tp">string</span>;\n    <span class="tp">audioBlob</span>?:  <span class="tp">Blob</span>;           <span class="cm">// raw audio for STT</span>\n    <span class="tp">imageBase64</span>?: <span class="tp">string</span>;         <span class="cm">// photo for classification</span>\n  };\n  <span class="tp">resolvedIntent</span>: {\n    <span class="tp">intentId</span>:    <span class="tp">string</span>;          <span class="cm">// mapped intent from catalog</span>\n    <span class="tp">confidence</span>:  <span class="tp">number</span>;          <span class="cm">// 0–1</span>\n    <span class="tp">fallback</span>?:   <span class="tp">string</span>;          <span class="cm">// next best intent</span>\n  };\n  <span class="tp">preprocessing</span>: {\n    <span class="tp">sttResult</span>?:      <span class="tp">string</span>;      <span class="cm">// speech-to-text output</span>\n    <span class="tp">imageLabels</span>?:    <span class="tp">string</span>[];    <span class="cm">// detected labels</span>\n    <span class="tp">languageDetected</span>: <span class="tp">string</span>;     <span class="cm">// ISO 639-1</span>\n  };\n}` },
+  { id:'reg', name:'Regulatory Schema', icon:'scroll', desc:'RegSchemaCache — cached regulatory framework data for offline and online reference lookups.', roles:['Inspector','Reviewer','Supervisor'],
+    code:`<span class="kw">interface</span> <span class="tp">RegSchemaCache</span> {\n  <span class="tp">framework</span>:    <span class="tp">string</span>;           <span class="cm">// e.g. "API_570", "ASME_B31.3"</span>\n  <span class="tp">version</span>:      <span class="tp">string</span>;           <span class="cm">// standard edition</span>\n  <span class="tp">lastUpdated</span>:  <span class="tp">number</span>;           <span class="cm">// epoch ms</span>\n  <span class="tp">updateStrategy</span>: <span class="str">"incremental"</span> | <span class="str">"full_replace"</span>;\n  <span class="tp">clauses</span>:      <span class="tp">ClauseEntry</span>[];\n  <span class="tp">mappings</span>: {\n    <span class="tp">defectType</span>:    <span class="tp">string</span>;        <span class="cm">// maps to clause</span>\n    <span class="tp">requiredFields</span>: <span class="tp">string</span>[];     <span class="cm">// evidence fields required</span>\n    <span class="tp">thresholds</span>:    <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">number</span>&gt;;\n  }[];\n}\n\n<span class="kw">interface</span> <span class="tp">ClauseEntry</span> {\n  <span class="tp">clauseId</span>:   <span class="tp">string</span>;  <span class="cm">// e.g. "570.9.3.1"</span>\n  <span class="tp">title</span>:      <span class="tp">string</span>;\n  <span class="tp">text</span>:       <span class="tp">string</span>;  <span class="cm">// full clause text</span>\n  <span class="tp">keywords</span>:   <span class="tp">string</span>[];\n  <span class="tp">embedding</span>?: <span class="tp">number</span>[];  <span class="cm">// for RAG similarity search</span>\n}\n\n<span class="cm">// Supported: API 570, API 510, ASME B31.3,</span>\n<span class="cm">// ASME B31.4, NBIC, OSHA 1910, ISO 55001</span>` },
+  { id:'auth', name:'Auth Token', icon:'key', desc:'Component authorization JWT structure — scoped per role, verified server-side before every COMPONENT_RENDER.', roles:['All Roles'],
+    code:`<span class="cm">// JWT payload structure for component authorization</span>\n<span class="kw">interface</span> <span class="tp">AIMSAuthToken</span> {\n  <span class="cm">// Standard JWT claims</span>\n  <span class="tp">sub</span>:       <span class="tp">string</span>;     <span class="cm">// userId</span>\n  <span class="tp">iat</span>:       <span class="tp">number</span>;     <span class="cm">// issued at</span>\n  <span class="tp">exp</span>:       <span class="tp">number</span>;     <span class="cm">// expiration</span>\n  <span class="tp">iss</span>:       <span class="str">"aims-auth-service"</span>;\n\n  <span class="cm">// AIMS-specific claims</span>\n  <span class="tp">role</span>:      <span class="str">"planner"</span> | <span class="str">"reviewer"</span> | <span class="str">"supervisor"</span> | <span class="str">"inspector"</span>;\n  <span class="tp">siteIds</span>:   <span class="tp">string</span>[];   <span class="cm">// authorized site scopes</span>\n  <span class="tp">trustLevel</span>: <span class="tp">number</span>;    <span class="cm">// 1–5 maps to trust tiers</span>\n  <span class="tp">permissions</span>: {\n    <span class="tp">read</span>:      <span class="tp">string</span>[]; <span class="cm">// componentIds allowed for READ</span>\n    <span class="tp">confirm</span>:   <span class="tp">string</span>[]; <span class="cm">// componentIds allowed for CONFIRM</span>\n    <span class="tp">action</span>:    <span class="tp">string</span>[]; <span class="cm">// componentIds allowed for ACTION</span>\n    <span class="tp">sign</span>:      <span class="tp">string</span>[]; <span class="cm">// componentIds allowed for SIGN</span>\n    <span class="tp">override</span>:  <span class="tp">string</span>[]; <span class="cm">// componentIds allowed for OVERRIDE</span>\n  };\n  <span class="tp">mfaVerified</span>: <span class="tp">boolean</span>;  <span class="cm">// required for OVERRIDE actions</span>\n}\n\n<span class="cm">// Signing: RS256 with rotating key pair</span>\n<span class="cm">// Key rotation: every 24h, grace period 1h</span>\n<span class="cm">// Refresh: silent refresh via httpOnly cookie</span>\n<span class="cm">// Revocation: Redis blacklist, checked on every request</span>` },
+];
+
+const DEFAULT_COMMENTS = [
+  { id:'c1', author:'Nalin R.', time:'09:18', section:'Architecture', text:'The 6-layer diagram really clarifies the Gemma→AG-UI escalation path. Approved for Sprint 3 planning.', color:'#0A84FF' },
+  { id:'c2', author:'Alex K.', time:'09:05', section:'Evidence Chain', text:'Question: should chainHash include the deviceId? Need to confirm tamper scope.', color:'#BF5AF2' },
+  { id:'c3', author:'James D.', time:'08:47', section:'Inspector/Gemma', text:'Offline queue priority order looks right. Confirm CRITICAL escalations bypass all other queue items.', color:'#00C7BE' },
+  { id:'c4', author:'Mark L.', time:'08:30', section:'AG-UI Transport', text:'Should we use UUIDv7 or CUID2 for threadId? UUIDv7 gives time-ordering which is nice for the cold tier.', color:'#FF9F0A' },
+  { id:'c5', author:'Sarah C.', time:'Yesterday', section:'Roadmap', text:'Sprint 3 timeline looks aggressive for mobile. May need to split Step 9 into two sub-steps.', color:'#32D74B' },
+];
+
+const DEFAULT_DECISIONS = [
+  { id:'d1', date:'19 Jul', text:'AG-UI for transport, A2UI for workspace, AIMS catalog as trusted renderer', by:'Agreed unanimously' },
+  { id:'d2', date:'19 Jul', text:'Gemma-4-2B-IT INT4 quantized for Inspector edge agent', by:'Approved: Nalin R.' },
+  { id:'d3', date:'19 Jul', text:'Sprint 1 steps 1–3 approved as immediate deliverables', by:'Approved: VS Code Copilot + Nalin R.' },
+  { id:'d4', date:'19 Jul', text:'UUIDv7 for threadId (time-ordered, suits Redis hot tier)', by:'Approved: Nalin R.' },
+  { id:'d5', date:'19 Jul', text:'Escalation priority: CRITICAL supervisor-bound, skip all other queue items', by:'Approved' },
+];
+
+const DEFAULT_QUESTIONS = [
+  { id:'q1', text:'Should chainHash include deviceId to scope tamper detection per device?', author:'@Alex K.', resolved:false },
+  { id:'q2', text:'Thread hydration: how many STATE_SNAPSHOT events to replay on reconnect? N=3? N=10?', author:'@Mark L.', resolved:false },
+  { id:'q3', text:'Supervisor override: MFA re-auth — TOTP or WebAuthn?', author:'@Nalin R.', resolved:false },
+  { id:'q4', text:'Regulatory schema cache update strategy — incremental patch or full replace?', author:'@Sarah C.', resolved:false },
+  { id:'q5', text:'Gemma confidence threshold for auto-escalation: 85% or configurable per asset class?', author:'@James D.', resolved:false },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  currentPanel: 'dashboard',
+  sidebarCollapsed: false,
+  searchQuery: '',
+  expandedGroups: new Set(NAV_STRUCTURE.map(g=>g.group)),
+  openContractDrawer: null,
+  expandedIntents: new Set(),
+  expandedLayers: new Set(),
+  comments: JSON.parse(localStorage.getItem('aims_portal_review_comments')||'null') || DEFAULT_COMMENTS,
+  decisions: JSON.parse(localStorage.getItem('aims_portal_review_decisions')||'null') || DEFAULT_DECISIONS,
+  questions: JSON.parse(localStorage.getItem('aims_portal_review_questions')||'null') || DEFAULT_QUESTIONS,
+};
+
+function saveState(){
+  localStorage.setItem('aims_portal_review_comments', JSON.stringify(state.comments));
+  localStorage.setItem('aims_portal_review_decisions', JSON.stringify(state.decisions));
+  localStorage.setItem('aims_portal_review_questions', JSON.stringify(state.questions));
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function buildNav(containerId, isMobile){
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  c.innerHTML = '';
+  NAV_STRUCTURE.forEach(group => {
+    const isExpanded = state.expandedGroups.has(group.group);
+    const hdr = document.createElement('div');
+    hdr.className = 'nav-group-hdr';
+    hdr.innerHTML = `<span>${group.group}</span>${group.badge?`<span class="badge badge-blue">${group.badge}</span>`:''}<i data-lucide="${isExpanded?'chevron-down':'chevron-right'}" class="w-3 h-3 text-t-mut"></i>`;
+    hdr.addEventListener('click', ()=>{
+      if(state.expandedGroups.has(group.group)) state.expandedGroups.delete(group.group);
+      else state.expandedGroups.add(group.group);
+      buildNav('sidebar-nav-s1n2', false);
+      buildNav('mobile-nav-items-m1n2', true);
+    });
+    c.appendChild(hdr);
+    if(isExpanded){
+      group.items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = `nav-item ${state.currentPanel===item.id?'active':''}`;
+        el.setAttribute('tabindex','0');
+        el.setAttribute('data-panel', item.id);
+        el.innerHTML = `<i data-lucide="${item.icon}" class="w-4 h-4 flex-shrink-0"></i><span class="sidebar-text truncate">${item.label}</span>${item.badge?`<span class="badge badge-grey ml-auto sidebar-text">${item.badge}</span>`:''}`;
+        el.addEventListener('click', ()=> navigateTo(item.id));
+        el.addEventListener('keydown', e=>{ if(e.key==='Enter') navigateTo(item.id); });
+        c.appendChild(el);
+      });
+    }
+  });
+  if(typeof lucide!=='undefined'&&typeof lucide.createIcons==='function') lucide.createIcons();
+}
+
+function navigateTo(panelId){
+  state.currentPanel = panelId;
+  // For contract items, route to contracts hub
+  const contractIds = ['contract-envelope','contract-evidence','contract-escalation','contract-sync','contract-handoff','contract-router','contract-reg','contract-auth'];
+  if(contractIds.includes(panelId)){
+    state.currentPanel = 'contracts';
+    renderPanels();
+    buildNav('sidebar-nav-s1n2', false);
+    buildNav('mobile-nav-items-m1n2', true);
+    history.pushState(null,'','#contracts');
+    // Open drawer for specific contract
+    const cid = panelId.replace('contract-','');
+    setTimeout(()=> openDrawer(cid), 400);
+    closeMobileNav();
+    return;
+  }
+  // Sprint items route to roadmap
+  if(['sprint-1','sprint-2-3','sprint-4-6'].includes(panelId)){
+    state.currentPanel = 'roadmap';
+    panelId = 'roadmap';
+  }
+  // decisions/open-questions route to review-board
+  if(['decisions','open-questions'].includes(panelId)){
+    state.currentPanel = 'review-board';
+    panelId = 'review-board';
+  }
+  // component-map, project-status, team-roles -> dashboard
+  if(['component-map','project-status','team-roles'].includes(panelId)){
+    state.currentPanel = panelId;
+  }
+  renderPanels();
+  buildNav('sidebar-nav-s1n2', false);
+  buildNav('mobile-nav-items-m1n2', true);
+  history.pushState(null,'','#'+state.currentPanel);
+  document.getElementById('main-content').scrollTop = 0;
+  closeMobileNav();
+}
+
+function closeMobileNav(){
+  const mn = document.getElementById('mobile-nav-m1n2');
+  if(mn) mn.classList.add('hidden');
+}
+
+// ============================================================
+// PANEL RENDERING
+// ============================================================
+function renderPanels(){
+  const container = document.getElementById('panels-container');
+  const p = state.currentPanel;
+  let html = '';
+
+  // Breadcrumb
+  const bc = getBreadcrumb(p);
+  html += `<div class="text-xs text-t-mut mb-1 mono">${bc}</div>`;
+
+  switch(p){
+    case 'dashboard': html += renderDashboard(); break;
+    case 'system-overview': html += renderSystemOverview(); break;
+    case 'ag-ui': html += renderAGUI(); break;
+    case 'a2ui': html += renderA2UI(); break;
+    case 'auth-matrix': html += renderAuthMatrix(); break;
+    case 'planner-intents': html += renderIntentPanel('planner','Planner','SchedulerAgent + DispatchAgent + AnalysisAgent', 9); break;
+    case 'reviewer-intents': html += renderIntentPanel('reviewer','Reviewer','ReviewAgent + AnalysisAgent + DispatchAgent', 7); break;
+    case 'supervisor-intents': html += renderIntentPanel('supervisor','Supervisor','SchedulerAgent + ReviewAgent + SubmitAgent + AnalysisAgent + DispatchAgent', 8); break;
+    case 'inspector-intents': html += renderIntentPanel('inspector','Inspector / Gemma','Gemma-4-2B-IT (on-device)', 10); break;
+    case 'contracts': html += renderContractsHub(); break;
+    case 'renderer-catalog': html += renderRendererCatalog(); break;
+    case 'roadmap': html += renderRoadmap(); break;
+    case 'deliverables': html += renderDeliverables(); break;
+    case 'review-board': html += renderReviewBoard(); break;
+    case 'project-status': html += renderProjectStatus(); break;
+    case 'team-roles': html += renderTeamRoles(); break;
+    case 'component-map': html += renderComponentMap(); break;
+    default: html += renderDashboard();
+  }
+
+  html += `<footer class="mt-16 pt-6 border-t border-bdr text-center text-xs text-t-mut pb-8">Made by Copilot · AIMS Engineering Portal v1.0 · Last updated 19 Jul 2026</footer>`;
+
+  container.innerHTML = html;
+  attachPanelEvents();
+  if(typeof lucide!=='undefined'&&typeof lucide.createIcons==='function') lucide.createIcons();
+}
+
+function getBreadcrumb(p){
+  const map = {
+    'dashboard':'AIMS Portal / Overview / Dashboard',
+    'project-status':'AIMS Portal / Overview / Project Status',
+    'team-roles':'AIMS Portal / Overview / Team & Roles',
+    'system-overview':'AIMS Portal / Architecture / System Overview',
+    'ag-ui':'AIMS Portal / Architecture / AG-UI Transport',
+    'a2ui':'AIMS Portal / Architecture / A2UI Workspace Layer',
+    'auth-matrix':'AIMS Portal / Architecture / Authorization Matrix',
+    'planner-intents':'AIMS Portal / Intent Catalogs / Planner',
+    'reviewer-intents':'AIMS Portal / Intent Catalogs / Reviewer',
+    'supervisor-intents':'AIMS Portal / Intent Catalogs / Supervisor',
+    'inspector-intents':'AIMS Portal / Intent Catalogs / Inspector · Gemma',
+    'contracts':'AIMS Portal / Contracts / Reference Hub',
+    'renderer-catalog':'AIMS Portal / Component Registry / Renderer Catalog',
+    'component-map':'AIMS Portal / Component Registry / Component Map',
+    'roadmap':'AIMS Portal / Implementation / Roadmap',
+    'deliverables':'AIMS Portal / Deliverables / Gallery',
+    'review-board':'AIMS Portal / Review Board / Team Review',
+  };
+  return map[p]||'AIMS Portal';
+}
+
+// DASHBOARD
+function renderDashboard(){
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Portal Dashboard</h1><p class="text-t-sec text-sm">Your single source of truth for AIMS architecture, intent catalogs, contracts, and implementation progress.</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span><button class="copy-link-btn p-1.5 rounded-lg hover:bg-elevated text-t-sec" data-link="#dashboard"><i data-lucide="link" class="w-4 h-4"></i></button></div>
+  </div>
+  <!-- Hero -->
+  <div class="rounded-2xl p-6 md:p-8 mb-6" style="background:linear-gradient(135deg,#0A1628 0%,#0D2040 50%,#101830 100%);border:1px solid var(--bdr)">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-6">
+      <div class="flex-1">
+        <h2 class="text-xl md:text-2xl font-bold mb-2">AIMS Engineering Portal</h2>
+        <p class="text-t-sec text-sm leading-relaxed">Your single source of truth for architecture, intent catalogs, contracts, and implementation progress. Bookmark this page and share it across the engineering team.</p>
+      </div>
+      <div class="flex flex-wrap gap-4 md:gap-6 text-center">
+        <div><div class="text-2xl font-bold text-pri stat-counter" data-target="34">0</div><div class="text-xs text-t-mut">Intents</div></div>
+        <div><div class="text-2xl font-bold text-tl stat-counter" data-target="20">0</div><div class="text-xs text-t-mut">Components</div></div>
+        <div><div class="text-2xl font-bold text-amb stat-counter" data-target="8">0</div><div class="text-xs text-t-mut">Contracts</div></div>
+        <div><div class="text-2xl font-bold text-grn stat-counter" data-target="15">0</div><div class="text-xs text-t-mut">Sprint Steps</div></div>
+        <div><div class="text-2xl font-bold text-pur stat-counter" data-target="4">0</div><div class="text-xs text-t-mut">Roles</div></div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-bdr text-xs text-t-mut">Last updated: 19 Jul 2026 · v1.0 · 4 apps deployed · Architecture reviewed</div>
+  </div>
+  <!-- Status cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-card border border-bdr rounded-xl p-4 hover:border-tl transition-all cursor-pointer nav-card" data-target="system-overview">
+      <div class="flex items-center justify-between mb-3"><i data-lucide="layers" class="w-5 h-5 text-tl"></i><span class="badge badge-green">REVIEWED</span></div>
+      <h3 class="font-semibold text-sm mb-1">System Architecture</h3>
+      <p class="text-xs text-t-sec mb-3">6-layer system · AG-UI + A2UI + Gemma edge</p>
+      <span class="text-xs text-tl">View Blueprint →</span>
+    </div>
+    <div class="bg-card border border-bdr rounded-xl p-4 hover:border-pri transition-all cursor-pointer nav-card" data-target="planner-intents">
+      <div class="flex items-center justify-between mb-3"><i data-lucide="list" class="w-5 h-5 text-pri"></i><span class="badge badge-amber">IN PROGRESS</span></div>
+      <h3 class="font-semibold text-sm mb-1">34 Intents Defined</h3>
+      <p class="text-xs text-t-sec mb-3">Planner 9 · Reviewer 7 · Supervisor 8 · Inspector 10</p>
+      <span class="text-xs text-pri">Browse Intents →</span>
+    </div>
+    <div class="bg-card border border-bdr rounded-xl p-4 hover:border-grn transition-all cursor-pointer nav-card" data-target="roadmap">
+      <div class="flex items-center justify-between mb-3"><i data-lucide="check-circle" class="w-5 h-5 text-grn"></i><span class="badge badge-blue status-pulse">ACTIVE</span></div>
+      <h3 class="font-semibold text-sm mb-1">Sprint 1 Approved</h3>
+      <p class="text-xs text-t-sec mb-3">Steps 1–3 complete · Steps 4–6 in progress</p>
+      <span class="text-xs text-grn">View Roadmap →</span>
+    </div>
+    <div class="bg-card border border-bdr rounded-xl p-4 hover:border-pur transition-all cursor-pointer nav-card" data-target="deliverables">
+      <div class="flex items-center justify-between mb-3"><i data-lucide="layout" class="w-5 h-5 text-pur"></i><span class="badge badge-green">DEPLOYED</span></div>
+      <h3 class="font-semibold text-sm mb-1">4 Apps Live</h3>
+      <p class="text-xs text-t-sec mb-3">Homepage · Agentic UI · Inspector PWA · Blueprint</p>
+      <span class="text-xs text-pur">View Deliverables →</span>
+    </div>
+  </div>
+  <!-- Architecture Layers -->
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="layers" class="w-5 h-5 text-pri"></i>System Architecture at a Glance</h3>
+    <div class="space-y-2">
+      ${renderLayerBands()}
+    </div>
+  </div>
+  <!-- Two column: Sequence + Activity -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+    <div class="lg:col-span-2 bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold mb-4">Implementation Sequence</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="rounded-lg p-4" style="background:rgba(10,132,255,.05);border:1px solid rgba(10,132,255,.15)">
+          <div class="text-xs font-semibold text-pri mb-3 flex items-center gap-1"><i data-lucide="code" class="w-3 h-3"></i> VS Code Copilot — Proposed Sequence</div>
+          <div class="space-y-2 text-xs text-t-sec">
+            <div class="flex gap-2"><span class="text-grn">✅</span> 1. Define Planner intent catalog + shared envelope</div>
+            <div class="flex gap-2"><span class="text-grn">✅</span> 2. Define first approved A2UI components</div>
+            <div class="flex gap-2"><span class="text-grn">✅</span> 3. Add real AG-UI threadId, message snapshots, state, run events</div>
+            <div class="flex gap-2"><span class="text-amb">🔜</span> 4. Replace sessionStorage with backend thread persistence</div>
+            <div class="flex gap-2"><span class="text-amb">🔜</span> 5. Fill left navigation, route to session surface</div>
+            <div class="flex gap-2"><span class="text-amb">🔜</span> 6. Connect 3 production intents</div>
+            <div class="flex gap-2"><span class="text-t-mut">🔮</span> 7. Add risk/readiness/scheduling/evidence contracts</div>
+          </div>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(191,90,242,.05);border:1px solid rgba(191,90,242,.15)">
+          <div class="text-xs font-semibold text-pur mb-3 flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i> Copilot Additions <span class="badge badge-purple ml-1">NEW</span></div>
+          <div class="space-y-2 text-xs text-t-sec">
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 8. Inspector/Gemma intent catalog + A2A handoff envelope</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 9. Offline-first CRDT sync contract + conflict resolution</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 10. Evidence chain governance contract</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 11. Escalation protocol: Gemma → Cloud priority routing</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 12. Component Authorization Matrix</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 13. Full Reviewer + Supervisor intent catalogs</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 14. Multi-modal intent router (text · voice · image)</div>
+            <div class="flex gap-2"><span class="text-pur">🆕</span> 15. Regulatory schema mapper</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Activity Feed -->
+    <div class="bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-tl"></i>Recent Activity</h3>
+      <div class="space-y-3">
+        <div class="flex gap-3 text-xs"><span class="text-grn mt-0.5">✅</span><div><span class="text-t-mut">09:24</span> · Architecture Blueprint published · <span class="text-pri">Nalin R.</span></div></div>
+        <div class="flex gap-3 text-xs"><span class="text-pri mt-0.5">💬</span><div><span class="text-t-mut">09:18</span> · Comment on Evidence Chain Contract · <span class="text-pur">Alex K.</span></div></div>
+        <div class="flex gap-3 text-xs"><span class="text-grn mt-0.5">✅</span><div><span class="text-t-mut">09:12</span> · Sprint 1 approved · <span class="text-pri">Nalin R.</span></div></div>
+        <div class="flex gap-3 text-xs"><span class="text-rd mt-0.5">🚩</span><div><span class="text-t-mut">08:55</span> · Open question: thread hydration strategy · <span class="text-amb">Mark L.</span></div></div>
+        <div class="flex gap-3 text-xs"><span class="text-grn mt-0.5">✅</span><div><span class="text-t-mut">08:30</span> · Inspector App deployed · <span class="text-tl">James D.</span></div></div>
+        <div class="flex gap-3 text-xs"><span class="text-amb mt-0.5">🔜</span><div><span class="text-t-mut">Yesterday</span> · Escalation protocol draft reviewed · <span class="text-grn">Sarah C.</span></div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderLayerBands(){
+  const layers = [
+    { name:'L1 FIELD EDGE', color:'#BF5AF2', items:'Inspector PWA · Gemma-4-2B-IT (INT4) · Local Evidence Cache · SQLite · Offline-first', target:'inspector-intents' },
+    { name:'L2 TRANSPORT', color:'#0A84FF', items:'AG-UI Protocol · threadId (UUIDv7) · SSE Event Stream · CRDT Sync Engine', target:'ag-ui' },
+    { name:'L3 WORKSPACE', color:'#00C7BE', items:'A2UI Dynamic Renderer · Planner WS · Reviewer WS · Supervisor WS · Auth Gate', target:'a2ui' },
+    { name:'L4 ORCHESTRATION', color:'#FF9F0A', items:'SchedulerAgent · DispatchAgent · CaptureAgent · AnalysisAgent · ReviewAgent · SubmitAgent', target:'system-overview' },
+    { name:'L5 GOVERNANCE', color:'#32D74B', items:'Evidence Hash Chain · Audit Log · Regulatory Schema Mapper · Tamper Hooks', target:'contracts' },
+    { name:'L6 PERSISTENCE', color:'#FF3B30', items:'Redis (hot threads) · PostgreSQL (cold archive) · Evidence DB · Asset Registry', target:'ag-ui' },
+  ];
+  return layers.map(l=>`<div class="layer-band nav-card" data-target="${l.target}" style="border-left-color:${l.color}"><div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4"><span class="mono text-xs font-bold" style="color:${l.color};min-width:140px">${l.name}</span><span class="text-xs text-t-sec">${l.items}</span></div></div>`).join('');
+}
+
+// SYSTEM OVERVIEW
+function renderSystemOverview(){
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">System Architecture Overview</h1><p class="text-t-sec text-sm">AG-UI transport · A2UI dynamic workspace · AIMS trusted renderer catalog · Gemma edge agent</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span><button class="copy-link-btn p-1.5 rounded-lg hover:bg-elevated text-t-sec" data-link="#system-overview"><i data-lucide="link" class="w-4 h-4"></i></button></div>
+  </div>
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="layers" class="w-5 h-5 text-pri"></i>Full Architecture Layer Stack</h3>
+    <p class="text-xs text-t-sec mb-4">Click any layer to view details, interfaces, and connected contracts.</p>
+    <div class="space-y-2">${renderLayerBands()}</div>
+  </div>
+  <!-- Core Principle -->
+  <div class="bg-card border-l-4 border-pri rounded-xl p-5 mb-6">
+    <p class="text-sm italic text-t-pri mb-3">"The agent may propose the UI and action. Authorization and execution remain in deterministic backend services."</p>
+    <p class="text-xs text-t-mut mb-4">— VS Code Copilot Recommendation</p>
+    <div class="mt-3 pt-3 border-t border-bdr">
+      <span class="badge badge-purple mb-2">Copilot Addition</span>
+      <p class="text-sm italic text-t-sec">"The Inspector layer introduces Gemma-4-2B-IT — an on-device LLM operating fully offline. It escalates to cloud orchestrators via a governed A2A envelope when thresholds are breached or confidence is insufficient."</p>
+    </div>
+  </div>
+  <!-- Render Pipeline -->
+  <div class="bg-card border border-bdr rounded-xl p-5">
+    <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="workflow" class="w-5 h-5 text-tl"></i>Render Pipeline Flowchart</h3>
+    <div class="flex flex-wrap gap-2 items-center text-xs">
+      ${['Intent received','threadId resolved','Run started','SSE stream open','Events flow','Auth gate check','Component mounted','Action','TOOL_RESULT','State committed','Thread persisted'].map((s,i,a)=>`<div class="bg-elevated rounded-lg px-3 py-2 mono text-t-code">${s}</div>${i<a.length-1?'<i data-lucide="arrow-right" class="w-4 h-4 text-t-mut flex-shrink-0"></i>':''}`).join('')}
+    </div>
+  </div>`;
+}
+
+// AG-UI
+function renderAGUI(){
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">AG-UI Transport Layer</h1><p class="text-t-sec text-sm">Persistent agent session · SSE event stream · Thread lifecycle</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <!-- Thread Interface -->
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-3 flex items-center gap-2"><i data-lucide="code" class="w-4 h-4 text-pri"></i>AIMSThread Interface</h3>
+    <div class="code-block text-xs"><button class="code-copy copy-code-btn">Copy</button><span class="kw">interface</span> <span class="tp">AIMSThread</span> {
+  <span class="tp">threadId</span>:     <span class="tp">string</span>;          <span class="cm">// UUIDv7 — time-ordered</span>
+  <span class="tp">role</span>:         <span class="str">"planner"</span> | <span class="str">"reviewer"</span> | <span class="str">"supervisor"</span> | <span class="str">"inspector"</span>;
+  <span class="tp">userId</span>:       <span class="tp">string</span>;
+  <span class="tp">siteId</span>:       <span class="tp">string</span>;
+  <span class="tp">status</span>:       <span class="str">"active"</span> | <span class="str">"idle"</span> | <span class="str">"closed"</span>;
+  <span class="tp">messages</span>:     <span class="tp">Message</span>[];
+  <span class="tp">stateSnapshot</span>: <span class="tp">Record</span>&lt;<span class="tp">string</span>, <span class="tp">unknown</span>&gt;;
+  <span class="tp">createdAt</span>:    <span class="tp">number</span>;          <span class="cm">// epoch ms</span>
+  <span class="tp">updatedAt</span>:    <span class="tp">number</span>;
+  <span class="tp">tier</span>:         <span class="str">"hot"</span> | <span class="str">"cold"</span> | <span class="str">"local"</span>;
+}</div>
+  </div>
+  <!-- Events Table -->
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-3 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-amb"></i>SSE Event Types</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead><tr class="text-t-mut text-left border-b border-bdr"><th class="pb-2 pr-4 font-medium">Event</th><th class="pb-2 pr-4 font-medium">Direction</th><th class="pb-2 pr-4 font-medium">Key Payload Fields</th><th class="pb-2 font-medium">Trigger</th></tr></thead>
+        <tbody class="text-t-sec">
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">RUN_STARTED</td><td>Server → Client</td><td>threadId, runId, agentId</td><td>New intent received</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">TEXT_DELTA</td><td>Server → Client</td><td>delta, messageId</td><td>Streaming text chunk</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">TOOL_CALL</td><td>Server → Client</td><td>toolName, args, callId</td><td>Agent invokes tool</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">TOOL_RESULT</td><td>Client → Server</td><td>callId, result, status</td><td>Tool execution complete</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">STATE_SNAPSHOT</td><td>Server → Client</td><td>snapshot, version</td><td>State mutation committed</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">RUN_FINISHED</td><td>Server → Client</td><td>runId, status, duration</td><td>Run completed</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">COMPONENT_RENDER</td><td>Server → Client</td><td>componentId, props, auth</td><td>Agent proposes UI</td></tr>
+          <tr class="border-b border-bdr/50"><td class="py-2 pr-4 mono text-t-code">ESCALATION_QUEUED</td><td>Edge → Cloud</td><td>escalationId, priority</td><td>Gemma escalation</td></tr>
+          <tr><td class="py-2 pr-4 mono text-t-code">SYNC_DELTA</td><td>Edge ↔ Cloud</td><td>deltaId, vectorClock, patch</td><td>CRDT sync event</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Thread Persistence -->
+  <div class="rounded-xl p-5 mb-6" style="background:rgba(191,90,242,.05);border:1px solid rgba(191,90,242,.2)">
+    <div class="flex items-center gap-2 mb-3"><span class="badge badge-purple">Copilot Addition</span><h3 class="font-semibold text-sm">Thread Persistence Strategy</h3></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="bg-card/50 rounded-lg p-3"><div class="mono text-xs text-rd font-semibold mb-1">Hot Tier</div><div class="text-xs text-t-sec">Redis — &lt;24h active threads, sub-ms lookup</div></div>
+      <div class="bg-card/50 rounded-lg p-3"><div class="mono text-xs text-pri font-semibold mb-1">Cold Tier</div><div class="text-xs text-t-sec">PostgreSQL — full archive, queryable, indexed</div></div>
+      <div class="bg-card/50 rounded-lg p-3"><div class="mono text-xs text-pur font-semibold mb-1">Inspector Local</div><div class="text-xs text-t-sec">SQLite — merged on sync via vector clock</div></div>
+      <div class="bg-card/50 rounded-lg p-3"><div class="mono text-xs text-tl font-semibold mb-1">Hydration</div><div class="text-xs text-t-sec">Replay last N STATE_SNAPSHOT on reconnect</div></div>
+    </div>
+  </div>
+  <!-- Thread Lifecycle -->
+  <div class="bg-card border border-bdr rounded-xl p-5">
+    <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="git-branch" class="w-4 h-4 text-grn"></i>Thread Lifecycle</h3>
+    <div class="flex flex-wrap gap-2 items-center text-xs">
+      ${['Created','Idle','Run Started','Streaming','Tool Call','State Update','Run Finished','Archived'].map((s,i,a)=>`<div class="bg-elevated rounded-lg px-3 py-2 mono text-t-code">${s}</div>${i<a.length-1?'<i data-lucide="arrow-right" class="w-4 h-4 text-t-mut flex-shrink-0"></i>':''}`).join('')}
+    </div>
+  </div>`;
+}
+
+// A2UI
+function renderA2UI(){
+  const steps = ['Agent receives intent','Agent resolves componentId from catalog','Server checks Authorization Matrix','Auth gate: role × componentId × trust level','COMPONENT_RENDER event emitted via SSE','Client-side renderer mounts trusted component','User interacts → ACTION event returned','TOOL_RESULT committed to state'];
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">A2UI Workspace Layer</h1><p class="text-t-sec text-sm">Agent-proposed UI · Deterministic renderer · Authorization gate</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <!-- Render Pipeline -->
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="workflow" class="w-5 h-5 text-tl"></i>A2UI Render Pipeline</h3>
+    <div class="space-y-2">
+      ${steps.map((s,i)=>`<div class="flex gap-3 items-start"><div class="w-7 h-7 rounded-full bg-elevated flex items-center justify-center text-xs mono text-pri flex-shrink-0">${i+1}</div><div class="bg-elevated rounded-lg px-4 py-2.5 text-sm text-t-sec flex-1">${s}</div></div>`).join('')}
+    </div>
+  </div>
+  <!-- Auth Gate Code -->
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-3 flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4 text-amb"></i>Authorization Gate</h3>
+    <div class="code-block text-xs"><button class="code-copy copy-code-btn">Copy</button><span class="kw">async function</span> <span class="fn">authorizeComponentRender</span>(
+  <span class="tp">event</span>: <span class="tp">ComponentRenderEvent</span>,
+  <span class="tp">token</span>: <span class="tp">AIMSAuthToken</span>
+): <span class="tp">Promise</span>&lt;<span class="tp">boolean</span>&gt; {
+  <span class="cm">// 1. Verify JWT signature and expiration</span>
+  <span class="kw">const</span> claims = <span class="kw">await</span> <span class="fn">verifyJWT</span>(token);
+
+  <span class="cm">// 2. Check role matches thread role</span>
+  <span class="kw">if</span> (claims.role !== event.threadRole) <span class="kw">return false</span>;
+
+  <span class="cm">// 3. Check componentId is in permitted list for trust level</span>
+  <span class="kw">const</span> requiredTrust = <span class="fn">getCatalogTrust</span>(event.componentId);
+  <span class="kw">const</span> permitted = claims.permissions[requiredTrust];
+  <span class="kw">if</span> (!permitted?.includes(event.componentId)) <span class="kw">return false</span>;
+
+  <span class="cm">// 4. OVERRIDE actions require MFA verification</span>
+  <span class="kw">if</span> (requiredTrust === <span class="str">'override'</span> && !claims.mfaVerified) <span class="kw">return false</span>;
+
+  <span class="cm">// 5. Log to audit trail</span>
+  <span class="kw">await</span> <span class="fn">auditLog</span>({ userId: claims.sub, componentId: event.componentId, action: <span class="str">'RENDER'</span> });
+
+  <span class="kw">return true</span>;
+}</div>
+  </div>
+  <!-- Key Principle -->
+  <div class="bg-card border-l-4 border-amb rounded-xl p-5">
+    <div class="flex items-center gap-2 mb-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-amb"></i><h3 class="font-semibold text-sm">Key Principle</h3></div>
+    <p class="text-sm text-t-sec">The agent cannot render arbitrary HTML. It can only reference <span class="mono text-t-code">componentId</span>s from the trusted catalog. All rendering is deterministic and server-authorized.</p>
+  </div>`;
+}
+
+// AUTH MATRIX
+function renderAuthMatrix(){
+  const roles = ['Planner','Reviewer','Supervisor','Inspector/Gemma'];
+  const perms = ['READ','CONFIRM','ACTION','SIGN','OVERRIDE','ESCALATE'];
+  const matrix = {
+    'Planner':     ['✅','✅','✅','—','—','—'],
+    'Reviewer':    ['✅','✅','✅','✅','—','—'],
+    'Supervisor':  ['✅','✅','✅','✅','✅','—'],
+    'Inspector/Gemma':['✅','✅','〜','—','—','✅'],
+  };
+  const cellColors = {'✅':'bg-grn/10 text-grn','〜':'bg-amb/10 text-amb','—':'bg-card text-t-mut'};
+  const tips = {'✅':'Granted','〜':'Conditional (offline only)','—':'Not permitted'};
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Authorization Matrix</h1><p class="text-t-sec text-sm">Role × Component × Action — enforced server-side before every COMPONENT_RENDER event</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <div class="bg-card border border-bdr rounded-xl p-5 mb-6">
+    <h3 class="font-semibold mb-4">Permission Matrix</h3>
+    <div class="overflow-x-auto">
+      <table class="text-sm">
+        <thead><tr><th class="pb-3 pr-6 text-left text-t-mut font-medium text-xs">Role</th>${perms.map(p=>`<th class="pb-3 px-3 text-center text-t-mut font-medium text-xs">${p}</th>`).join('')}</tr></thead>
+        <tbody>${roles.map(r=>`<tr class="border-t border-bdr/50"><td class="py-3 pr-6 mono text-sm text-t-pri">${r}</td>${matrix[r].map(v=>`<td class="py-3 px-3 text-center"><div class="matrix-cell mx-auto ${cellColors[v]} rounded-lg">${v}<div class="tooltip text-t-pri">${tips[v]}</div></div></td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold text-sm mb-3">Trust Level Definitions</h3>
+      <div class="space-y-2 text-xs text-t-sec">
+        <div><span class="badge badge-grey mr-2">1 READ</span> View-only, no mutations</div>
+        <div><span class="badge badge-blue mr-2">2 CONFIRM</span> Acknowledge, no data change</div>
+        <div><span class="badge badge-amber mr-2">3 ACTION</span> Executes a state mutation</div>
+        <div><span class="badge badge-teal mr-2">4 SIGN</span> Cryptographic signature, audit-logged</div>
+        <div><span class="badge badge-red mr-2">5 OVERRIDE</span> Overrules prior decision, MFA required</div>
+      </div>
+    </div>
+    <div class="bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold text-sm mb-3">Condition Footnotes</h3>
+      <div class="space-y-2 text-xs text-t-sec">
+        <div>• Inspector ACTION is conditional: <span class="mono text-t-code">offline-only</span> scope, queued for sync</div>
+        <div>• Supervisor OVERRIDE requires MFA re-authentication (TOTP or WebAuthn)</div>
+        <div>• ESCALATE is exclusive to Inspector/Gemma edge agents</div>
+        <div>• All permissions are enforced server-side — client cannot bypass the auth gate</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// INTENT PANELS
+function renderIntentPanel(role, title, agents, count){
+  const intents = INTENTS[role] || [];
+  const statusMap = {'PRODUCTION':'badge-green','NEXT':'badge-amber','BACKLOG':'badge-grey','LOCAL':'badge-green','ESCALATION':'badge-blue'};
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">${title} Intent Catalog</h1><p class="text-t-sec text-sm">${count} intents · Agents: ${agents}</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <!-- Stats -->
+  <div class="flex flex-wrap gap-3 mb-5">
+    <div class="bg-card border border-bdr rounded-lg px-4 py-2 text-center"><div class="text-lg font-bold text-pri">${count}</div><div class="text-xs text-t-mut">Total</div></div>
+    <div class="bg-card border border-bdr rounded-lg px-4 py-2 text-center"><div class="text-lg font-bold text-grn">${intents.filter(i=>i.status==='PRODUCTION').length}</div><div class="text-xs text-t-mut">Production</div></div>
+    <div class="bg-card border border-bdr rounded-lg px-4 py-2 text-center"><div class="text-lg font-bold text-amb">${intents.filter(i=>i.status==='NEXT').length}</div><div class="text-xs text-t-mut">Next Sprint</div></div>
+    <div class="bg-card border border-bdr rounded-lg px-4 py-2 text-center"><div class="text-lg font-bold text-t-mut">${intents.filter(i=>i.status==='BACKLOG').length}</div><div class="text-xs text-t-mut">Backlog</div></div>
+  </div>
+  <!-- Intent Cards -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    ${intents.map(intent=>{
+      const offlineBadge = intent.offline===true ? '<span class="badge badge-green ml-1">✅ Offline</span>' : intent.offline===false ? '<span class="badge badge-blue ml-1">📡 Queued</span>' : '';
+      const escalationBadge = intent.escalation ? '<span class="badge badge-amber ml-1">ESCALATION</span>' : '';
+      return `<div class="intent-card">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="mono text-sm text-pri font-semibold">${intent.name}</span>
+          <span class="badge ${statusMap[intent.status]||'badge-grey'}">${intent.status}</span>
+          ${offlineBadge}${escalationBadge}
+        </div>
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="badge badge-blue text-xs">${intent.agent}</span>
+          <span class="mono text-xs text-tl">${intent.component}</span>
+        </div>
+        <p class="text-xs text-t-sec mb-3 leading-relaxed">${intent.desc}</p>
+        <div class="flex items-center justify-between">
+          <span class="badge ${intent.trust==='READ'?'badge-grey':intent.trust==='CONFIRM'?'badge-blue':intent.trust==='ACTION'?'badge-amber':intent.trust==='SIGN'?'badge-teal':'badge-red'}">${intent.trust}</span>
+          <button class="schema-toggle text-xs text-pri hover:underline cursor-pointer" data-intent="${intent.id}">Show Schema</button>
+        </div>
+        <div class="schema-block mt-3" id="schema-${intent.id}">
+          <div class="code-block text-xs"><button class="code-copy copy-code-btn">Copy</button><span class="cm">// Request</span>\n${intent.req}\n\n<span class="cm">// Response</span>\n${intent.res}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// CONTRACTS HUB
+function renderContractsHub(){
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Contract Reference</h1><p class="text-t-sec text-sm">All TypeScript interfaces and JSON schemas — copy-ready for implementation</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">8 contracts</span></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    ${CONTRACTS.map(c=>`<div class="contract-card open-drawer-btn" data-contract="${c.id}">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center"><i data-lucide="${c.icon}" class="w-5 h-5 text-pri"></i></div>
+        <div class="flex-1"><h3 class="font-semibold text-sm">${c.name}</h3><p class="text-xs text-t-sec mt-0.5">${c.desc.substring(0,80)}…</p></div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex flex-wrap gap-1">${c.roles.map(r=>`<span class="badge badge-grey text-xs">${r}</span>`).join('')}</div>
+        <span class="text-xs text-pri">View Contract →</span>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// RENDERER CATALOG
+function renderRendererCatalog(){
+  const trustColors = {'READ':'badge-grey','CONFIRM':'badge-blue','ACTION':'badge-amber','SIGN':'badge-teal','OVERRIDE':'badge-red'};
+  const statusColors = {'Production':'text-grn','Next Sprint':'text-amb','Backlog':'text-t-mut'};
+  const statusBg = {'Production':'bg-grn','Next Sprint':'bg-amb','Backlog':'bg-t-mut'};
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Trusted Renderer Catalog</h1><p class="text-t-sec text-sm">20 components · Agents may reference but never bypass</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <div class="bg-card border border-bdr rounded-xl p-5">
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead><tr class="text-t-mut text-left border-b border-bdr"><th class="pb-2 pr-3 font-medium">Component ID</th><th class="pb-2 pr-3 font-medium">Human Name</th><th class="pb-2 pr-3 font-medium">Role(s)</th><th class="pb-2 pr-3 font-medium">Trust</th><th class="pb-2 pr-3 font-medium">Executes</th><th class="pb-2 pr-3 font-medium">Escalates</th><th class="pb-2 font-medium">Status</th></tr></thead>
+        <tbody>${COMPONENTS.map(comp=>`<tr class="border-b border-bdr/30 hover:bg-elevated/50 transition-all">
+          <td class="py-2.5 pr-3 mono text-t-code">${comp.id}</td>
+          <td class="py-2.5 pr-3 text-t-pri">${comp.name}</td>
+          <td class="py-2.5 pr-3">${comp.roles.join(', ')}</td>
+          <td class="py-2.5 pr-3"><span class="badge ${trustColors[comp.trust]}">${comp.trust}</span></td>
+          <td class="py-2.5 pr-3 mono text-t-sec">${comp.executes}</td>
+          <td class="py-2.5 pr-3 text-t-sec">${comp.escalates}</td>
+          <td class="py-2.5 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ${statusBg[comp.status]}"></span><span class="${statusColors[comp.status]}">${comp.status}</span></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="mt-4 bg-card border border-bdr rounded-xl p-4 flex flex-wrap gap-4 text-xs text-t-sec">
+    <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-grn"></span> Production — deployed and active</div>
+    <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amb"></span> Next Sprint — scheduled for implementation</div>
+    <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-t-mut"></span> Backlog — designed, not yet scheduled</div>
+  </div>`;
+}
+
+// ROADMAP
+function renderRoadmap(){
+  const completedSteps = 3;
+  const totalSteps = 15;
+  const pct = Math.round((completedSteps/totalSteps)*100);
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Implementation Roadmap</h1><p class="text-t-sec text-sm">15-step sprint sequence · VS Code Copilot baseline + Copilot additions</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <!-- Progress -->
+  <div class="bg-card border border-bdr rounded-xl p-4 mb-6">
+    <div class="flex items-center justify-between text-xs mb-2"><span class="text-t-sec">${completedSteps} / ${totalSteps} steps complete or approved</span><span class="text-pri font-semibold">${pct}%</span></div>
+    <div class="w-full h-2 bg-elevated rounded-full overflow-hidden"><div class="h-full bg-pri rounded-full progress-fill" style="width:0%" data-width="${pct}%"></div></div>
+  </div>
+  <!-- Sprints -->
+  <div class="space-y-6">
+    <!-- Sprint 1 -->
+    <div class="rounded-xl overflow-hidden" style="border:1px solid rgba(50,215,75,.2)">
+      <div class="px-5 py-3 flex items-center gap-2" style="background:rgba(50,215,75,.08)"><span class="text-grn font-semibold text-sm">✅ Sprint 1 — Foundation</span><span class="badge badge-green ml-auto">APPROVED · Steps 1–3</span></div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-card">
+        ${[['1','Planner intent catalog + BaseIntentRequest/Response envelope','Backend + Frontend'],['2','First 3 approved A2UI components','Frontend'],['3','Real AG-UI threadId, SSE events, message snapshots, state','Backend']].map(([n,t,o])=>`<div class="bg-elevated rounded-lg p-3"><div class="text-2xl font-bold text-t-mut/30 mono mb-1">${n}</div><div class="text-sm font-medium mb-2">${t}</div><div class="flex gap-2"><span class="badge badge-blue">${o}</span><span class="badge badge-green">✅ Done</span></div></div>`).join('')}
+        <div class="md:col-span-3 text-right"><span class="badge badge-blue text-xs">VS Code Copilot Baseline</span></div>
+      </div>
+    </div>
+    <!-- Sprint 2 -->
+    <div class="rounded-xl overflow-hidden" style="border:1px solid rgba(255,159,10,.2)">
+      <div class="px-5 py-3 flex items-center gap-2" style="background:rgba(255,159,10,.08)"><span class="text-amb font-semibold text-sm">🔜 Sprint 2 — Persistence & Routing</span><span class="badge badge-amber ml-auto">NEXT · Steps 4–6</span></div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-card">
+        ${[['4','Replace sessionStorage with Redis + PostgreSQL thread store','Backend'],['5','Left navigation wired — each destination routes to session surface','Frontend'],['6','Connect 3 production intents: planner_session_brief · show_field_ready_assignments · prepare_assignment_release','Full Stack']].map(([n,t,o])=>`<div class="bg-elevated rounded-lg p-3"><div class="text-2xl font-bold text-t-mut/30 mono mb-1">${n}</div><div class="text-sm font-medium mb-2">${t}</div><span class="badge badge-blue">${o}</span></div>`).join('')}
+        <div class="md:col-span-3 text-right"><span class="badge badge-blue text-xs">VS Code Copilot Baseline</span></div>
+      </div>
+    </div>
+    <!-- Sprint 3 -->
+    <div class="rounded-xl overflow-hidden" style="border:1px solid rgba(10,132,255,.2)">
+      <div class="px-5 py-3 flex items-center gap-2" style="background:rgba(10,132,255,.08)"><span class="text-pri font-semibold text-sm">🔜 Sprint 3 — Inspector + Contracts</span><span class="badge badge-blue ml-auto">NEXT · Steps 7–9</span></div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-card">
+        ${[['7','Risk, readiness, scheduling, evidence contracts','Backend',''],['8','Inspector/Gemma intent catalog + A2A handoff envelope','Mobile + Backend','🆕'],['9','CRDT offline sync contract + SQLite for Inspector PWA','Mobile','🆕']].map(([n,t,o,nw])=>`<div class="bg-elevated rounded-lg p-3"><div class="text-2xl font-bold text-t-mut/30 mono mb-1">${n}</div><div class="text-sm font-medium mb-2">${t}</div><div class="flex gap-2"><span class="badge badge-blue">${o}</span>${nw?'<span class="badge badge-purple">Copilot Addition</span>':''}</div></div>`).join('')}
+      </div>
+    </div>
+    <!-- Sprint 4 -->
+    <div class="rounded-xl overflow-hidden" style="border:1px solid var(--bdr)">
+      <div class="px-5 py-3 flex items-center gap-2 bg-elevated"><span class="text-t-sec font-semibold text-sm">🔮 Sprint 4 — Evidence Governance</span><span class="badge badge-grey ml-auto">PLANNED · Steps 10–11</span></div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-card">
+        ${[['10','Evidence chain governance — hash-chaining, tamper hooks, alerts','Backend'],['11','Escalation protocol — Gemma triggers, priority routing, offline queue','Mobile + Backend']].map(([n,t,o])=>`<div class="bg-elevated rounded-lg p-3"><div class="text-2xl font-bold text-t-mut/30 mono mb-1">${n}</div><div class="text-sm font-medium mb-2">${t}</div><div class="flex gap-2"><span class="badge badge-blue">${o}</span><span class="badge badge-purple">Copilot Addition</span></div></div>`).join('')}
+      </div>
+    </div>
+    <!-- Sprint 5 -->
+    <div class="rounded-xl overflow-hidden" style="border:1px solid var(--bdr)">
+      <div class="px-5 py-3 flex items-center gap-2 bg-elevated"><span class="text-t-sec font-semibold text-sm">🔮 Sprint 5 — Security + Full Catalog</span><span class="badge badge-grey ml-auto">PLANNED · Steps 12–13</span></div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-card">
+        ${[['12','Component Authorization Matrix server-side enforcement','Backend'],['13','Full Reviewer + Supervisor intent catalogs','Full Stack']].map(([n,t,o])=>`<div class="bg-elevated rounded-lg p-3"><div class="text-2xl font-bold text-t-mut/30 mono mb-1">${n}</div><div class="text-sm font-medium mb-2">${t}</div><div class="flex gap-2"><span class="badge badge-blue">${o}</span><span class="badge badge-purple">Copilot Addition</span></div></div>`).join('')}
+      </div>
+    </div>
+    <!-- Sprint 6 -->
+    <div class="rounded-xl overflow-hidden" style="border:1px solid var(--bdr)">
+      <div class="px-5 py-3 flex items-center gap-2 bg-elevated"><span class="text-t-sec font-semibold text-sm">🔮 Sprint 6 — Intelligence Layer</span><span class="badge badge-grey ml-auto">BACKLOG · Steps 14–15</span></div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-card">
+        ${[['14','Multi-modal intent router (text · voice · image)','ML + Backend'],['15','Regulatory schema mapper + RAG cache','ML + Backend']].map(([n,t,o])=>`<div class="bg-elevated rounded-lg p-3"><div class="text-2xl font-bold text-t-mut/30 mono mb-1">${n}</div><div class="text-sm font-medium mb-2">${t}</div><div class="flex gap-2"><span class="badge badge-blue">${o}</span><span class="badge badge-purple">Copilot Addition</span></div></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// DELIVERABLES
+function renderDeliverables(){
+  const apps = [
+    { title:'AIMS Homepage · Campaign Landing Page', desc:'Full marketing homepage — hero, lifecycle diagram, competitive table, customer outcomes, 12 complete sections', tags:['Marketing','Design','Campaign'], accent:'#0A84FF', status:'Deployed', notes:'Use this as the reference for campaign messaging and visual hierarchy' },
+    { title:'AIMS Agentic UI · Multi-Role Workspace Shell', desc:'3-pane shell — Planner, Reviewer, Supervisor workspaces. AG-UI command chips, dynamic left-pane rendering, agent streaming simulation.', tags:['Frontend','AG-UI','A2UI','Roles'], accent:'#00C7BE', status:'Deployed', notes:'Reference for component placement, chat UX, and workspace switching patterns' },
+    { title:'AIMS Inspector · Mobile/Tablet PWA', desc:'Offline-first field app — Gemma-4-2B-IT on-device agent, 5 screens, defect capture, escalation queue, CRDT sync simulation.', tags:['Mobile','PWA','Gemma','Offline'], accent:'#BF5AF2', status:'Deployed', notes:'Reference for Inspector UX, Gemma chat patterns, and escalation flows' },
+    { title:'AIMS Architecture Blueprint · Intent Catalog & Contracts', desc:'Interactive reference — all 34 intents, 20 components, 8 TypeScript contracts, authorization matrix, 15-step sprint roadmap.', tags:['Architecture','Contracts','Intents','Reference'], accent:'#FF9F0A', status:'Live — This Portal', notes:'You are here — navigate via the sidebar' },
+  ];
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Deployed Deliverables</h1><p class="text-t-sec text-sm">All interactive apps and documents — review and share with your team</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">4 deliverables</span></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    ${apps.map(a=>`<div class="bg-card border border-bdr rounded-xl overflow-hidden hover:border-bdr-hi transition-all">
+      <div class="h-24 flex items-center justify-center" style="background:linear-gradient(135deg,${a.accent}15 0%,${a.accent}08 100%)">
+        <span class="mono text-sm font-bold" style="color:${a.accent}">${a.title.split('·')[0].trim()}</span>
+      </div>
+      <div class="p-4">
+        <h3 class="font-semibold text-sm mb-1">${a.title}</h3>
+        <p class="text-xs text-t-sec mb-3 leading-relaxed">${a.desc}</p>
+        <div class="flex flex-wrap gap-1 mb-3">${a.tags.map(t=>`<span class="badge badge-grey text-xs">${t}</span>`).join('')}</div>
+        <div class="flex items-center justify-between">
+          <span class="badge badge-green">✅ ${a.status}</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-bdr text-xs text-t-mut italic">${a.notes}</div>
+      </div>
+    </div>`).join('')}
+  </div>
+  <!-- Document Downloads -->
+  <div class="bg-card border border-bdr rounded-xl p-5">
+    <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-pri"></i>Document Downloads</h3>
+    <div class="space-y-3">
+      <div class="flex items-center gap-3 p-3 bg-elevated rounded-lg"><i data-lucide="file-text" class="w-5 h-5 text-pri"></i><div class="flex-1"><div class="text-sm font-medium">Architecture Blueprint Document</div><div class="text-xs text-t-mut">DOCX · ~42 pages</div></div><span class="badge badge-grey text-xs">Download</span></div>
+      <div class="flex items-center gap-3 p-3 bg-elevated rounded-lg"><i data-lucide="file-text" class="w-5 h-5 text-tl"></i><div class="flex-1"><div class="text-sm font-medium">Intent Catalog Reference</div><div class="text-xs text-t-mut">Included in blueprint</div></div><span class="badge badge-grey text-xs">View</span></div>
+    </div>
+  </div>`;
+}
+
+// REVIEW BOARD
+function renderReviewBoard(){
+  const sections = ['Architecture','Evidence Chain','Inspector/Gemma','AG-UI Transport','Roadmap','Contracts','Auth Matrix','Deliverables'];
+  return `
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+    <div><h1 class="text-2xl md:text-3xl font-bold mb-1">Team Review Board</h1><p class="text-t-sec text-sm">Comments, decisions, and open questions — all stored locally</p></div>
+    <div class="flex items-center gap-2 mt-3 md:mt-0"><span class="badge badge-grey text-xs">Updated 19 Jul 2026</span></div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Comments -->
+    <div class="bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="message-circle" class="w-4 h-4 text-pri"></i>Comments</h3>
+      <div class="mb-4 space-y-2">
+        <textarea id="new-comment-text-nc1" class="w-full bg-surface border border-bdr rounded-lg p-2 text-sm text-t-pri placeholder-t-mut focus:outline-none focus:border-pri resize-none" rows="2" placeholder="Add a comment..."></textarea>
+        <div class="flex gap-2">
+          <select id="new-comment-section-nc2" class="bg-surface border border-bdr rounded-lg px-2 py-1 text-xs text-t-sec focus:outline-none focus:border-pri flex-1">
+            ${sections.map(s=>`<option value="${s}">${s}</option>`).join('')}
+          </select>
+          <button id="post-comment-btn-pc1" class="bg-pri text-white px-3 py-1 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">Post</button>
+        </div>
+      </div>
+      <div id="comments-list-cl1" class="space-y-3 max-h-[400px] overflow-y-auto">
+        ${state.comments.map(c=>`<div class="p-3 bg-elevated rounded-lg"><div class="flex items-center gap-2 mb-1"><div class="avatar w-6 h-6 text-[9px]" style="background:${c.color}">${c.author.split(' ').map(w=>w[0]).join('')}</div><span class="text-xs font-semibold">${c.author}</span><span class="text-xs text-t-mut ml-auto">${c.time}</span></div><div class="text-xs text-t-sec">${c.text}</div><div class="mt-1"><span class="badge badge-grey text-xs">${c.section}</span></div></div>`).join('')}
+      </div>
+    </div>
+    <!-- Decisions -->
+    <div class="bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="check-square" class="w-4 h-4 text-grn"></i>Decisions Log</h3>
+      <div id="decisions-list-dl1" class="space-y-3 max-h-[520px] overflow-y-auto">
+        ${state.decisions.map(d=>`<div class="p-3 bg-elevated rounded-lg"><div class="flex items-start gap-2"><span class="text-grn text-sm mt-0.5">✅</span><div><div class="text-xs text-t-mut mb-1">${d.date}</div><div class="text-xs text-t-pri mb-1">${d.text}</div><div class="text-xs text-t-sec italic">${d.by}</div></div></div></div>`).join('')}
+      </div>
+      <div class="mt-4 pt-3 border-t border-bdr space-y-2">
+        <input id="new-decision-text-nd1" type="text" class="w-full bg-surface border border-bdr rounded-lg px-3 py-1.5 text-xs text-t-pri placeholder-t-mut focus:outline-none focus:border-pri" placeholder="New decision..."/>
+        <div class="flex gap-2">
+          <input id="new-decision-by-nd2" type="text" class="flex-1 bg-surface border border-bdr rounded-lg px-3 py-1.5 text-xs text-t-pri placeholder-t-mut focus:outline-none focus:border-pri" placeholder="Approved by..."/>
+          <button id="add-decision-btn-ad1" class="bg-grn text-root px-3 py-1 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">Add</button>
+        </div>
+      </div>
+    </div>
+    <!-- Open Questions -->
+    <div class="bg-card border border-bdr rounded-xl p-5">
+      <h3 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="flag" class="w-4 h-4 text-rd"></i>Open Questions</h3>
+      <div id="questions-list-ql1" class="space-y-3 max-h-[520px] overflow-y-auto">
+        ${state.questions.map(q=>`<div class="p-3 bg-elevated rounded-lg ${q.resolved?'opacity-50':''}"><div class="flex items-start gap-2"><span class="text-sm mt-0.5">${q.resolved?'✅':'🚩'}</span><div class="flex-1"><div class="text-xs ${q.resolved?'line-through text-t-mut':'text-t-pri'} mb-1">${q.text}</div><div class="text-xs text-t-sec">${q.author} · ${q.resolved?'Resolved':'Unresolved'}</div></div><button class="resolve-q-btn text-xs text-pri hover:underline flex-shrink-0" data-qid="${q.id}">${q.resolved?'Reopen':'Resolve'}</button></div></div>`).join('')}
+      </div>
+      <div class="mt-4 pt-3 border-t border-bdr space-y-2">
+        <input id="new-question-text-nq1" type="text" class="w-full bg-surface border border-bdr rounded-lg px-3 py-1.5 text-xs text-t-pri placeholder-t-mut focus:outline-none focus:border-pri" placeholder="New question..."/>
+        <div class="flex gap-2">
+          <input id="new-question-author-nq2" type="text" class="flex-1 bg-surface border border-bdr rounded-lg px-3 py-1.5 text-xs text-t-pri placeholder-t-mut focus:outline-none focus:border-pri" placeholder="@author"/>
+          <button id="add-question-btn-aq1" class="bg-rd text-white px-3 py-1 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// PROJECT STATUS
+function renderProjectStatus(){
+  return `
+  <div class="mb-6"><h1 class="text-2xl md:text-3xl font-bold mb-1">Project Status</h1><p class="text-t-sec text-sm">Overall AIMS project health and milestone tracking</p></div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-card border border-bdr rounded-xl p-5 text-center"><div class="text-3xl font-bold text-grn mb-1">On Track</div><div class="text-xs text-t-sec">Overall Status</div></div>
+    <div class="bg-card border border-bdr rounded-xl p-5 text-center"><div class="text-3xl font-bold text-pri mb-1">Sprint 1</div><div class="text-xs text-t-sec">Current Sprint — Approved</div></div>
+    <div class="bg-card border border-bdr rounded-xl p-5 text-center"><div class="text-3xl font-bold text-amb mb-1">19 Jul 2026</div><div class="text-xs text-t-sec">Last Architecture Review</div></div>
+  </div>
+  <div class="bg-card border border-bdr rounded-xl p-5">
+    <h3 class="font-semibold mb-4">Milestone Timeline</h3>
+    <div class="space-y-4">
+      ${[['Sprint 1 — Foundation','Steps 1–3: Intent catalog, A2UI components, AG-UI transport','✅','Completed'],['Sprint 2 — Persistence','Steps 4–6: Thread persistence, navigation, production intents','🔜','In Progress'],['Sprint 3 — Inspector','Steps 7–9: Contracts, Gemma intents, CRDT sync','🔜','Planned'],['Sprint 4–6 — Governance','Steps 10–15: Evidence chain, auth matrix, multimodal, regulatory','🔮','Backlog']].map(([t,d,icon,s])=>`<div class="flex gap-4 items-start"><span class="text-lg">${icon}</span><div><div class="font-semibold text-sm">${t}</div><div class="text-xs text-t-sec">${d}</div><span class="badge ${s==='Completed'?'badge-green':s==='In Progress'?'badge-amber':'badge-grey'} mt-1">${s}</span></div></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// TEAM & ROLES
+function renderTeamRoles(){
+  const team = [
+    { name:'Nalin R.', role:'Lead Architect', initials:'NR', color:'#0A84FF', focus:'Architecture, Sprint Planning, System Design' },
+    { name:'James D.', role:'Mobile Engineer', initials:'JD', color:'#00C7BE', focus:'Inspector PWA, Gemma Integration, Offline-first' },
+    { name:'Alex K.', role:'Backend Engineer', initials:'AK', color:'#BF5AF2', focus:'Evidence Chain, Contracts, API Development' },
+    { name:'Mark L.', role:'Platform Engineer', initials:'ML', color:'#FF9F0A', focus:'AG-UI Transport, Thread Persistence, Infrastructure' },
+    { name:'Sarah C.', role:'Frontend Engineer', initials:'SC', color:'#32D74B', focus:'A2UI Workspace, Component Catalog, UX' },
+  ];
+  return `
+  <div class="mb-6"><h1 class="text-2xl md:text-3xl font-bold mb-1">Team & Roles</h1><p class="text-t-sec text-sm">Core engineering team and areas of ownership</p></div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    ${team.map(t=>`<div class="bg-card border border-bdr rounded-xl p-5"><div class="flex items-center gap-3 mb-3"><div class="avatar w-10 h-10 text-sm" style="background:${t.color}">${t.initials}</div><div><div class="font-semibold text-sm">${t.name}</div><div class="text-xs text-t-sec">${t.role}</div></div></div><p class="text-xs text-t-sec">${t.focus}</p></div>`).join('')}
+  </div>`;
+}
+
+// COMPONENT MAP
+function renderComponentMap(){
+  return `
+  <div class="mb-6"><h1 class="text-2xl md:text-3xl font-bold mb-1">Component Map</h1><p class="text-t-sec text-sm">Visual mapping of components to roles and intents</p></div>
+  <div class="bg-card border border-bdr rounded-xl p-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${['Planner','Reviewer','Supervisor','Inspector'].map(role=>{
+        const comps = COMPONENTS.filter(c=>c.roles.includes(role));
+        const color = role==='Planner'?'#0A84FF':role==='Reviewer'?'#00C7BE':role==='Supervisor'?'#FF9F0A':'#BF5AF2';
+        return `<div class="rounded-lg p-4" style="border:1px solid ${color}30;background:${color}08">
+          <h3 class="font-semibold text-sm mb-3" style="color:${color}">${role}</h3>
+          <div class="space-y-1">${comps.map(c=>`<div class="text-xs mono text-t-sec py-1">${c.id}</div>`).join('')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+function attachPanelEvents(){
+  // Nav cards
+  document.querySelectorAll('.nav-card').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const target = el.dataset.target;
+      if(target) navigateTo(target);
+    });
+  });
+
+  // Copy link
+  document.querySelectorAll('.copy-link-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const link = location.origin + location.pathname + (btn.dataset.link||'');
+      navigator.clipboard.writeText(link).then(()=>{
+        btn.innerHTML='<i data-lucide="check" class="w-4 h-4 text-grn"></i>';
+        if(typeof lucide!=='undefined'&&typeof lucide.createIcons==='function') lucide.createIcons();
+        setTimeout(()=>{btn.innerHTML='<i data-lucide="link" class="w-4 h-4"></i>';if(typeof lucide!=='undefined'&&typeof lucide.createIcons==='function') lucide.createIcons();},1500);
+      });
+    });
+  });
+
+  // Copy code
+  document.querySelectorAll('.copy-code-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const block = btn.parentElement;
+      const text = block.innerText.replace('Copy','').trim();
+      navigator.clipboard.writeText(text).then(()=>{
+        btn.textContent='Copied!';
+        setTimeout(()=>{btn.textContent='Copy';},1500);
+      });
+    });
+  });
+
+  // Schema toggles
+  document.querySelectorAll('.schema-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.intent;
+      const el = document.getElementById('schema-'+id);
+      if(el){
+        el.classList.toggle('expanded');
+        btn.textContent = el.classList.contains('expanded') ? 'Hide Schema' : 'Show Schema';
+      }
+    });
+  });
+
+  // Contract drawer
+  document.querySelectorAll('.open-drawer-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> openDrawer(btn.dataset.contract));
+  });
+
+  // Comment post
+  const postBtn = document.getElementById('post-comment-btn-pc1');
+  if(postBtn){
+    postBtn.addEventListener('click', ()=>{
+      const text = document.getElementById('new-comment-text-nc1').value.trim();
+      const section = document.getElementById('new-comment-section-nc2').value;
+      if(!text) return;
+      state.comments.unshift({ id:'c'+Date.now(), author:'Nalin R.', time:'Just now', section, text, color:'#0A84FF' });
+      saveState();
+      renderPanels();
+    });
+  }
+
+  // Decision add
+  const addDecBtn = document.getElementById('add-decision-btn-ad1');
+  if(addDecBtn){
+    addDecBtn.addEventListener('click', ()=>{
+      const text = document.getElementById('new-decision-text-nd1').value.trim();
+      const by = document.getElementById('new-decision-by-nd2').value.trim()||'Nalin R.';
+      if(!text) return;
+      state.decisions.unshift({ id:'d'+Date.now(), date:'19 Jul', text, by:'Approved: '+by });
+      saveState();
+      renderPanels();
+    });
+  }
+
+  // Question add
+  const addQBtn = document.getElementById('add-question-btn-aq1');
+  if(addQBtn){
+    addQBtn.addEventListener('click', ()=>{
+      const text = document.getElementById('new-question-text-nq1').value.trim();
+      const author = document.getElementById('new-question-author-nq2').value.trim()||'@Nalin R.';
+      if(!text) return;
+      state.questions.unshift({ id:'q'+Date.now(), text, author, resolved:false });
+      saveState();
+      renderPanels();
+    });
+  }
+
+  // Resolve question
+  document.querySelectorAll('.resolve-q-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = btn.dataset.qid;
+      const q = state.questions.find(x=>x.id===qid);
+      if(q){ q.resolved = !q.resolved; saveState(); renderPanels(); }
+    });
+  });
+
+  // Stat counters animation
+  document.querySelectorAll('.stat-counter').forEach(el=>{
+    const target = parseInt(el.dataset.target);
+    let current = 0;
+    const step = Math.ceil(target / 30);
+    const interval = setInterval(()=>{
+      current += step;
+      if(current >= target){ current = target; clearInterval(interval); }
+      el.textContent = current;
+    }, 30);
+  });
+
+  // Progress bar animation
+  document.querySelectorAll('.progress-fill').forEach(el=>{
+    setTimeout(()=>{el.style.width = el.dataset.width;}, 100);
+  });
+}
+
+// DRAWER
+function openDrawer(contractId){
+  const contract = CONTRACTS.find(c=>c.id===contractId);
+  if(!contract) return;
+  document.getElementById('drawer-title-d1t2').textContent = contract.name;
+  document.getElementById('drawer-content-d1c3').innerHTML = contract.code;
+  document.getElementById('drawer-d1r2').classList.add('open');
+  document.getElementById('drawer-overlay-d1o2').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer-d1r2').classList.remove('open');
+  document.getElementById('drawer-overlay-d1o2').classList.remove('open');
+}
+
+// SEARCH
+const ALL_SEARCHABLE = [];
+function buildSearchIndex(){
+  NAV_STRUCTURE.forEach(g=>{
+    g.items.forEach(item=>{
+      ALL_SEARCHABLE.push({ label:item.label, panelId:item.id, type:'Navigation' });
+    });
+  });
+  Object.values(INTENTS).flat().forEach(i=>{
+    ALL_SEARCHABLE.push({ label:i.name, panelId:i.id.includes('planner')?'planner-intents':i.id.includes('reviewer')||i.id.startsWith('load_evidence')||i.id.startsWith('open_evidence')||i.id.startsWith('approve_evidence')||i.id.startsWith('flag_')||i.id.startsWith('request_field')||i.id.startsWith('verify_hash')||i.id.startsWith('defect_analytics')?'reviewer-intents':i.id.includes('supervisor')||i.id.includes('fleet')||i.id.includes('agent_health')||i.id.includes('compliance')||i.id.includes('kpi')||i.id.includes('regulatory_submission')?'supervisor-intents':'inspector-intents', type:'Intent' });
+  });
+  CONTRACTS.forEach(c=>{
+    ALL_SEARCHABLE.push({ label:c.name, panelId:'contract-'+c.id, type:'Contract' });
+  });
+  COMPONENTS.forEach(c=>{
+    ALL_SEARCHABLE.push({ label:c.id+' — '+c.name, panelId:'renderer-catalog', type:'Component' });
+  });
+}
+
+function handleSearch(query){
+  const results = document.getElementById('search-results-s1a2');
+  if(!query.trim()){ results.classList.remove('show'); return; }
+  const q = query.toLowerCase();
+  const matches = ALL_SEARCHABLE.filter(item=>item.label.toLowerCase().includes(q)).slice(0,10);
+  if(!matches.length){ results.innerHTML='<div class="p-3 text-xs text-t-mut">No results found</div>'; results.classList.add('show'); return; }
+  results.innerHTML = matches.map(m=>`<div class="search-result-item" data-panel="${m.panelId}"><span class="badge badge-grey mr-2 text-xs">${m.type}</span><span class="text-sm">${m.label}</span></div>`).join('');
+  results.classList.add('show');
+  results.querySelectorAll('.search-result-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      navigateTo(el.dataset.panel);
+      results.classList.remove('show');
+      document.getElementById('search-input-s1a2').value='';
+    });
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  buildSearchIndex();
+
+  // Hash routing
+  const hash = location.hash.replace('#','');
+  if(hash){
+    // Map hash to valid panel
+    const validPanels = new Set();
+    NAV_STRUCTURE.forEach(g=>g.items.forEach(i=>validPanels.add(i.id)));
+    ['contracts','roadmap','deliverables','review-board','project-status','team-roles','component-map'].forEach(p=>validPanels.add(p));
+    if(validPanels.has(hash)) state.currentPanel = hash;
+  }
+
+  buildNav('sidebar-nav-s1n2', false);
+  buildNav('mobile-nav-items-m1n2', true);
+  renderPanels();
+
+  // Search
+  document.getElementById('search-input-s1a2').addEventListener('input', e=> handleSearch(e.target.value));
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('#search-input-s1a2')&&!e.target.closest('#search-results-s1a2')){
+      document.getElementById('search-results-s1a2').classList.remove('show');
+    }
+  });
+
+  // Drawer
+  document.getElementById('drawer-close-d1c2').addEventListener('click', closeDrawer);
+  document.getElementById('drawer-overlay-d1o2').addEventListener('click', closeDrawer);
+  document.getElementById('drawer-copy-all-d1a2').addEventListener('click', ()=>{
+    const text = document.getElementById('drawer-content-d1c3').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      document.getElementById('drawer-copy-all-d1a2').textContent='Copied!';
+      setTimeout(()=>{document.getElementById('drawer-copy-all-d1a2').textContent='Copy all';},1500);
+    });
+  });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDrawer(); });
+
+  // Mobile nav
+  document.getElementById('mobile-menu-btn-x3k9').addEventListener('click', ()=>{
+    document.getElementById('mobile-nav-m1n2').classList.remove('hidden');
+  });
+  document.getElementById('mobile-nav-close-m1n2').addEventListener('click', closeMobileNav);
+
+  // popstate
+  window.addEventListener('popstate', ()=>{
+    const hash = location.hash.replace('#','');
+    if(hash && hash !== state.currentPanel){
+      state.currentPanel = hash;
+      renderPanels();
+      buildNav('sidebar-nav-s1n2', false);
+    }
+  });
+}
+
+// Icons + Init
+if(typeof lucide!=='undefined'&&typeof lucide.createIcons==='function'){
+  lucide.createIcons();
+}
+init();
+</script>
+</body>
+</html>
