@@ -1,0 +1,33 @@
+name: Validate HTML
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: HTML Validation & Size Check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run html-validate on all apps
+        run: npm run validate
+      - name: Check file sizes
+        run: |
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          for f in apps/*/index.html docs/*.html; do
+            echo "| $f | $(du -sh $f | cut -f1) |" >> $GITHUB_STEP_SUMMARY
+          done
+      - name: Lint check passed
+        run: echo "All HTML files validated successfully"
