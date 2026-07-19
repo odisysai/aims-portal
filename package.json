@@ -1,0 +1,36 @@
+{
+  "name": "aims-portal",
+  "version": "1.0.0",
+  "description": "AIMS Asset Integrity Management System – Design & Architecture Portal",
+  "private": true,
+  "scripts": {
+    "dev": "live-server --port=3000 --open=apps/developer-portal/index.html",
+    "validate": "html-validate apps/**/*.html docs/**/*.html",
+    "a11y": "node scripts/a11y-check.js",
+    "format": "prettier --write apps/**/*.html docs/**/*.html",
+    "lint": "npm run validate",
+    "test": "npm run validate && npm run a11y"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "html-validate": "^9.0.0",
+    "@playwright/test": "^1.44.0",
+    "axe-playwright": "^2.0.1",
+    "prettier": "^3.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "aims",
+    "asset-integrity",
+    "inspection",
+    "agentic-ui",
+    "ag-ui",
+    "a2ui",
+    "gemma",
+    "edge-intelligence"
+  ],
+  "author": "odisysai",
+  "license": "MIT"
+}
